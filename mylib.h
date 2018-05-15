@@ -11,6 +11,7 @@ void DISPLAY_CONFIG(void);
 void KEYBOARD_CONFIG(void);
 uint8_t getKey(void);
 uint8_t getKey_nonBlock(void);
+void NVIC_CONFIG(uint8_t IRQChannel, uint8_t Priority);
 void EXTI_CONFIG(void);
 void USART_INT_CONFIG(void);
 void USART_CONFIG(void);

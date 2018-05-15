@@ -490,6 +490,11 @@
               <FileType>1</FileType>
               <FilePath>Resource\res.c</FilePath>
             </File>
+            <File>
+              <FileName>myNVIC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myNVIC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

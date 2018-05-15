@@ -10,14 +10,15 @@ uint8_t translate[] =
 	'.',	0,		'=',	'B'
 };
 
+
 int main()
 {
 	USART_CONFIG();
-	Temp_ADC1_Init();
+	
 	while(1)
 	{
 		while (fgetc(NULL) != '@')
-			printf("ready!");
+			printf("READY!");
 		
 	}
 	return 0;

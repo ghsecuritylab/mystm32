@@ -31,13 +31,7 @@ void USART_INT_CONFIG()
 	gpio_init_t.GPIO_Pin = USART_TXD_Pin;
 	GPIO_Init(USART_TXD, &gpio_init_t);
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	NVIC_InitTypeDef nvic_init_t;
-	nvic_init_t.NVIC_IRQChannel = USARTX_IRQn;
-	nvic_init_t.NVIC_IRQChannelCmd = ENABLE;
-	nvic_init_t.NVIC_IRQChannelPreemptionPriority = 1;
-	nvic_init_t.NVIC_IRQChannelSubPriority = 1;
-	NVIC_Init(&nvic_init_t);
+	NVIC_CONFIG(USARTX_IRQn, 9);
 	
 	USART_InitTypeDef usart_init_t;
 	usart_init_t.USART_BaudRate = 9600;

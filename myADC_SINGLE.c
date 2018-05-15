@@ -24,13 +24,7 @@ void ADC_SINGLE_CONFIG()
 	gpio_init_t.GPIO_Pin = GPIO_ADC_Pin;
 	GPIO_Init(GPIO_ADC, &gpio_init_t);
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	NVIC_InitTypeDef nvic_init_t;
-	nvic_init_t.NVIC_IRQChannel = ADCXIRQn;
-	nvic_init_t.NVIC_IRQChannelCmd = ENABLE;
-	nvic_init_t.NVIC_IRQChannelPreemptionPriority = 1;
-	nvic_init_t.NVIC_IRQChannelSubPriority = 1;
-	NVIC_Init(&nvic_init_t);
+	NVIC_CONFIG(ADCXIRQn, 10);
 	ADC_ITConfig(ADCX, ADC_IT_EOC, ENABLE);
 	
 	ADC_InitTypeDef adc_init_t;
