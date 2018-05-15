@@ -329,7 +329,6 @@ uint8_t I2C_EE_BufferRead(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteTo
 }
 
 #include <stdio.h>
-#include <stdlib.h>
 void I2C_EE_EXAMPLE(void)
 {	
 	#define BufferSize		20
@@ -349,7 +348,7 @@ void I2C_EE_EXAMPLE(void)
 		I2C_EE_BufferRead(Rx_Buffer, 0x50, BufferSize-1);
 
 		// 检查写入的数据与读出的数据是否相等
-		printf("\nDATA=%s\n", Rx_Buffer);
+		printf("DATA=%s\n", Rx_Buffer);
 	}
 	else
 	{

@@ -216,7 +216,7 @@ uint8_t i2c_ee_CheckDevice()
 
 	i2c_Stop();		// 发送停止信号
 
-	return success;	// 返回0正确，返回1表示未探测到
+	return success;	// 返回0表示未探测到
 }
 
 uint8_t i2c_ee_ByteWrite(uint8_t c, uint8_t addr)
@@ -274,7 +274,6 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 	// 第1步：发起I2C总线启动信号
 	i2c_Start();
 	
-	printf("SEND_7BIT_ADDRESS\n");
 	// 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
 	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_WR);	// 此处是写指令
 	 
@@ -286,7 +285,6 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 		return 0;
 	}
 
-	printf("SEND_WORD_ADDRESS\n");
 	// 第4步：发送字节地址
 	i2c_SendByte(ReadAddr);
 	
@@ -298,11 +296,9 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 		return 0;
 	}
 	
-	printf("GENERATE_START\n");
 	// 第6步：重新启动I2C总线。前面的代码的目的向EEPROM传送地址，下面开始读取数据
 	i2c_Start();
 	
-	printf("SEND_7BIT_ADDRESS_AGAIN\n");
 	// 第7步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
 	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_RD);	// 此处是读指令
 	
@@ -316,25 +312,27 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 	
 	// 第9步：循环读取数据
 	while (NumByteToRead)
-	{
-		if(NumByteToRead == 1)
+	{		
+		*pBuffer = i2c_ReadByte();	// 读1个字节
+		
+		pBuffer++; 
+		
+		--NumByteToRead;
+
+		if(NumByteToRead == 0)
 		{
 			// 最后1个字节读完后，CPU产生NACK信号(驱动SDA = 1)
 			i2c_NAck();
 
 			// 发送I2C总线停止信号
 			i2c_Stop();
+			
+			break;
 		}
-		
-		*pBuffer = i2c_ReadByte();	// 读1个字节
-		
-		printf("GET=%c\n", *pBuffer);
-		
-		pBuffer++; 
-		
-		--NumByteToRead;
-
-		i2c_Ack();	// 中间字节读完后，CPU产生ACK信号(驱动SDA = 0)
+		else
+		{
+			i2c_Ack();	// 中间字节读完后，CPU产生ACK信号(驱动SDA = 0)
+		}
 	}
 	
 	// Enable Acknowledgement to be ready for another reception
@@ -411,7 +409,6 @@ uint8_t i2c_ee_WriteBytes(uint8_t *pBuffer, uint8_t WriteAddr, uint16_t NumByteT
 }
 
 #include <stdio.h>
-#include <stdlib.h>
 void i2c_ee_example(void)
 {
 	#define BufferSize		20
@@ -424,18 +421,18 @@ void i2c_ee_example(void)
 		return;
 	}
 
-//	// 将发送缓冲区的数据写到flash中，写一页，一页的大小为BufferSize个字节
-//	if (i2c_ee_WriteBytes(Tx_Buffer, 0x50, BufferSize-1))
-//	{
+	// 将发送缓冲区的数据写到flash中，写一页，一页的大小为BufferSize个字节
+	if (i2c_ee_WriteBytes(Tx_Buffer, 0x50, BufferSize-1))
+	{
 		// 将刚刚写入的数据读出来放到接收缓冲区中
 		i2c_ee_ReadBytes(Rx_Buffer, 0x50, BufferSize-1);
 
 		// 检查写入的数据与读出的数据是否相等
 		printf("DATA=%s\n", Rx_Buffer);
-//	}
-//	else
-//	{
-//		printf("WRITE_FAILED\n");
-//	}
+	}
+	else
+	{
+		printf("WRITE_FAILED\n");
+	}
 }
 

@@ -24,7 +24,10 @@ int LED_EXAMPLE()
 		GPIO_ResetBits(LED_GPIO, LED_GPIO_Pin);
 		delay_ms(500);
 	}
-	
+}
+
+void LED_EXAMPLE2()
+{
 	// 呼吸灯
 	int k=0,flag=1;
 	while (1)

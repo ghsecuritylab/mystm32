@@ -10,17 +10,15 @@ uint8_t translate[] =
 	'.',	0,		'=',	'B'
 };
 
-void SPI_FLASH_EXAMPLE(void);
 int main()
 {
 	USART_CONFIG();
-	
-	while (fgetc(NULL) != '@')
-		printf("ready!");
-	
-	SPI_FLASH_EXAMPLE();
-	
-	
-	while(1);
+	Temp_ADC1_Init();
+	while(1)
+	{
+		while (fgetc(NULL) != '@')
+			printf("ready!");
+		
+	}
 	return 0;
 }

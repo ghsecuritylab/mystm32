@@ -27,7 +27,7 @@ void ADC_SINGLE_CONFIG(void);
 void DMA_ADC_Config(ADC_TypeDef *ADCX, uint32_t DMA_, DMA_Channel_TypeDef *DMAX_ChannelX, uint16_t dest[], uint32_t ArrayLength);
 void ADC_MULTI_CONFIG(void);
 void Temp_ADC1_Init(void);
-uint16_t Temp_ADC1_Get(void);
+float Temp_ADC1_Get(void);
 void TIM_BASE_CONFIG(void);
 void TIM_PWMOUT_CONFIG(void);
 uint8_t TPAD_Init(void);

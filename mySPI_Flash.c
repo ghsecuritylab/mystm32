@@ -164,7 +164,7 @@ void SPI_FLASH_WriteEnable(void)
 	// 通讯结束：CS高 
 	SPI_FLASH_CS_HIGH();
 }
-// 擦除指定FLASH扇区
+// 擦除指定FLASH扇区，必须4K对齐
 void SPI_FLASH_SectorErase(uint32_t	SectorAddr)
 {
 	// 发送FLASH写使能命令 
@@ -341,7 +341,6 @@ void SPI_FLASH_BufferRead(uint8_t* pBuffer, uint32_t ReadAddr, uint16_t NumByteT
 uint32_t SPI_FLASH_ReadID(void)
 {
 	uint32_t b0, b1, b2;
-
 	
 	SPI_FLASH_WaitForWriteEnd();
 	
@@ -413,9 +412,8 @@ void SPI_Flash_WAKEUP(void)
 }
 
 #include <stdio.h>
-#include <stdlib.h>
 void SPI_FLASH_EXAMPLE(void)
-{	
+{
 	#define BufferSize		30
 	uint8_t Tx_Buffer[BufferSize] = "Hello,EveryOne";
 	uint8_t Rx_Buffer[BufferSize] = {0};
@@ -424,19 +422,19 @@ void SPI_FLASH_EXAMPLE(void)
 	
 	// 获取 Flash Device ID
 	printf("DeviceID=%x\n", SPI_FLASH_ReadDeviceID());
-	
+
 	// 检验 SPI Flash ID
 	if (FLASH_ID == SPI_FLASH_ReadID())
-	{
-		// 擦除将要写入的 SPI FLASH 扇区，FLASH写入前要先擦除
+	{	
+		// FLASH 写入前要先擦除扇区，地址必须4K对齐（0x1000）
 		// 这里擦除4K，即一个扇区，擦除的最小单位是扇区
-		SPI_FLASH_SectorErase(0x00000);
+		SPI_FLASH_SectorErase(0x001000*1);
 		
-		// 将发送缓冲区的数据写到flash中，写一页，一页的大小为BufferSize个字节
-		SPI_FLASH_BufferWrite(Tx_Buffer, 0x00000, BufferSize);
+		// 将发送缓冲区的数据写到flash中
+		SPI_FLASH_BufferWrite(Tx_Buffer, 0x001000, BufferSize-1);
 		
 		// 将刚刚写入的数据读出来放到接收缓冲区中
-		SPI_FLASH_BufferRead(Rx_Buffer, 0x00000, BufferSize);
+		SPI_FLASH_BufferRead(Rx_Buffer, 0x001000, BufferSize-1);
 		
 		// 检查写入的数据与读出的数据是否相等
 		printf("Data=%s\n", Rx_Buffer);
