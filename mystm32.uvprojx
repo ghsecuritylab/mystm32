@@ -431,14 +431,24 @@
               <FilePath>.\mySoftI2C.c</FilePath>
             </File>
             <File>
-              <FileName>mySPI.c</FileName>
+              <FileName>mySPI_OLED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\mySPI_OLED.h</FilePath>
+            </File>
+            <File>
+              <FileName>mySPI_OLED.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\mySPI.c</FilePath>
+              <FilePath>.\mySPI_OLED.c</FilePath>
             </File>
             <File>
               <FileName>mySPI_Flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\mySPI_Flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>myNVIC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myNVIC.c</FilePath>
             </File>
             <File>
               <FileName>myDMA.c</FileName>
@@ -489,11 +499,6 @@
               <FileName>res.c</FileName>
               <FileType>1</FileType>
               <FilePath>Resource\res.c</FilePath>
-            </File>
-            <File>
-              <FileName>myNVIC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myNVIC.c</FilePath>
             </File>
           </Files>
         </Group>
