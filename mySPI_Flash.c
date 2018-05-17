@@ -414,11 +414,12 @@ void SPI_Flash_WAKEUP(void)
 #include <stdio.h>
 void SPI_FLASH_EXAMPLE(void)
 {
+	// 初始化一次即可
+	// SPI_FLASH_Init();
+	
 	#define BufferSize		30
 	uint8_t Tx_Buffer[BufferSize] = "Hello,EveryOne";
 	uint8_t Rx_Buffer[BufferSize] = {0};
-	
-	SPI_FLASH_Init();
 	
 	// 获取 Flash Device ID
 	printf("DeviceID=%x\n", SPI_FLASH_ReadDeviceID());

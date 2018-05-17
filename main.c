@@ -10,16 +10,15 @@ uint8_t translate[] =
 	'.',	0,		'=',	'B'
 };
 
-
+void OLED_EXAMPLE2(void);
 int main()
 {
 	USART_CONFIG();
-	
 	while(1)
 	{
-		while (fgetc(NULL) != '@')
-			printf("READY!");
+		while (getchar() != '@');
 		
+		OLED_EXAMPLE2();
 	}
 	return 0;
 }
