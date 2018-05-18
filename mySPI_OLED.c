@@ -209,7 +209,7 @@ void OLED_ShowStr(uint8_t x, uint8_t y, const char str[], uint8_t TextSize)
 			if(x > 128-8)
 			{
 				x = 0;
-				y++;
+				y+=2;
 			}
 			OLED_SetPos(x,y);
 			for(i=0; i<8; i++)

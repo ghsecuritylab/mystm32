@@ -456,19 +456,9 @@
               <FilePath>.\myDMA.c</FilePath>
             </File>
             <File>
-              <FileName>myADC_SINGLE.c</FileName>
+              <FileName>myADC.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\myADC_SINGLE.c</FilePath>
-            </File>
-            <File>
-              <FileName>myADC_MULTI.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myADC_MULTI.c</FilePath>
-            </File>
-            <File>
-              <FileName>myADC_Temperature.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myADC_Temperature.c</FilePath>
+              <FilePath>.\myADC.c</FilePath>
             </File>
             <File>
               <FileName>mySYSTICK.c</FileName>

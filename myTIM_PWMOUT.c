@@ -34,28 +34,6 @@
 // By default, set all to be high 
 #define TIMX_PULSE					TIMX_PERIOD
 
-const uint16_t notes_c4[] = {264,292,330,352,396,440,495,523};
-const uint16_t notes_c5[] = {523,587,659,698,784,880,988,1046};
-const uint16_t notes_c6[] = {1046,1175,1319,1397,1568,1760,1976,2093};
-const uint16_t notes_c7[] = {2093,2349,2637,2794,3136,3520,3951,4186};
-void tone(uint16_t Hz)
-{
-	// Hz = 72000000 / PERIOD / PSC
-	TIMX->CCRX = TIMX_PERIOD/2;	// 比较寄存器 TIM_SetCompareX(TIMX, pulse)
-	TIMX->ARR = TIMX_PERIOD-1;	// 自动重装值 TIM_SetAutoreload(TIMX, TIMX_PERIOD-1);
-	TIMX->PSC = (SystemCoreClock / TIMX_PERIOD) / Hz - 1;	// 预分频
-}
-void notone()
-{
-	// 将PWM作为输入引脚时通电逻辑相反，置为全高即可
-	TIMX->CCRX = TIMX_PERIOD;
-}
-void duty_cycle(uint16_t pulse)
-{
-	// 0 <= pulse <= TIMX_PERIOD-1
-	TIMX->CCRX = pulse;	// TIM_SetCompareX(TIMX, pulse)
-}
-
 void TIM_PWMOUT_CONFIG()
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
@@ -112,42 +90,70 @@ void TIM_PWMOUT_CONFIG()
 	
 	TIM_Cmd(TIMX, ENABLE);
 //	TIM_CtrlPWMOutputs(TIMX, ENABLE);	// 使用通用定时器（TIM2-TIM5） 时这句不需要
-	
-//	// breath
-//	while (1)
-//	{
-//		for(int8_t i = 0; i < TIMX_PERIOD; i++) {
-//			duty_cycle(i);
-//			delay_ms(100);
-//		}
-//		for(int8_t i = TIMX_PERIOD-1; i >= 0; i--) {
-//			duty_cycle(i);
-//			delay_ms(100);
-//		}
-//	}
-//	// melody
-//	while (1)
-//	{
-//		for(int8_t i = 0; i < sizeof(notes_c6)/sizeof(uint16_t); i++) {
-//			tone(notes_c7[i]);
-//			delay_ms(400);
-//			notone();
-//			delay_ms(200);
-//		}
-//	}
+}
 
-//	// WAVE Player
-//	uint32_t imageFileInfo (const char *name, const uint8_t **data);
-//	const uint8_t* data;
-//	uint32_t size = imageFileInfo("music.pcm", &data);
-//	
-//	TIMX->ARR = 65535;	// 16bit采样精度
-//	TIMX->PSC = 1;		// 以最高频率输出音量PWM
-//	while (1)
-//	{
-//		for(uint32_t i = 0; i < size/2; i++) {
-//			TIMX->CCRX = ((uint16_t*)data)[i];
-//			delay_us(91);		// 1/91us =10989Hz ~~ 11025Hz 采样率
-//		}
-//	}
+void duty_cycle(uint16_t pulse)
+{
+	// 0 <= pulse <= TIMX_PERIOD-1
+	TIMX->CCRX = pulse;	// TIM_SetCompareX(TIMX, pulse)
+}
+void PWM_BREATH_EXAMPLE(void)
+{
+	while (1)
+	{
+		for(int8_t i = 0; i < TIMX_PERIOD; i++) {
+			duty_cycle(i);
+			delay_ms(100);
+		}
+		for(int8_t i = TIMX_PERIOD-1; i >= 0; i--) {
+			duty_cycle(i);
+			delay_ms(100);
+		}
+	}
+}
+
+const uint16_t notes_c4[] = {264,292,330,352,396,440,495,523};
+const uint16_t notes_c5[] = {523,587,659,698,784,880,988,1046};
+const uint16_t notes_c6[] = {1046,1175,1319,1397,1568,1760,1976,2093};
+const uint16_t notes_c7[] = {2093,2349,2637,2794,3136,3520,3951,4186};
+void tone(uint16_t Hz)
+{
+	// Hz = 72000000 / PERIOD / PSC
+	TIMX->CCRX = TIMX_PERIOD/2;	// 比较寄存器 TIM_SetCompareX(TIMX, pulse)
+	TIMX->ARR = TIMX_PERIOD-1;	// 自动重装值 TIM_SetAutoreload(TIMX, TIMX_PERIOD-1);
+	TIMX->PSC = (SystemCoreClock / TIMX_PERIOD) / Hz - 1;	// 预分频
+}
+void notone()
+{
+	// 将PWM作为输入引脚时通电逻辑相反，置为全高即可
+	TIMX->CCRX = TIMX_PERIOD;
+}
+void PWM_MELODY_EXAMPLE(void)
+{
+	while (1)
+	{
+		for(int8_t i = 0; i < sizeof(notes_c6)/sizeof(uint16_t); i++) {
+			tone(notes_c7[i]);
+			delay_ms(400);
+			notone();
+			delay_ms(200);
+		}
+	}
+}
+
+void PWM_WAVE_PLAYER_EXAMPLE(void)
+{
+	uint32_t imageFileInfo (const char *name, const uint8_t **data);
+	const uint8_t* data;
+	uint32_t size = imageFileInfo("music.pcm", &data);
+	
+	TIMX->ARR = 65535;	// 16bit采样精度
+	TIMX->PSC = 1;		// 以最高频率输出音量PWM
+	while (1)
+	{
+		for(uint32_t i = 0; i < size/2; i++) {
+			TIMX->CCRX = ((uint16_t*)data)[i];
+			delay_us(91);		// 1/91us =10989Hz ~~ 11025Hz 采样率
+		}
+	}
 }

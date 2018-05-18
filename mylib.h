@@ -25,6 +25,8 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 uint8_t i2c_ee_WriteBytes(uint8_t *pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite);
 void SPI_FLASH_Init(void);
 void SPI_OLED_Init(void);
+void OLED_Fill(uint8_t fill_Data);
+void OLED_ShowStr(uint8_t x, uint8_t y, const char str[], uint8_t TextSize);
 void ADC_SINGLE_CONFIG(void);
 void DMA_ADC_Config(ADC_TypeDef *ADCX, uint32_t DMA_, DMA_Channel_TypeDef *DMAX_ChannelX, uint16_t dest[], uint32_t ArrayLength);
 void ADC_MULTI_CONFIG(void);
