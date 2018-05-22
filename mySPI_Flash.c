@@ -29,6 +29,7 @@
 //#define FLASH_ID				0XEF4017	/*W25Q64*/
 #define FLASH_ID				0XEF4018	/*W25Q128*/
 #define FLASH_PageSize			256
+#define FLASH_SectorSize		4096
 
 #define W25X_WriteEnable		0x06
 #define W25X_WriteDisable		0x04
@@ -164,6 +165,7 @@ void SPI_FLASH_WriteEnable(void)
 	// 通讯结束：CS高 
 	SPI_FLASH_CS_HIGH();
 }
+
 // 擦除指定FLASH扇区，必须4K对齐
 void SPI_FLASH_SectorErase(uint32_t	SectorAddr)
 {
@@ -386,7 +388,7 @@ uint32_t SPI_FLASH_ReadDeviceID(void)
 }
 
 // 进入掉电模式
-void SPI_Flash_PowerDown(void)   
+void SPI_FLASH_PowerDown(void)
 { 
 	// 通讯开始：CS低 
 	SPI_FLASH_CS_LOW();
@@ -399,7 +401,7 @@ void SPI_Flash_PowerDown(void)
 }
 
 // 唤醒
-void SPI_Flash_WAKEUP(void)
+void SPI_FLASH_WakeUp(void)
 {
 	// 选择 FLASH: CS 低 
 	SPI_FLASH_CS_LOW();
@@ -415,7 +417,7 @@ void SPI_Flash_WAKEUP(void)
 void SPI_FLASH_EXAMPLE(void)
 {
 	// 初始化一次即可
-	// SPI_FLASH_Init();
+	SPI_FLASH_Init();
 	
 	#define BufferSize		30
 	uint8_t Tx_Buffer[BufferSize] = "Hello,EveryOne";
@@ -426,16 +428,16 @@ void SPI_FLASH_EXAMPLE(void)
 
 	// 检验 SPI Flash ID
 	if (FLASH_ID == SPI_FLASH_ReadID())
-	{	
+	{
 		// FLASH 写入前要先擦除扇区，地址必须4K对齐（0x1000）
 		// 这里擦除4K，即一个扇区，擦除的最小单位是扇区
-		SPI_FLASH_SectorErase(0x001000*1);
+		SPI_FLASH_SectorErase(FLASH_SectorSize*0);
 		
 		// 将发送缓冲区的数据写到flash中
-		SPI_FLASH_BufferWrite(Tx_Buffer, 0x001000, BufferSize-1);
+		SPI_FLASH_BufferWrite(Tx_Buffer, FLASH_SectorSize*0, BufferSize-1);
 		
 		// 将刚刚写入的数据读出来放到接收缓冲区中
-		SPI_FLASH_BufferRead(Rx_Buffer, 0x001000, BufferSize-1);
+		SPI_FLASH_BufferRead(Rx_Buffer, FLASH_SectorSize*0, BufferSize-1);
 		
 		// 检查写入的数据与读出的数据是否相等
 		printf("Data=%s\n", Rx_Buffer);

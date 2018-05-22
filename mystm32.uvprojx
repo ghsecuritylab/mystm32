@@ -446,6 +446,11 @@
               <FilePath>.\mySPI_Flash.c</FilePath>
             </File>
             <File>
+              <FileName>myFatFs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myFatFs.c</FilePath>
+            </File>
+            <File>
               <FileName>myNVIC.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\myNVIC.c</FilePath>
@@ -528,6 +533,46 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FatFs</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FATFS\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>diskio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FATFS\diskio.h</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FATFS\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FATFS\ff.h</FilePath>
+            </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FATFS\ffconf.h</FilePath>
+            </File>
+            <File>
+              <FileName>integer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FATFS\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>ffunicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FATFS\ffunicode.c</FilePath>
             </File>
           </Files>
         </Group>
