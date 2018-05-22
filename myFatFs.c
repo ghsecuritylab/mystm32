@@ -4,14 +4,13 @@
 #include <string.h>
 
 // 递归扫描 path 路径下的文件
-FRESULT scan_files (char* path)
+FRESULT scan_files (char path[FF_LFN_BUF + 1])
 { 
 	FRESULT result;
 	FILINFO fno;
 	DIR dir;
 	uint16_t i;
 	
-	printf("OPENING_DIR\n");
 	// 打开目录
 	result = f_opendir(&dir, path); 
 	if (result != FR_OK)
@@ -20,27 +19,29 @@ FRESULT scan_files (char* path)
 	i = strlen(path);
 	for (;;)
 	{
-		printf("READING_DIR\n");
 		// 读取目录下的下一个文件
 		result = f_readdir(&dir, &fno);
 
 		// 为空时表示所有项目读取完毕，跳出
-		if (result != FR_OK || fno.fname[0] == 0)
+		if (result != FR_OK || fno.fname[0] == '\0')
 			break;
+
 		// 点表示当前目录，跳过
-		if (*fno.fname == '.') continue;
+		if (fno.fname[0] == '.') continue;
 
 		// 目录，递归读取
 		if (fno.fattrib & AM_DIR)
 		{
 			// 合成完整目录名
 			sprintf(path + i, "/%s", fno.fname);
-			printf("%s\n",path);
+
+			// 输出目录名
+			printf("%s\n", path);
 
 			// 递归遍历
 			result = scan_files(path);
 			if (result != FR_OK)
-				break; 
+				break;
 
 			path[i] = '\0';
 		}
@@ -48,13 +49,19 @@ FRESULT scan_files (char* path)
 		{
 			// 输出文件名
 			printf("%s/%s\n", path, fno.fname);
-			// 可以在这里提取特定格式的文件路径
-
 		}
 	}
 	return result;
 }
 
+#define MAKE_DATE(y,m,d)	((WORD)(((y - 1980) << 9) | m << 5 | d))
+#define MAKE_TIME(h,m,s)	((WORD)(h << 11 | m << 5 | s / 2U))
+#define GET_YEAR(d)			((d >> 9) + 1980)
+#define GET_MONTH(d)		(d >> 5 & 0x0F)
+#define GET_DAY(d)			(d & 0x1F)
+#define GET_HOUR(t)			(t >> 11)
+#define GET_MINUTE(t)		(t >> 5 & 0x3F)
+#define GET_SECONDS(t)		((t & 0x1F)*2U)
 
 // 这两个对象占用较大的空间，因此作为全局变量以防栈溢出
 FATFS fs;				// FatFs文件系统对象
@@ -144,8 +151,8 @@ void FATFS_EXAMPLE(void)
 		result = f_read(&fnew, ReadBuffer, sizeof(ReadBuffer), &num); 
 		if (result == FR_OK)
 		{
-		  printf("BYTE_READ_NUM=%d\n",num);
-		  printf("READ=%s\n", ReadBuffer);
+			printf("BYTE_READ_NUM=%d\n", num);
+			printf("READ=%s\n", ReadBuffer);
 		}
 		else
 		{
@@ -220,9 +227,9 @@ void FATFS_EXAMPLE(void)
 	if (result == FR_OK)
 	{
 		printf("FILE_SIZE=%ld Bytes\n", fno.fsize);
-		printf("TimeStamp=%u/%02u/%02u, %02u:%02u\n",
-				(fno.fdate >> 9) + 1980, fno.fdate >> 5 & 15, fno.fdate & 31,
-				fno.ftime >> 11, fno.ftime >> 5 & 63);
+		printf("TimeStamp=%u/%02u/%02u, %02u:%02u:%02u\n",
+				GET_YEAR(fno.fdate),GET_MONTH(fno.fdate),GET_DAY(fno.fdate),
+				GET_HOUR(fno.ftime),GET_MINUTE(fno.ftime),GET_SECONDS(fno.ftime));
 		printf("Attributes=%c%c%c%c%c\n",
 				(fno.fattrib & AM_DIR) ? 'D' : '-',		// 是一个目录
 				(fno.fattrib & AM_RDO) ? 'R' : '-',		// 只读文件
@@ -236,9 +243,11 @@ void FATFS_EXAMPLE(void)
 	}
 
 	// 遍历目录
-	if (scan_files("1:") != FR_OK)
-		printf("FAILED_TO_LIST_FILES\n");
-	
+	char path[FF_LFN_BUF + 1] = "1:";
+	result = scan_files(path);
+	if (result != FR_OK)
+		printf("FAILED_TO_LIST_FILES=%d\n", result);
+
 	// 不再使用文件系统，取消挂载文件系统
 	f_mount(NULL, "1:", 1);	// 0：不立即执行，1：立即执行
 }

@@ -150,11 +150,11 @@ DRESULT disk_ioctl (
 #if _FS_NORTC==0
 // 返回当前时间戳
 DWORD get_fattime(void) {
-	return	((DWORD)(2018 - 1980) << 25)	// Year 2015
-			| ((DWORD)1 << 21)				// Month 1
-			| ((DWORD)1 << 16)				// Mday 1
-			| ((DWORD)0 << 11)				// Hour 0
-			| ((DWORD)0 << 5)				// Min 0
-			| ((DWORD)0 >> 1);				// Sec 0
+	return	((DWORD)(2018 - 1980) << 25)	// Year 25:31
+			| ((DWORD)1 << 21)				// Month 21:24
+			| ((DWORD)1 << 16)				// Mday 16:20
+			| ((DWORD)0 << 11)				// Hour 11:15
+			| ((DWORD)0 << 5)				// Min 5:10
+			| ((DWORD)0 / 2U);				// Sec 0:4
 }
 #endif
