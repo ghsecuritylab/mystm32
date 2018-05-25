@@ -10,6 +10,8 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "ff.h"
 #include "../mylib.h"
+#include "../mySDIO.h"
+extern SD_CardInfo SDCardInfo;
 
 // 为每个设备定义一个物理编号
 // SD 卡
@@ -24,6 +26,10 @@
 #define FLASH_PageSize			256
 #define FLASH_SectorSize		4096
 
+#define SD_SectorSize			512
+
+__align(4) uint8_t align_buffer[SD_SectorSize];
+
 // 设备状态，pdrv 物理编号
 DSTATUS disk_status(BYTE pdrv)
 {
@@ -31,6 +37,7 @@ DSTATUS disk_status(BYTE pdrv)
 	switch (pdrv)
 	{
 	case ATA:
+		status = RES_OK;
 		break;
 	case SPI_FLASH:
 		// SPI Flash状态检测：读取SPI Flash 设备ID
@@ -50,6 +57,10 @@ DSTATUS disk_initialize(BYTE pdrv)
 	DSTATUS status = STA_NOINIT;	
 	switch (pdrv) {
 	case ATA:			// SD CARD
+		if (SD_Init() == SD_OK)
+		{
+			status = RES_OK;
+		}
 		break;
     case SPI_FLASH:		// SPI Flash
 		SPI_FLASH_Init();
@@ -58,7 +69,7 @@ DSTATUS disk_initialize(BYTE pdrv)
 		if(FLASH_ID == SPI_FLASH_ReadID())
 		{
 			// 设备ID读取结果正确
-			status &= ~STA_NOINIT;
+			status = RES_OK;
 		}
 		break;
 	}
@@ -77,6 +88,43 @@ DRESULT disk_read (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
+		//传入的buff数据地址不是四字节对齐，需要额外处理
+		if ((uint32_t)buff % 4 != 0) 
+		{
+			uint8_t i;
+			for (i = 0; i<count; i++)
+			{
+				SD_ReadBlock(align_buffer, (sector+i)*SD_SectorSize, SD_SectorSize);
+				// Check if the Transfer is finished
+				// 循环查询DMA传输是否结束
+				SD_WaitReadOperation();
+				// Wait until end of DMA transfer
+				while (SD_GetStatus() != SD_TRANSFER_OK);
+
+				for (uint16_t j = 0; j<SD_SectorSize; ++j)
+					buff[j] = align_buffer[j];
+
+				buff += SD_SectorSize;
+			}
+		}
+		else	//传入的buff数据地址四字节对齐，直接读取
+		{
+			if (count > 1)
+			{
+				SD_ReadMultiBlocks(buff, sector*SD_SectorSize, SD_SectorSize, count);
+			}
+			else
+			{
+				SD_ReadBlock(buff, sector*SD_SectorSize, SD_SectorSize);
+			}
+			// Check if the Transfer is finished 
+			// 循环查询DMA传输是否结束
+			SD_WaitReadOperation();
+
+			// Wait until end of DMA transfer
+			while (SD_GetStatus() != SD_TRANSFER_OK);
+		}
+		status = RES_OK;
 		break;
 	case SPI_FLASH:
 		SPI_FLASH_BufferRead(buff, sector*FLASH_SectorSize, count*FLASH_SectorSize);
@@ -104,6 +152,46 @@ DRESULT disk_write (
 	switch (pdrv)
 	{
 	case ATA:	// SD CARD
+		// 若传入的buff地址不是4字节对齐，需要额外处理
+		if ((uint32_t)buff % 4 != 0)
+		{
+			uint8_t i;
+			for (i = 0; i<count; i++)
+			{
+				for (uint16_t j = 0; j<SD_SectorSize; ++j)
+					align_buffer[j] = buff[j];
+				
+				// 单个sector的写操作
+				SD_WriteBlock(align_buffer, (sector+i)*SD_SectorSize, SD_SectorSize);
+
+				// Check if the Transfer is finished
+				// 等待DMA传输结束
+				SD_WaitWriteOperation();
+
+				// 等待SDIO到SD卡传输结束
+				while (SD_GetStatus() != SD_TRANSFER_OK);
+
+				buff += SD_SectorSize;
+			}
+		}
+		else // 4字节对齐，不需要额外处理
+		{
+			if (count > 1)
+			{
+				SD_WriteMultiBlocks((uint8_t *)buff, sector*SD_SectorSize, SD_SectorSize, count);
+			}
+			else
+			{
+				SD_WriteBlock((uint8_t *)buff, sector*SD_SectorSize, SD_SectorSize);
+			}
+			// Check if the Transfer is finished
+			// 等待DMA传输结束
+			SD_WaitWriteOperation();
+
+			// 等待SDIO到SD卡传输结束
+			while (SD_GetStatus() != SD_TRANSFER_OK);
+		}
+		status = RES_OK;
 		break;
 	case SPI_FLASH:
 		write_addr = sector*FLASH_SectorSize;
@@ -127,15 +215,29 @@ DRESULT disk_ioctl (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
+		switch (cmd)
+		{
+		case GET_SECTOR_SIZE:	// Get R/W sector size (WORD) 
+			*(WORD *)buff = SD_SectorSize;
+			break;
+		case GET_SECTOR_COUNT:	// SDSC 不确定，SDHC 就是 512
+			*(DWORD *)buff = SDCardInfo.CardCapacity / SDCardInfo.CardBlockSize;
+		case GET_BLOCK_SIZE:	// Get erase block size in unit of sector (DWORD)
+			*(DWORD *)buff = SDCardInfo.CardBlockSize;
+			break;
+		case CTRL_SYNC:
+			break;
+		}
+		status = RES_OK;
 		break;
 	case SPI_FLASH:
 		switch (cmd)
 		{
-		case GET_SECTOR_COUNT:			// 扇区数量：16*1024*1024/4096
-			*(DWORD*)buff = 4096;
-			break;
 		case GET_SECTOR_SIZE:			// 扇区大小
 			*(WORD*)buff = FLASH_SectorSize;
+			break;
+		case GET_SECTOR_COUNT:			// 扇区数量：16*1024*1024/4096
+			*(DWORD*)buff = 4096;
 			break;
 		case GET_BLOCK_SIZE:
 			*(DWORD*)buff = 1;			// 同时擦除扇区个数
