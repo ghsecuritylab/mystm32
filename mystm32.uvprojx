@@ -501,16 +501,6 @@
               <FilePath>.\myWWDG.c</FilePath>
             </File>
             <File>
-              <FileName>mySDIO.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\mySDIO.h</FilePath>
-            </File>
-            <File>
-              <FileName>mySDIO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\mySDIO.c</FilePath>
-            </File>
-            <File>
               <FileName>res.c</FileName>
               <FileType>1</FileType>
               <FilePath>Resource\res.c</FilePath>

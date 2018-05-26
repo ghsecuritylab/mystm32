@@ -35,12 +35,14 @@
 /** 
   * @brief  SDIO Intialization Frequency (400KHz max)
   */
-#define SDIO_INIT_CLK_DIV                ((uint8_t)0xB2)
+//#define SDIO_INIT_CLK_DIV                ((uint8_t)0xB2)
+#define SDIO_INIT_CLK_DIV                ((uint8_t)0xC2)
 /** 
   * @brief  SDIO Data Transfer Frequency (25MHz max) 
   */
 /*!< SDIOCLK = HCLK, SDIO_CK = HCLK/(2 + SDIO_TRANSFER_CLK_DIV) */
-#define SDIO_TRANSFER_CLK_DIV            ((uint8_t)0x01)
+//#define SDIO_TRANSFER_CLK_DIV            ((uint8_t)0x01)
+#define SDIO_TRANSFER_CLK_DIV            ((uint8_t)0x02)
 
 #define SD_SDIO_DMA                      DMA2
 #define SD_SDIO_DMA_CLK                  RCC_AHBPeriph_DMA2
