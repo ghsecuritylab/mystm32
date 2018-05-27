@@ -198,7 +198,7 @@ void FATFS_EXAMPLE(void)
 				printf("READ=%s\n", ReadBuffer);
 			}
 		}
-		f_close(&fnew);    
+		f_close(&fnew);
 
 		// 尝试打开目录
 		result = f_opendir(&dir, "1:test");

@@ -10,9 +10,10 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "ff.h"
 #include "../mylib.h"
-#include "../mySDIO.h"
+#ifdef SUPPORT_SD
+#include "../SDCard/sdio_sd.h"
 extern SD_CardInfo SDCardInfo;
-
+#endif
 // 为每个设备定义一个物理编号
 // SD 卡
 #define ATA			    0
@@ -57,10 +58,12 @@ DSTATUS disk_initialize(BYTE pdrv)
 	DSTATUS status = STA_NOINIT;	
 	switch (pdrv) {
 	case ATA:			// SD CARD
+		#ifdef SUPPORT_SD
 		if (SD_Init() == SD_OK)
 		{
 			status = RES_OK;
 		}
+		#endif
 		break;
     case SPI_FLASH:		// SPI Flash
 		SPI_FLASH_Init();
@@ -88,6 +91,7 @@ DRESULT disk_read (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
+		#ifdef SUPPORT_SD
 		//传入的buff数据地址不是四字节对齐，需要额外处理
 		if ((uint32_t)buff % 4 != 0) 
 		{
@@ -125,6 +129,7 @@ DRESULT disk_read (
 			while (SD_GetStatus() != SD_TRANSFER_OK);
 		}
 		status = RES_OK;
+		#endif
 		break;
 	case SPI_FLASH:
 		SPI_FLASH_BufferRead(buff, sector*FLASH_SectorSize, count*FLASH_SectorSize);
@@ -152,6 +157,7 @@ DRESULT disk_write (
 	switch (pdrv)
 	{
 	case ATA:	// SD CARD
+		#ifdef SUPPORT_SD
 		// 若传入的buff地址不是4字节对齐，需要额外处理
 		if ((uint32_t)buff % 4 != 0)
 		{
@@ -192,6 +198,7 @@ DRESULT disk_write (
 			while (SD_GetStatus() != SD_TRANSFER_OK);
 		}
 		status = RES_OK;
+		#endif
 		break;
 	case SPI_FLASH:
 		write_addr = sector*FLASH_SectorSize;
@@ -215,6 +222,7 @@ DRESULT disk_ioctl (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
+		#ifdef SUPPORT_SD
 		switch (cmd)
 		{
 		case GET_SECTOR_SIZE:	// Get R/W sector size (WORD) 
@@ -229,6 +237,7 @@ DRESULT disk_ioctl (
 			break;
 		}
 		status = RES_OK;
+		#endif
 		break;
 	case SPI_FLASH:
 		switch (cmd)

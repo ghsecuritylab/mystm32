@@ -1,83 +1,58 @@
-/**
-  ******************************************************************************
-  * @file    stm32_eval_spi_sd.h
-  * @author  MCD Application Team
-  * @version V4.5.0
-  * @date    07-March-2011
-  * @brief   This file contains all the functions prototypes for the stm32_eval_spi_sd
-  *          firmware driver.
-  ******************************************************************************
-  * @attention
-  *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-  ******************************************************************************  
-  */
+// This file contains all the functions prototypes for the stm32 spi_sd firmware driver
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32_EVAL_SPI_SD_H
-#define __STM32_EVAL_SPI_SD_H
+#include "mylib.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+#define __IO	volatile
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32_eval.h"
+#define SD_SPI                           SPI2
+#define SD_SPI_CLK                       RCC_APB1Periph_SPI2
 
-/** @addtogroup Utilities
-  * @{
-  */
-  
-/** @addtogroup STM32_EVAL
-  * @{
-  */ 
+#define SD_SPI_SCK_PIN                   GPIO_Pin_13                 /* PC.13 */
+#define SD_SPI_SCK_GPIO_PORT             GPIOB                       /* GPIOB */
+#define SD_SPI_SCK_GPIO_CLK              RCC_APB2Periph_GPIOB
 
-/** @addtogroup Common
-  * @{
-  */
-  
-/** @addtogroup STM32_EVAL_SPI_SD
-  * @{
-  */  
+#define SD_SPI_MISO_PIN                  GPIO_Pin_14                 /* PC.14 */
+#define SD_SPI_MISO_GPIO_PORT            GPIOB                       /* GPIOB */
+#define SD_SPI_MISO_GPIO_CLK             RCC_APB2Periph_GPIOB
 
-/** @defgroup STM32_EVAL_SPI_SD_Exported_Types
-  * @{
-  */ 
+#define SD_SPI_MOSI_PIN                  GPIO_Pin_15                 /* PB.15 */
+#define SD_SPI_MOSI_GPIO_PORT            GPIOB                       /* GPIOB */
+#define SD_SPI_MOSI_GPIO_CLK             RCC_APB2Periph_GPIOB
+
+#define SD_CS_PIN                        GPIO_Pin_6                  /* PG.06 */
+#define SD_CS_GPIO_PORT                  GPIOG                       /* GPIOG */
+#define SD_CS_GPIO_CLK                   RCC_APB2Periph_GPIOG
+
+#define SD_DETECT_PIN                    GPIO_Pin_11                 /* PF.11 */
+#define SD_DETECT_GPIO_PORT              GPIOF                       /* GPIOF */
+#define SD_DETECT_GPIO_CLK               RCC_APB2Periph_GPIOF
+
+// Select SD Card: ChipSelect pin low
+#define SD_CS_LOW()     GPIO_ResetBits(SD_CS_GPIO_PORT, SD_CS_PIN)
+// Deselect SD Card: ChipSelect pin high
+#define SD_CS_HIGH()    GPIO_SetBits(SD_CS_GPIO_PORT, SD_CS_PIN)
 
 typedef enum
 {
-/**
-  * @brief  SD reponses and error flags
-  */
-  SD_RESPONSE_NO_ERROR      = (0x00),
-  SD_IN_IDLE_STATE          = (0x01),
-  SD_ERASE_RESET            = (0x02),
-  SD_ILLEGAL_COMMAND        = (0x04),
-  SD_COM_CRC_ERROR          = (0x08),
-  SD_ERASE_SEQUENCE_ERROR   = (0x10),
-  SD_ADDRESS_ERROR          = (0x20),
-  SD_PARAMETER_ERROR        = (0x40),
-  SD_RESPONSE_FAILURE       = (0xFF),
+//	SD reponses and error flags
+	SD_RESPONSE_NO_ERROR	= (0x00),
+	SD_IN_IDLE_STATE		= (0x01),
+	SD_ERASE_RESET			= (0x02),
+	SD_ILLEGAL_COMMAND		= (0x04),
+	SD_COM_CRC_ERROR		= (0x08),
+	SD_ERASE_SEQUENCE_ERROR	= (0x10),
+	SD_ADDRESS_ERROR		= (0x20),
+	SD_PARAMETER_ERROR		= (0x40),
+	SD_RESPONSE_FAILURE		= (0xFF),
 
-/**
-  * @brief  Data response error
-  */
-  SD_DATA_OK                = (0x05),
-  SD_DATA_CRC_ERROR         = (0x0B),
-  SD_DATA_WRITE_ERROR       = (0x0D),
-  SD_DATA_OTHER_ERROR       = (0xFF)
+//	Data response error
+	SD_DATA_OK				= (0x05),
+	SD_DATA_CRC_ERROR		= (0x0B),
+	SD_DATA_WRITE_ERROR		= (0x0D),
+	SD_DATA_OTHER_ERROR		= (0xFF)
 } SD_Error;
 
-/** 
-  * @brief  Card Specific Data: CSD Register   
-  */ 
+// Card Specific Data: CSD Register
 typedef struct
 {
   __IO uint8_t  CSDStruct;            /*!< CSD structure */
@@ -119,9 +94,7 @@ typedef struct
   __IO uint8_t  Reserved4;            /*!< always 1*/
 } SD_CSD;
 
-/** 
-  * @brief  Card Identification Data: CID Register   
-  */
+// Card Identification Data: CID Register   
 typedef struct
 {
   __IO uint8_t  ManufacturerID;       /*!< ManufacturerID */
@@ -136,56 +109,31 @@ typedef struct
   __IO uint8_t  Reserved2;            /*!< always 1 */
 } SD_CID;
 
-/** 
-  * @brief SD Card information 
-  */
+// SD Card information 
 typedef struct
 {
-  SD_CSD SD_csd;
-  SD_CID SD_cid;
-  uint32_t CardCapacity;  /*!< Card Capacity */
-  uint32_t CardBlockSize; /*!< Card Block Size */
+	SD_CSD SD_csd;
+	SD_CID SD_cid;
+	uint32_t CardCapacity;	/*!< Card Capacity */
+	uint32_t CardBlockSize;	/*!< Card Block Size */
 } SD_CardInfo;
 
-/**
-  * @}
-  */
-  
-/** @defgroup STM32_EVAL_SPI_SD_Exported_Constants
-  * @{
-  */ 
-    
-/**
-  * @brief  Block Size
-  */
-#define SD_BLOCK_SIZE    0x200
 
-/**
-  * @brief  Dummy byte
-  */
-#define SD_DUMMY_BYTE   0xFF
+#define SD_BLOCK_SIZE	0x200
+#define SD_DUMMY_BYTE	0xFF
 
-/**
-  * @brief  Start Data tokens:
-  *         Tokens (necessary because at nop/idle (and CS active) only 0xff is 
-  *         on the data/command line)  
-  */
+// Start Data tokens: Tokens (necessary because at nop/idle (and CS active) only 0xff is on the data/command line)
 #define SD_START_DATA_SINGLE_BLOCK_READ    0xFE  /*!< Data token start byte, Start Single Block Read */
 #define SD_START_DATA_MULTIPLE_BLOCK_READ  0xFE  /*!< Data token start byte, Start Multiple Block Read */
 #define SD_START_DATA_SINGLE_BLOCK_WRITE   0xFE  /*!< Data token start byte, Start Single Block Write */
 #define SD_START_DATA_MULTIPLE_BLOCK_WRITE 0xFD  /*!< Data token start byte, Start Multiple Block Write */
 #define SD_STOP_DATA_MULTIPLE_BLOCK_WRITE  0xFD  /*!< Data toke stop byte, Stop Multiple Block Write */
 
-/**
-  * @brief  SD detection on its memory slot
-  */
+// SD detection on its memory slot
 #define SD_PRESENT        ((uint8_t)0x01)
 #define SD_NOT_PRESENT    ((uint8_t)0x00)
 
-
-/**
-  * @brief  Commands: CMDxx = CMD-number | 0x40
-  */
+// Commands: CMDxx = CMD-number | 0x40
 #define SD_CMD_GO_IDLE_STATE          0   /*!< CMD0 = 0x40 */
 #define SD_CMD_SEND_OP_COND           1   /*!< CMD1 = 0x41 */
 #define SD_CMD_SEND_CSD               9   /*!< CMD9 = 0x49 */
@@ -209,29 +157,9 @@ typedef struct
 #define SD_CMD_ERASE_GRP_END          36  /*!< CMD36 = 0x64 */
 #define SD_CMD_UNTAG_ERASE_GROUP      37  /*!< CMD37 = 0x65 */
 #define SD_CMD_ERASE                  38  /*!< CMD38 = 0x66 */
+#define SD_CMD_SD_APP_OP_COND		  41
+#define SD_CMD_APP_CMD				  55
 
-/**
-  * @}
-  */ 
-  
-/** @defgroup STM32_EVAL_SPI_SD_Exported_Macros
-  * @{
-  */
-/** 
-  * @brief  Select SD Card: ChipSelect pin low   
-  */  
-#define SD_CS_LOW()     GPIO_ResetBits(SD_CS_GPIO_PORT, SD_CS_PIN)
-/** 
-  * @brief  Deselect SD Card: ChipSelect pin high   
-  */ 
-#define SD_CS_HIGH()    GPIO_SetBits(SD_CS_GPIO_PORT, SD_CS_PIN)
-/**
-  * @}
-  */ 
-
-/** @defgroup STM32_EVAL_SPI_SD_Exported_Functions
-  * @{
-  */ 
 void SD_DeInit(void);  
 SD_Error SD_Init(void);
 uint8_t SD_Detect(void);
@@ -251,30 +179,3 @@ uint16_t SD_GetStatus(void);
 
 uint8_t SD_WriteByte(uint8_t byte);
 uint8_t SD_ReadByte(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32_EVAL_SPI_SD_H */
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */    
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
