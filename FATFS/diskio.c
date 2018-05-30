@@ -10,8 +10,9 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "ff.h"
 #include "../mylib.h"
+#define SUPPORT_SD
 #ifdef SUPPORT_SD
-#include "../SDCard/sdio_sd.h"
+#include "../SDCard/mySD_SDIO.h"
 extern SD_CardInfo SDCardInfo;
 #endif
 // 为每个设备定义一个物理编号

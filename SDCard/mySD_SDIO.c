@@ -379,7 +379,7 @@ static void NVIC_Configuration(void)
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	/* Configure the NVIC Preemption Priority Bits */
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 
 	NVIC_InitStructure.NVIC_IRQChannel = SDIO_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -533,7 +533,7 @@ SD_Error SD_Init(void)
 
 	/*对SDIO的所有寄存器进行复位*/
 	SDIO_DeInit(); 
-	
+
 	/*上电并进行卡识别流程，确认卡的操作电压  */
 	errorstatus = SD_PowerON(); 
 	
@@ -541,6 +541,7 @@ SD_Error SD_Init(void)
 	if (errorstatus != SD_OK)
 	{
 		/*!< CMD Response TimeOut (wait for CMDSENT flag) */
+		printf("SD_PowerON_ERROR_STATUS=%d",errorstatus);
 		return(errorstatus);	
 	}
 	
@@ -550,6 +551,7 @@ SD_Error SD_Init(void)
 	if (errorstatus != SD_OK)	  //失败返回
 	{
 		/*!< CMD Response TimeOut (wait for CMDSENT flag) */
+		printf("SD_InitializeCards_ERROR_STATUS=%d",errorstatus);
 		return(errorstatus);
 	}
 
@@ -588,15 +590,15 @@ SD_Error SD_Init(void)
 		/* 通过cmd7  ,rca选择要操作的卡 */
 		errorstatus = SD_SelectDeselect((uint32_t) (SDCardInfo.RCA << 16));
 	}
-	printf("SD_SelectDeselect_ret\n");
-	if (errorstatus == SD_OK)
-	{
-		/* 最后为了提高读写，开启4bits模式 */
-		printf("SD_EnableWideBusOperation\n");
-		errorstatus = SD_EnableWideBusOperation(SDIO_BusWide_4b);
-	}  
 
-	printf("errorstatus=%d\n",errorstatus);
+//	if (errorstatus == SD_OK)
+//	{
+//		/* 最后为了提高读写，开启4bits模式 */
+//		printf("SD_EnableWideBusOperation\n");
+//		errorstatus = SD_EnableWideBusOperation(SDIO_BusWide_4b);
+//	}  
+
+	printf("SD_Init_errorstatus=%d\n",errorstatus);
 	return(errorstatus);
 }
 
@@ -718,7 +720,11 @@ SD_Error SD_PowerON(void)
 
 	/* 使能 SDIO 时钟 */
 	SDIO_ClockCmd(ENABLE);
-		
+	
+	printf("WAITING..\r\n");
+	for(uint16_t x;x<0xfff;x++)
+		__NOP;
+	
 	/* 下面发送一系列命令,开始卡识别流程
 	 * CMD0: GO_IDLE_STATE(复位所以SD卡进入空闲状态) 
 	 * 没有响应  
@@ -1388,7 +1394,6 @@ SD_Error SD_SelectDeselect(uint32_t addr)
 	SDIO_SendCommand(&SDIO_CmdInitStructure);
 	
 	errorstatus = CmdResp1Error(SD_CMD_SEL_DESEL_CARD);
-	printf("RET!\n");
 	return(errorstatus);
 }
 

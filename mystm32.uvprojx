@@ -580,14 +580,14 @@
           <GroupName>SDCard</GroupName>
           <Files>
             <File>
-              <FileName>sdio_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SDCard\sdio_sd.c</FilePath>
+              <FileName>mySD_SDIO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDCard\mySD_SDIO.h</FilePath>
             </File>
             <File>
-              <FileName>sdio_sd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SDCard\sdio_sd.h</FilePath>
+              <FileName>mySD_SDIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDCard\mySD_SDIO.c</FilePath>
             </File>
           </Files>
         </Group>
