@@ -2,7 +2,7 @@
 #include "FATFS/ff.h"
 #include <stdio.h>
 #include <string.h>
-#include "SDCard/sdio_sd.h"
+#include "SDCard/mySD_SDIO.h"
 
 // 递归扫描 path 路径下的文件
 FRESULT scan_files (char path[FF_LFN_BUF + 1])
@@ -85,9 +85,9 @@ void FATFS_EXAMPLE(void)
 	// f_mount()->find_volume()->disk_initialize()->SPI_FLASH_Init()
 	result = f_mount(&fs, "0:", 1);	// 0：不立即执行，1：立即执行
 
-//	// 如果没有文件系统就格式化创建创建文件系统
-//	if (result == FR_NO_FILESYSTEM)
-//	{
+	// 如果没有文件系统就格式化创建创建文件系统
+	if (result == FR_NO_FILESYSTEM)
+	{
 //		// 格式化 FM_ANY 使用 FM_FAT, FM_FAT32, FM_EXFAT
 //		result = f_mkfs("0:", FM_ANY, 0, work, sizeof work);
 
@@ -113,13 +113,13 @@ void FATFS_EXAMPLE(void)
 //			printf("FAILED_TO_FORMAT\n");
 //			return;
 //		}
-//	}
-//	else if (result != FR_OK)
-//	{
-//		// SPI Flash初始化不成功
-//		printf("FAILED_TO_INIT\n");
-//		return;
-//	}
+	}
+	else if (result != FR_OK)
+	{
+		// SPI Flash初始化不成功
+		printf("FAILED_TO_INIT\n");
+		return;
+	}
 
 //	// 文件系统测试：写测试
 //	// 打开文件，每次都以新建的形式打开，属性为可写

@@ -10,15 +10,19 @@ uint8_t translate[] =
 	'.',	0,		'=',	'B'
 };
 
-void OLED_EXAMPLE2(void);
+void FATFS_EXAMPLE(void);
+void USB_EXAMPLE(void);
 int main()
 {
 	USART_CONFIG();
 	while(1)
 	{
-		while (getchar() != '@');
+		getchar();
+		printf("START!!\r\n");
 		
-		OLED_EXAMPLE2();
+		FATFS_EXAMPLE();
+		//USB_EXAMPLE();
+		while(1){}
 	}
 	return 0;
 }
