@@ -34,7 +34,7 @@ void TIM_BASE_CONFIG()
 	TIM_ClearFlag(TIMX, TIM_FLAG_Update);		// 清除中断标志位
 	TIM_ITConfig(TIMX, TIM_IT_Update, ENABLE);	// TIM中断使能
 	
-	NVIC_CONFIG(TIMX_IRQn, 3);
+	NVIC_CONFIG(TIMX_IRQn, 0, 3);
 	
 	TIM_Cmd(TIMX, ENABLE);
 	

@@ -34,7 +34,7 @@ void WWDG_CONFIG(uint8_t tr, uint8_t wr, uint32_t prv)
 	WWDG_ClearFlag();
 	
 	// WWDG 中断优先级初始化
-	NVIC_CONFIG(WWDG_IRQn, 0);	
+	NVIC_CONFIG(WWDG_IRQn, 0, 0);	
 	
 	// 开WWDG 中断
 	WWDG_EnableIT();

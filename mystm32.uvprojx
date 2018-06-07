@@ -401,11 +401,6 @@
               <FilePath>.\my7Segment.c</FilePath>
             </File>
             <File>
-              <FileName>myEXTI.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myEXTI.c</FilePath>
-            </File>
-            <File>
               <FileName>my1602.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\my1602.c</FilePath>
@@ -509,6 +504,16 @@
               <FileName>myUSB.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\myUSB.c</FilePath>
+            </File>
+            <File>
+              <FileName>myESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myESP8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>myEXTI_IR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myEXTI_IR.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -31,7 +31,7 @@ void USART_INT_CONFIG()
 	gpio_init_t.GPIO_Pin = USART_TXD_Pin;
 	GPIO_Init(USART_TXD, &gpio_init_t);
 	
-	NVIC_CONFIG(USARTX_IRQn, 9);
+	NVIC_CONFIG(USARTX_IRQn, 1, 5);
 	
 	USART_InitTypeDef usart_init_t;
 	usart_init_t.USART_BaudRate = 9600;
