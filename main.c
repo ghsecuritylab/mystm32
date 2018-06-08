@@ -9,7 +9,7 @@ uint8_t translate[] =
 	7,		8,		9,		'!',
 	'.',	0,		'=',	'B'
 };
-
+void ESP8266_EXAMPLE(void);
 
 int main()
 {
@@ -19,9 +19,9 @@ int main()
 		getchar();
 		printf("START!!\r\n");
 		
+		ESP8266_EXAMPLE();
 		
-		
-		
+		printf("OVER!!\r\n");
 		while(1){}
 	}
 	return 0;
