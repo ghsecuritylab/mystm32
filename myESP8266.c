@@ -82,21 +82,21 @@ struct STRUCT_USARTx_Frame
 #define macESP8266_RST_LOW_LEVEL()	GPIO_ResetBits(macESP8266_RST_PORT, macESP8266_RST_PIN)
 
 void	ESP8266_Init				(void);
-bool	ESP8266_Cmd					(char * cmd, char * reply1, char * reply2, uint32_t waittime);
+bool	ESP8266_Cmd					(char* cmd, char* reply1, char* reply2, uint32_t waittime);
 bool	ESP8266_Net_Mode_Choose		(NetMode_TypeDef Mode);
 bool	ESP8266_JoinAP				(char* pSSID, char* pPassWord);
 bool	ESP8266_CreateAP			(char* pSSID, char* pPassWord, AP_PsdMode_TypeDef PsdMode);
-bool	ESP8266_Enable_MultipleId	(FunctionalState EnUnvarnishTx);
+bool	ESP8266_Enable_MultiConn	(FunctionalState multiConnection);
 bool	ESP8266_Link_Server			(NetPro_TypeDef proto, char* ip, char* ComNum, ID_NO_TypeDef id);
 bool	ESP8266_StartOrShutServer	(FunctionalState Mode, char* pPortNum, char* pTimeOver);
 uint8_t	ESP8266_Get_LinkStatus		(void);
 uint8_t	ESP8266_Get_IdLinkStatus	(void);
-uint8_t	ESP8266_Inquire_ApIp		(char* pApIp, uint8_t ucArrayLength);
+uint8_t ESP8266_GetDHCP_IP			(char* buffer_ip, uint8_t buffer_len);
 bool	ESP8266_UnvarnishSend		(FunctionalState EnUnvarnishTx);
 bool	ESP8266_SendString			(FunctionalState EnUnvarnishTx, char* pStr, uint32_t ulStrLength, ID_NO_TypeDef ucId);
 char*	ESP8266_ReceiveString		(FunctionalState EnUnvarnishTx);
-uint8_t	ESP8266_CWLIF				(char* pStaIp);
-uint8_t	ESP8266_CIPAP				(char* pApIp);
+uint8_t ESP8266_GetConnectedIP		(char* buffer_connectedIP);
+uint8_t ESP8266_SetIP				(char* buffer_ip);
 void	ESP8266_GPIO_Config			(void);
 void	ESP8266_USART_Config		(void);
 
@@ -163,19 +163,17 @@ void ESP8266_USART_Config ( void )
 // 串口接收中断处理函数，将 ESP8266 发送来的数据保存到 Data_RX_BUF 中
 void macESP8266_USART_INT_FUN(void)
 {	
-	uint8_t ucCh;
+	uint8_t c;
 	if (USART_GetITStatus(macESP8266_USARTx, USART_IT_RXNE) == SET)	// 接收中断
 	{
-		ucCh = USART_ReceiveData(macESP8266_USARTx);
+		c = USART_ReceiveData(macESP8266_USARTx);
 		if (strEsp8266_Frame_Record.InfoBit.FrameLength < (RX_BUF_MAX_LEN - 1))	// 预留1个字节写结束符
-			strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength++] = ucCh;
-		else
-			strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength] = '\0';
+			strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength++] = c;
 	}
 	if (USART_GetITStatus(macESP8266_USARTx, USART_IT_IDLE) == SET)	// 数据帧接收完毕
 	{
 		strEsp8266_Frame_Record.InfoBit.FrameFinishFlag = 1;
-		ucCh = USART_ReceiveData(macESP8266_USARTx);	// 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+		c = USART_ReceiveData(macESP8266_USARTx);	// 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
 	}
 }
 
@@ -202,8 +200,10 @@ bool ESP8266_Cmd(char* cmd, char* reply1, char* reply2, uint32_t waittime)
 	if ((reply1 == 0) && (reply2 == 0))	// 不需要接收数据
 		return true;
 
-	delay_ms ( waittime );
-	printf (">>> %s", strEsp8266_Frame_Record.Data_RX_BUF);
+	delay_ms(waittime);
+	
+	strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength] = '\0';
+	printf(">>> %s", strEsp8266_Frame_Record.Data_RX_BUF);
   
 	if ((reply1 != 0) && (reply2 != 0))
 		return ((bool)strstr(strEsp8266_Frame_Record.Data_RX_BUF, reply1) || 
@@ -220,11 +220,11 @@ bool ESP8266_Net_Mode_Choose(NetMode_TypeDef Mode)
 	switch (Mode)
 	{
 	case STA:
-		return ESP8266_Cmd("AT+CWMODE=1", "OK", "no change", 2500); 
+		return ESP8266_Cmd("AT+CWMODE_CUR=1", "OK", "no change", 2500);
 	case AP:
-		return ESP8266_Cmd("AT+CWMODE=2", "OK", "no change", 2500); 
+		return ESP8266_Cmd("AT+CWMODE_CUR=2", "OK", "no change", 2500);
 	case STA_AP:
-		return ESP8266_Cmd("AT+CWMODE=3", "OK", "no change", 2500); 
+		return ESP8266_Cmd("AT+CWMODE_CUR=3", "OK", "no change", 2500);
 	default:
 		return false;
 	}
@@ -234,7 +234,7 @@ bool ESP8266_Net_Mode_Choose(NetMode_TypeDef Mode)
 bool ESP8266_JoinAP(char* pSSID, char* pPassWord)
 {
 	char cCmd[120];
-	sprintf(cCmd, "AT+CWJAP=\"%s\",\"%s\"", pSSID, pPassWord );
+	sprintf(cCmd, "AT+CWJAP_CUR=\"%s\",\"%s\"", pSSID, pPassWord );
 	return ESP8266_Cmd (cCmd, "OK", 0, 5000);
 }
 
@@ -246,33 +246,37 @@ bool ESP8266_CreateAP(char* pSSID, char* pPassWord, AP_PsdMode_TypeDef PsdMode )
 	return ESP8266_Cmd(cCmd, "OK", 0, 1000);
 }
 
-// 启动多连接，EnUnvarnishTx 配置是否多连接
-bool ESP8266_Enable_MultipleId(FunctionalState EnUnvarnishTx)
+// 配置是否多连接（最多同时5个）默认为单连接；
+// 只有非透传模式 (AT+CIPMODE=0)，才能设置为多连接；
+// 必须在没有连接建立的情况下，设置连接模式
+// 如果建立了TCP服务器，想切换为单连接，必须关闭服务器 (AT+CIPSERVER=0)
+// 服务器仅支持多连接。
+bool ESP8266_Enable_MultiConn(FunctionalState multiConnection)
 {
 	char cStr [20];
-	sprintf (cStr, "AT+CIPMUX=%d", (EnUnvarnishTx?1:0));
+	sprintf (cStr, "AT+CIPMUX=%d", (multiConnection?1:0));
 	return ESP8266_Cmd(cStr, "OK", 0, 500 );
 }
 
-// 连接外部服务器，proto，网络协议，ip，服务器IP字符串，ComNum，服务器端口字符串，id，模块连接服务器的ID
+// 连接外部服务器，proto，网络协议，ip，服务器IP字符串，ComNum，服务器端口字符串，id，连接ID
 bool ESP8266_Link_Server(NetPro_TypeDef proto, char* ip, char* ComNum, ID_NO_TypeDef id)
 {
 	char cStr[100] = { 0 }, cCmd[120];
 	switch (proto)
 	{
 	case TCP:
-		sprintf(cStr, "\"%s\",\"%s\",%s", "TCP", ip, ComNum);
+		sprintf(cStr, "\"TCP\",\"%s\",%s", ip, ComNum);
 		break;
 	case UDP:
-		sprintf(cStr, "\"%s\",\"%s\",%s", "UDP", ip, ComNum);
+		sprintf(cStr, "\"UDP\",\"%s\",%s", ip, ComNum);
 		break;
 	default:
 		break;
 	}
-	if (id < 5)
-		sprintf(cCmd, "AT+CIPSTART=%d,%s", id, cStr);
+	if (id == Single_ID_0)
+		sprintf(cCmd, "AT+CIPSTART=%s", cStr);
 	else
-		sprintf(cCmd, "AT+CIPSTART=%s", cStr );
+		sprintf(cCmd, "AT+CIPSTART=%d,%s", id, cStr);
 	return ESP8266_Cmd(cCmd, "OK", "ALREADY CONNECT", 4000);
 }
 
@@ -293,19 +297,21 @@ bool ESP8266_StartOrShutServer(FunctionalState Mode, char* pPortNum, char* pTime
 	}
 }
 
-// 获取 ESP8266 的连接状态，较适合单端口时使用，返回2获得ip，3建立连接，4失去连接，0获取状态失败
+// 获取 ESP8266 的连接状态，较适合单端口时使用
 uint8_t ESP8266_Get_LinkStatus(void)
 {
-	if (ESP8266_Cmd("AT+CIPSTATUS", "OK", 0, 500 ))
+	if (ESP8266_Cmd("AT+CIPSTATUS", "OK", 0, 500))
 	{
 		if (strstr(strEsp8266_Frame_Record.Data_RX_BUF, "STATUS:2\r\n"))
-			return 2;
+			return 2;	// 已连接AP且获得ip
 		else if (strstr(strEsp8266_Frame_Record.Data_RX_BUF, "STATUS:3\r\n"))
-			return 3;
+			return 3;	// 建立连接
 		else if (strstr(strEsp8266_Frame_Record.Data_RX_BUF, "STATUS:4\r\n"))
-			return 4;
+			return 4;	// 失去连接
+		else if (strstr(strEsp8266_Frame_Record.Data_RX_BUF, "STATUS:5\r\n"))
+			return 5;	// 未连接AP
 	}
-	return 0;
+	return 0;	//获取状态失败
 }
 
 // 获取 WF-ESP8266 的端口（Id）连接状态，较适合多端口时使用
@@ -344,24 +350,24 @@ uint8_t ESP8266_Get_IdLinkStatus (void)
 	return ucIdLinkStatus;
 }
 
-// 获取 F-ESP8266 的 AP IP，pApIp，存放 AP IP 的数组的首地址，ucArrayLength，存放 AP IP 的数组的长度
-uint8_t ESP8266_Inquire_ApIp (char* pApIp, uint8_t ucArrayLength)
+// 获取 F-ESP8266 的 DHCP IP
+uint8_t ESP8266_GetDHCP_IP (char* buffer_ip, uint8_t buffer_len)
 {
-	char uc;
-	char * pCh;
+	uint8_t i;
+	char *p;
 	ESP8266_Cmd("AT+CIFSR", "OK", 0, 500);
-	pCh = strstr(strEsp8266_Frame_Record.Data_RX_BUF, "APIP,\"");
-	if (pCh)
-		pCh += 6;
+	p = strstr(strEsp8266_Frame_Record.Data_RX_BUF, "APIP,\"");
+	if (p)
+		p += 6;
 	else
 		return 0;
-	for (uc=0; uc < ucArrayLength; uc++)
+	for (i=0; i < buffer_len; i++)
 	{
-		pApIp[uc] = pCh[uc];
+		buffer_ip[i] = p[i];
 
-		if (pApIp[uc] == '\"')
+		if (buffer_ip[i] == '\"')
 		{
-			pApIp[uc] = '\0';
+			buffer_ip[i] = '\0';
 			break;
 		}
 	}
@@ -374,9 +380,9 @@ bool ESP8266_UnvarnishSend(FunctionalState EnUnvarnishTx)
 	// WF-ESP8266 退出透传模式
 	if (EnUnvarnishTx == DISABLE)
 	{
-		delay_ms(1000);
-		ESP8266_SendStr("+++");
-		delay_ms(500); 
+		delay_ms(1000);	// 等待数据发完
+		ESP8266_SendStr("+++");	// 退出透传不加回车换行也没有响应
+		delay_ms(500);	// 等待退出透传
 		return true;
 	}
 	else // WF-ESP8266 进入透传发送
@@ -389,95 +395,92 @@ bool ESP8266_UnvarnishSend(FunctionalState EnUnvarnishTx)
 
 // 发送字符串，EnUnvarnishTx，声明是否已使能了透传模式，pStr，要发送的字符串
 // ulStrLength，要发送的字符串的字节数，ucId，哪个ID发送的字符串
-bool ESP8266_SendString(FunctionalState EnUnvarnishTx, char* pStr, u32 ulStrLength, ID_NO_TypeDef ucId)
+bool ESP8266_SendString(FunctionalState EnUnvarnishTx, char* pStr, uint32_t ulStrLength, ID_NO_TypeDef ucId)
 {
-	char cStr [20];
-	if ( EnUnvarnishTx )
+	char cStr[20];
+	if (EnUnvarnishTx)
 	{
+		// 透传模式直接发送
 		ESP8266_SendStr(pStr);
 		return true;
 	}
 	else
 	{
-		if (ucId < 5)
-			sprintf(cStr, "AT+CIPSEND=%d,%d", ucId, ulStrLength + 2);
-		else
+		if (ucId == Single_ID_0)
 			sprintf(cStr, "AT+CIPSEND=%d", ulStrLength + 2);
+		else
+			sprintf(cStr, "AT+CIPSEND=%d,%d", ucId, ulStrLength + 2);
 		ESP8266_Cmd(cStr, "> ", 0, 100);
 		return ESP8266_Cmd(pStr, "SEND OK", 0, 500);
 	}
 }
 
-
 // WF-ESP8266模块接收字符串，EnUnvarnishTx，声明是否已使能了透传模式，返回接收到的字符串首地址
 char* ESP8266_ReceiveString(FunctionalState EnUnvarnishTx)
 {
-	char* pRecStr = 0;
 	strEsp8266_Frame_Record.InfoBit.FrameLength = 0;
 	strEsp8266_Frame_Record.InfoBit.FrameFinishFlag = 0;
 
 	while (!strEsp8266_Frame_Record.InfoBit.FrameFinishFlag);
 	strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength] = '\0';
 	
-	if (EnUnvarnishTx)
-		pRecStr = strEsp8266_Frame_Record.Data_RX_BUF;
+	if (EnUnvarnishTx) // 透传模式直接接收
+		return strEsp8266_Frame_Record.Data_RX_BUF;
 	else
 	{
 		if (strstr(strEsp8266_Frame_Record.Data_RX_BUF, "+IPD"))
-			pRecStr = strEsp8266_Frame_Record.Data_RX_BUF;
+			return strEsp8266_Frame_Record.Data_RX_BUF;
+		else
+			return NULL;
 	}
-	return pRecStr;
 }
 
-// 查询已接入设备的IP，pStaIp 存放已接入设备的IP
-uint8_t ESP8266_CWLIF(char* pStaIp)
+// 查询已接入设备的IP
+uint8_t ESP8266_GetConnectedIP(char* buffer_connectedIP)
 {
-	uint8_t uc, ucLen;
-	char *pCh, *pCh1;
+	uint8_t i, len;
+	char *p, *p2;
 	ESP8266_Cmd("AT+CWLIF", "OK", 0, 100);
 
-	pCh = strstr(strEsp8266_Frame_Record.Data_RX_BUF, ",");
+	p2 = strstr(strEsp8266_Frame_Record.Data_RX_BUF, ",");
 
-	if (pCh)
+	if (p2)
 	{
-		pCh1 = strstr(strEsp8266_Frame_Record.Data_RX_BUF, "AT+CWLIF\r\r\n") + 11;
-		ucLen = pCh - pCh1;
+		p = strstr(strEsp8266_Frame_Record.Data_RX_BUF, "AT+CWLIF\r\r\n") + 11;
+		len = p2 - p;
 	}
 	else
 		return 0;
 
-	for (uc = 0; uc < ucLen; uc++)
-		pStaIp[uc] = pCh1[uc];
+	for (i = 0; i < len; i++)
+		buffer_connectedIP[i] = p[i];
 
-	pStaIp[ucLen] = '\0';
+	buffer_connectedIP[len] = '\0';
 	return 1;
 }
 
 
-//设置模块的 AP IP，pApIp，模块的 AP IP
-uint8_t ESP8266_CIPAP(char* pApIp)
+// 指定模块的IP
+uint8_t ESP8266_SetIP(char* buffer_ip)
 {
 	char cCmd [30];
-	
-	sprintf (cCmd, "AT+CIPAP=\"%s\"", pApIp);
+	sprintf (cCmd, "AT+CIPAP=\"%s\"", buffer_ip);
 	if (ESP8266_Cmd(cCmd, "OK", 0, 5000))
 		return 1;
 	else 
 		return 0;
 }
 
-#define	macUser_ESP8266_ApSsid			"A304"			/* 要连接的热点的名称 */
-#define	macUser_ESP8266_ApPwd			"wildfire"		/* 要连接的热点的密钥 */
-#define	macUser_ESP8266_TcpServer_IP	"192.168.1.9"	/* 要连接的服务器的 IP */
-#define	macUser_ESP8266_TcpServer_Port	"8080"			/* 要连接的服务器的端口 */
-__IO uint8_t ucTcpClosedFlag = 0;
+#define	macUser_ESP8266_SSID			"304"			/* 要连接的热点的名称 */
+#define	macUser_ESP8266_PSK				"password"		/* 要连接的热点的密钥 */
+#define	macUser_ESP8266_TcpServer_IP	"192.168.0.223"	/* 要连接的服务器的 IP */
+#define	macUser_ESP8266_TcpServer_Port	"5377"			/* 要连接的服务器的端口 */
 
 void ESP8266_EXAMPLE(void)
 {
-	uint8_t ucStatus,count;
-	char cStr[100] = { 0 };
-	ESP8266_GPIO_Config (); 
-	ESP8266_USART_Config (); 
+	uint8_t count;
+	ESP8266_GPIO_Config(); 
+	ESP8266_USART_Config();
 	macESP8266_RST_HIGH_LEVEL();
 	macESP8266_CH_DISABLE();
 
@@ -485,18 +488,17 @@ void ESP8266_EXAMPLE(void)
 	macESP8266_CH_ENABLE();
 	
 	// 对WF-ESP8266模块进行AT测试启动
-	macESP8266_RST_HIGH_LEVEL();
 	delay_ms(1000);
 	for (count=0; count < 10; ++count)
 	{
 		if (ESP8266_Cmd("AT", "OK", NULL, 500))
 			break;
-		//重启WF-ESP8266模块
-		macESP8266_RST_LOW_LEVEL();
-		delay_ms ( 500 ); 
-		macESP8266_RST_HIGH_LEVEL();
-		// or
-		// ESP8266_Cmd ( "AT+RST", "OK", "ready", 2500 );
+		// 重启WF-ESP8266模块
+//		macESP8266_RST_LOW_LEVEL();
+//		delay_ms(500); 
+//		macESP8266_RST_HIGH_LEVEL();
+		// 或者
+		ESP8266_Cmd ("AT+RST", "OK", "ready", 2500);
 	}
 	if (count==10)
 	{
@@ -504,14 +506,14 @@ void ESP8266_EXAMPLE(void)
 		return;
 	}
 	
+	// 查看固件版本
+	ESP8266_Cmd("AT+GMR", "OK", NULL, 500);
+	
 	// STATION 模式
 	ESP8266_Net_Mode_Choose(STA);
 
 	// 加入AP
-	while (!ESP8266_JoinAP(macUser_ESP8266_ApSsid, macUser_ESP8266_ApPwd));	
-
-	// 禁用多连接
-	ESP8266_Enable_MultipleId(DISABLE);
+	while (!ESP8266_JoinAP(macUser_ESP8266_SSID, macUser_ESP8266_PSK));	
 
 	// 连接服务
 	while (!ESP8266_Link_Server(TCP, macUser_ESP8266_TcpServer_IP, macUser_ESP8266_TcpServer_Port, Single_ID_0));
@@ -519,42 +521,28 @@ void ESP8266_EXAMPLE(void)
 	// 进入透传模式
 	while (!ESP8266_UnvarnishSend(ENABLE));
 
-	printf ( "config successfully\r\n" );
+	printf("config successfully\r\n");
+
 	while (1)
-	{		
-		sprintf(cStr,
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n");
-		
+	{
 		// 发送数据
-		ESP8266_SendString(ENABLE, cStr, 0, Single_ID_0 );
-		// 发送间隔
-		delay_ms (100);
+		ESP8266_SendString(ENABLE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n", 0, Single_ID_0);
 		
-		if (ucTcpClosedFlag)	// 检测是否失去连接
+		// 发送间隔
+		//delay_ms(1000);
+		
+		// 接下来要发送指令，先退出透传模式
+		ESP8266_UnvarnishSend(DISABLE);
+		
+		// 失去连接后重连
+		if (ESP8266_Get_LinkStatus() == 4)
 		{
-			ESP8266_UnvarnishSend(DISABLE);	//退出透传模式
-			
-			do {
-				// 获取连接状态
-				ucStatus = ESP8266_Get_LinkStatus();
-			} while ( ! ucStatus );
-			
-			// 确认失去连接后重连
-			if (ucStatus == 4)
-			{
-				printf ( "reconnecting...\r\n" );
-				// 连接服务
-				while (!ESP8266_Link_Server(TCP, macUser_ESP8266_TcpServer_IP, macUser_ESP8266_TcpServer_Port, Single_ID_0));
-				// 进入透传模式
-				while (!ESP8266_UnvarnishSend(ENABLE));
-				printf ( "reconnect successfully\r\n" );
-			}
-			
-			// 重新进入透传模式
-			while (!ESP8266_UnvarnishSend(ENABLE));
+			printf("reconnecting...\r\n" );
+			while (!ESP8266_Link_Server(TCP, macUser_ESP8266_TcpServer_IP, macUser_ESP8266_TcpServer_Port, Single_ID_0));
+			printf("reconnect successfully\r\n");
 		}
+		// 进入透传模式
+		while (!ESP8266_UnvarnishSend(ENABLE));
 	}
 }
