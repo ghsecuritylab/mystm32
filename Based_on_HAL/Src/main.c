@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright � 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright © 2016 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -56,13 +56,94 @@
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
 char SDPath[4]; /* SD card logical drive path */
-BYTE work[4096];	// ��ʽ��ʱʹ�õĹ�������Խ���ʽ��Խ��
+BYTE work[FF_MAX_SS];	// 用于格式化的工作区，值越大格式化越快
+/* UART handler declaration */
+UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
+#ifdef __GNUC__
+/* With GCC, small printf (option LD Linker->Libraries->Small printf
+   set to 'Yes') calls __io_putchar() */
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#define GETCHAR_PROTOTYPE int __io_getchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+#endif /* __GNUC__ */
 void SystemClock_Config(void);
-static void Error_Handler(void);
+static void Error_Handler(uint8_t id);
 
 /* Private functions ---------------------------------------------------------*/
+// use this to learn sth about SDIO mode
+//extern SD_HandleTypeDef uSdHandle;
+uint16_t _strlen(char* s)
+{
+	uint16_t i=0;
+	while (s[i])++i;
+	return i;
+}
+// 递归扫描 path 路径下的文件
+FRESULT scan_files (char path[FF_LFN_BUF + 1])
+{ 
+  FRESULT result;
+  FILINFO fno;
+  DIR dir;
+  uint16_t i;
+
+  // 输出目录名
+  printf("%s\n", path);
+  
+  // 打开目录
+  result = f_opendir(&dir, path); 
+  if (result != FR_OK)
+    return result;
+
+  for (;;)
+  {
+    // 读取目录下的下一个文件
+    result = f_readdir(&dir, &fno);
+
+    // 为空时表示所有项目读取完毕，跳出
+    if (result != FR_OK || fno.fname[0] == '\0')
+      break;
+
+    // 点表示当前目录，跳过
+    if (fno.fname[0] == '.') continue;
+
+    // 目录，递归读取
+    if (fno.fattrib & AM_DIR)
+    {
+      i = _strlen(path);
+      
+      // 合成完整目录名
+      sprintf(path + i, "/%s", fno.fname);
+      // 递归遍历
+      result = scan_files(path);
+      
+      path[i] = '\0';
+      
+      if (result != FR_OK)
+        continue;
+    }
+    else
+    {
+      // 输出文件名
+      printf("%s/%s\n", path, fno.fname);
+    }
+  }
+  f_closedir(&dir);
+  return result;
+}
+
+
+#define MAKE_DATE(y,m,d)	((WORD)(((y - 1980) << 9) | m << 5 | d))
+#define MAKE_TIME(h,m,s)	((WORD)(h << 11 | m << 5 | s / 2U))
+#define GET_YEAR(d)			((d >> 9) + 1980)
+#define GET_MONTH(d)		(d >> 5 & 0x0F)
+#define GET_DAY(d)			(d & 0x1F)
+#define GET_HOUR(t)			(t >> 11)
+#define GET_MINUTE(t)		(t >> 5 & 0x3F)
+#define GET_SECONDS(t)		((t & 0x1F)*2U)
 
 /**
   * @brief  Main program
@@ -92,20 +173,64 @@ int main(void)
   SystemClock_Config();
   
   /* Configure LED_GREEN and LED_RED */
-  BSP_LED_Init(LED_GREEN);
-  BSP_LED_Init(LED_RED);
-  
+//  BSP_LED_Init(LED_GREEN);
+//  BSP_LED_Init(LED_RED);
+
+  /*##-1- Configure the UART peripheral ######################################*/
+  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
+  /* UART configured as follows:
+      - Word Length = 8 Bits (7 data bit + 1 parity bit) : BE CAREFUL : Program 7 data bits + 1 parity bit in PC HyperTerminal
+      - Stop Bit    = One Stop bit
+      - Parity      = no parity
+      - BaudRate    = 115200 baud
+      - Hardware flow control disabled (RTS and CTS signals) */
+  UartHandle.Instance        = USARTx;
+
+  UartHandle.Init.BaudRate   = 115200;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits   = UART_STOPBITS_1;
+  UartHandle.Init.Parity     = UART_PARITY_NONE;
+  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  UartHandle.Init.Mode       = UART_MODE_TX_RX;
+
+  if (HAL_UART_Init(&UartHandle) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler(0);
+  }
+
+  /* Output a message on Hyperterminal using printf function */
+  printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
+  printf("** Test finished successfully. ** \n\r");
+  /* Infinite loop */
+  getchar();
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {
+    FRESULT result;
     /*##-2- Register the file system object to the FatFs module ##############*/
-    if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) != FR_OK)
+    if((result=f_mount(&SDFatFs, (TCHAR const*)SDPath, 1)) != FR_OK)
     {
+		printf("RESULT=%d\r\n",result);
+		//printf("ERROR=%d,STATUS=%d\r\n",uSdHandle.ErrorCode,uSdHandle.State);
+		BSP_SD_CardInfo CardInfo;
+		BSP_SD_GetCardInfo(&CardInfo);
+//		printf("BlockNbr=%d\r\n",CardInfo.BlockNbr);
+//		printf("BlockSize=%d\r\n",CardInfo.BlockSize);
+//		printf("CardType=%d\r\n",CardInfo.CardType);
+//		printf("CardVersion=%d\r\n",CardInfo.CardVersion);
+//		printf("Class=%d\r\n",CardInfo.Class);
+		printf("CardCapacity=%d\r\n",CardInfo.CardBlockSize);
+		printf("CardCapacity=%d\r\n",CardInfo.CardCapacity);
+//		printf("LogBlockNbr=%d\r\n",CardInfo.LogBlockNbr);
+//		printf("LogBlockSize=%d\r\n",CardInfo.LogBlockSize);
+//		printf("RelCardAdd=%d\r\n",CardInfo.RelCardAdd);
       /* FatFs Initialization Error */
-      Error_Handler();
+      Error_Handler(2);
     }
     else
     {
+	  printf("mount_ok\r\n");
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
 //      /* WARNING: Formatting the uSD card will delete all content on the device */
 //      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
@@ -176,8 +301,13 @@ int main(void)
 //          }
 //        }
 //      }
+		// 遍历目录
+		char path[FF_LFN_BUF + 1] = "0:/";
+		FRESULT result = scan_files(path);
+		if (result != FR_OK)
+			printf("FAILED_TO_LIST_FILES=%d\n", result);
     }
-  }
+  }else printf("Link FAILED\r\n");
   
   /*##-11- Unlink the RAM disk I/O driver ####################################*/
   FATFS_UnLinkDriver(SDPath);
@@ -188,6 +318,36 @@ int main(void)
   {
   }
 }
+
+/**
+  * @brief  Retargets the C library printf function to the USART.
+  * @param  None
+  * @retval None
+  */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
+
+  return ch;
+}
+
+/**
+  * @brief  Retargets the C library scanf function to the USART.
+  * @param  None
+  * @retval None
+  */
+GETCHAR_PROTOTYPE
+{
+  /* Place your implementation of fgetc here */
+  /* e.g. read a character to the USART1 and Loop until the end of transmission */
+  uint8_t ch;
+  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+
+  return ch;
+}
+
 
 /**
   * @brief  System Clock Configuration
@@ -250,20 +410,19 @@ void SystemClock_Config(void)
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  id: error id
   * @retval None
   */
-static void Error_Handler(void)
+static void Error_Handler(uint8_t id)
 {
+  printf("an error corrupted=%d\r\n",id);
   while(1)
   {
     /* Toggle LED_RED fast */
-    BSP_LED_Toggle(LED_RED);
+    //BSP_LED_Toggle(LED_RED);
     HAL_Delay(40);
   }
 }
-
-
 
   
 #ifdef USE_FULL_ASSERT
