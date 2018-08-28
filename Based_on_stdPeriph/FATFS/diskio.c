@@ -10,7 +10,7 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "ff.h"
 #include "../mylib.h"
-#define SUPPORT_SD
+//#define SUPPORT_SD
 #ifdef SUPPORT_SD
 #include "../SDCard/mySD_SDIO.h"
 extern SD_CardInfo SDCardInfo;
