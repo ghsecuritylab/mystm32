@@ -486,8 +486,8 @@ void BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart)
   COMx_CLK_ENABLE(COM);
   
   /* Remap AFIO if needed */
-  AFIOCOMx_CLK_ENABLE(COM);
-  AFIOCOMx_REMAP(COM);
+//  AFIOCOMx_CLK_ENABLE(COM);
+ // AFIOCOMx_REMAP(COM);
 
   /* Configure USART Tx as alternate function push-pull */
   gpioinitstruct.Pin        = COM_TX_PIN[COM];
@@ -1158,7 +1158,7 @@ void SD_IO_Init(void)
 
   /* SD_CS_GPIO and SD_DETECT_GPIO Periph clock enable */
   SD_CS_GPIO_CLK_ENABLE();
-  SD_DETECT_GPIO_CLK_ENABLE();
+//  SD_DETECT_GPIO_CLK_ENABLE();
 
   /* Configure SD_CS_PIN pin: SD Card CS pin */
   gpioinitstruct.Pin    = SD_CS_PIN;
@@ -1167,11 +1167,11 @@ void SD_IO_Init(void)
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
 
-  /* Configure SD_DETECT_PIN pin: SD Card detect pin */
-  gpioinitstruct.Pin    = SD_DETECT_PIN;
-  gpioinitstruct.Mode   = GPIO_MODE_IT_RISING_FALLING;
-  gpioinitstruct.Pull   = GPIO_PULLUP;
-  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
+//  /* Configure SD_DETECT_PIN pin: SD Card detect pin */
+//  gpioinitstruct.Pin    = SD_DETECT_PIN;
+//  gpioinitstruct.Mode   = GPIO_MODE_IT_RISING_FALLING;
+//  gpioinitstruct.Pull   = GPIO_PULLUP;
+//  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
 
   /*------------Put SD in SPI mode--------------*/
   /* SD SPI Config */

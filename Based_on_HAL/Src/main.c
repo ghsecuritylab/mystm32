@@ -146,7 +146,7 @@ FRESULT scan_files (char path[FF_LFN_BUF + 1])
 #define GET_SECONDS(t)		((t & 0x1F)*2U)
 
 /**
-  * @brief  Main program
+  * @brief  Main program 接线方式见 stm32f10c_eval.h 的 SPIx 和 SD 部分
   * @param  None
   * @retval None
   */
@@ -184,20 +184,13 @@ int main(void)
       - Parity      = no parity
       - BaudRate    = 115200 baud
       - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Instance        = USARTx;
-
   UartHandle.Init.BaudRate   = 115200;
   UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
   UartHandle.Init.StopBits   = UART_STOPBITS_1;
   UartHandle.Init.Parity     = UART_PARITY_NONE;
   UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
   UartHandle.Init.Mode       = UART_MODE_TX_RX;
-
-  if (HAL_UART_Init(&UartHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler(0);
-  }
+  BSP_COM_Init(COM1, &UartHandle);
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
