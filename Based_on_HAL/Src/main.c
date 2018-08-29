@@ -225,75 +225,77 @@ int main(void)
     {
 	  printf("mount_ok\r\n");
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
-//      /* WARNING: Formatting the uSD card will delete all content on the device */
-//      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
-//      {
-//        /* FatFs Format Error */
-//        Error_Handler();
-//      }
-//      else
-//      {       
-//        /*##-4- Create and Open a new text file object with write access #####*/
-//        if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
-//        {
-//          /* 'STM32.TXT' file Open for write Error */
-//          Error_Handler();
-//        }
-//        else
-//        {
-//          /*##-5- Write data to the text file ################################*/
-//          res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&byteswritten);
+      /* WARNING: Formatting the uSD card will delete all content on the device */
+		// 注意：在 Windows 上进行格式化后，使用 FatFs 遍历目录
+		// 会失败（一直卡在 f_opendir 这个函数这里）
+		// 使用 FatFs 进行格式化不会出现这个情况
+      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
+      {
+        /* FatFs Format Error */
+        Error_Handler(3);
+      }
+      else
+      {       
+        /*##-4- Create and Open a new text file object with write access #####*/
+        if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
+        {
+          /* 'STM32.TXT' file Open for write Error */
+          Error_Handler(4);
+        }
+        else
+        {
+          /*##-5- Write data to the text file ################################*/
+          res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&byteswritten);
 
-//          /*##-6- Close the open text file #################################*/
-//          if (f_close(&MyFile) != FR_OK )
-//          {
-//            Error_Handler();
-//          }
-//          
-//          if((byteswritten == 0) || (res != FR_OK))
-//          {
-//            /* 'STM32.TXT' file Write or EOF Error */
-//            Error_Handler();
-//          }
-//          else
-//          {      
-//            /*##-7- Open the text file object with read access ###############*/
-//            if(f_open(&MyFile, "STM32.TXT", FA_READ) != FR_OK)
-//            {
-//              /* 'STM32.TXT' file Open for read Error */
-//              Error_Handler();
-//            }
-//            else
-//            {
-//              /*##-8- Read data from the text file ###########################*/
-//              res = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
-//              
-//              if((bytesread == 0) || (res != FR_OK))
-//              {
-//                /* 'STM32.TXT' file Read or EOF Error */
-//                Error_Handler();
-//              }
-//              else
-//              {
-//                /*##-9- Close the open text file #############################*/
-//                f_close(&MyFile);
-//                
-//                /*##-10- Compare read data with the expected data ############*/
-//                if((bytesread != byteswritten))
-//                {                
-//                  /* Read data is different from the expected data */
-//                  Error_Handler();
-//                }
-//                else
-//                {
-//                  /* Success of the demo: no error occurrence */
-//                  BSP_LED_On(LED_GREEN);
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
+          /*##-6- Close the open text file #################################*/
+          if (f_close(&MyFile) != FR_OK )
+          {
+            Error_Handler(5);
+          }
+          
+          if((byteswritten == 0) || (res != FR_OK))
+          {
+            /* 'STM32.TXT' file Write or EOF Error */
+            Error_Handler(6);
+          }
+          else
+          {      
+            /*##-7- Open the text file object with read access ###############*/
+            if(f_open(&MyFile, "STM32.TXT", FA_READ) != FR_OK)
+            {
+              /* 'STM32.TXT' file Open for read Error */
+              Error_Handler(7);
+            }
+            else
+            {
+              /*##-8- Read data from the text file ###########################*/
+              res = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+              
+              if((bytesread == 0) || (res != FR_OK))
+              {
+                /* 'STM32.TXT' file Read or EOF Error */
+                Error_Handler(8);
+              }
+              else
+              {
+                /*##-9- Close the open text file #############################*/
+                f_close(&MyFile);
+                
+                /*##-10- Compare read data with the expected data ############*/
+                if((bytesread != byteswritten))
+                {                
+                  /* Read data is different from the expected data */
+                  Error_Handler(9);
+                }
+                else
+                {
+                  /* Success of the demo: no error occurrence */
+                }
+              }
+            }
+          }
+        }
+      }
 		// 遍历目录
 		char path[FF_LFN_BUF + 1] = "0:/";
 		FRESULT result = scan_files(path);
@@ -304,7 +306,6 @@ int main(void)
   
   /*##-11- Unlink the RAM disk I/O driver ####################################*/
   FATFS_UnLinkDriver(SDPath);
-
   
   /* Infinite loop */
   while (1)
@@ -351,10 +352,16 @@ GETCHAR_PROTOTYPE
   *            AHB Prescaler                  = 1
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
+//------------------stm3210c-------STM32F107VC---------------
   *            HSE Frequency(Hz)              = 25000000
   *            HSE PREDIV1                    = 5
   *            HSE PREDIV2                    = 5
   *            PLL2MUL                        = 8
+//------------------stm3210e-------STM32F103Zx---------------
+  *            HSE Frequency(Hz)              = 8000000
+  *            HSE PREDIV1                    = 1
+  *            PLLMUL                         = 9
+//------------------------------------------------
   *            Flash Latency(WS)              = 2
   * @param  None
   * @retval None
@@ -372,14 +379,15 @@ void SystemClock_Config(void)
   /* Enable HSE Oscillator and activate PLL with HSE as source */
   oscinitstruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
   oscinitstruct.HSEState              = RCC_HSE_ON;
-  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV5;
-  oscinitstruct.Prediv1Source         = RCC_PREDIV1_SOURCE_PLL2;
+  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV1;
+//  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV5;
+//  oscinitstruct.Prediv1Source         = RCC_PREDIV1_SOURCE_PLL2;
   oscinitstruct.PLL.PLLState          = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
   oscinitstruct.PLL.PLLMUL            = RCC_PLL_MUL9;
-  oscinitstruct.PLL2.PLL2State        = RCC_PLL2_ON;
-  oscinitstruct.PLL2.PLL2MUL          = RCC_PLL2_MUL8;
-  oscinitstruct.PLL2.HSEPrediv2Value  = RCC_HSE_PREDIV2_DIV5;
+//  oscinitstruct.PLL2.PLL2State        = RCC_PLL2_ON;
+//  oscinitstruct.PLL2.PLL2MUL          = RCC_PLL2_MUL8;
+//  oscinitstruct.PLL2.HSEPrediv2Value  = RCC_HSE_PREDIV2_DIV5;
   if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
   {
     /* Initialization Error */

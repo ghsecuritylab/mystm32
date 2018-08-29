@@ -135,7 +135,7 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
                                        TAMPER_BUTTON_EXTI_IRQn,
                                        KEY_BUTTON_EXTI_IRQn};
 
-
+#if 0
 /**
  * @brief COM variables
  */
@@ -148,7 +148,25 @@ GPIO_TypeDef* COM_RX_PORT[COMn]   = {EVAL_COM1_RX_GPIO_PORT};
 const uint16_t COM_TX_PIN[COMn]   = {EVAL_COM1_TX_PIN};
 
 const uint16_t COM_RX_PIN[COMn]   = {EVAL_COM1_RX_PIN};
+#endif
+
+//------------------------
+// stm3210e
+//------------------------
+
+/**
+ * @brief COM variables
+ */
+USART_TypeDef* COM_USART[COMn]   = {EVAL_COM1, EVAL_COM2}; 
+
+GPIO_TypeDef* COM_TX_PORT[COMn]   = {EVAL_COM1_TX_GPIO_PORT, EVAL_COM2_TX_GPIO_PORT};
  
+GPIO_TypeDef* COM_RX_PORT[COMn]   = {EVAL_COM1_RX_GPIO_PORT, EVAL_COM2_RX_GPIO_PORT};
+
+const uint16_t COM_TX_PIN[COMn]   = {EVAL_COM1_TX_PIN, EVAL_COM2_TX_PIN};
+
+const uint16_t COM_RX_PIN[COMn]   = {EVAL_COM1_RX_PIN, EVAL_COM2_RX_PIN};
+
 /**
  * @brief BUS variables
  */
@@ -776,8 +794,9 @@ static void SPIx_MspInit(void)
   /* Enable GPIO clock */
   EVAL_SPIx_SCK_GPIO_CLK_ENABLE();
   EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
-  __HAL_RCC_AFIO_CLK_ENABLE();
-  __HAL_AFIO_REMAP_SPI3_ENABLE();
+//  only used in stm3210c
+//  __HAL_RCC_AFIO_CLK_ENABLE();
+//  __HAL_AFIO_REMAP_SPI3_ENABLE();
   
   /* configure SPI SCK */
   gpioinitstruct.Pin        = EVAL_SPIx_SCK_PIN;
