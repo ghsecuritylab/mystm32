@@ -364,6 +364,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
   SD_IO_WriteByte(SD_DUMMY_BYTE);
   if ( response.r1 != SD_R1_NO_ERROR)
   {
+  printf("ReadBlocks error1!");
      goto error;
   }
 
@@ -375,6 +376,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
     response = SD_SendCmd(SD_CMD_READ_SINGLE_BLOCK, (ReadAddr + offset) * (flag_SDHC == 1 ? 1: BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
     if ( response.r1 != SD_R1_NO_ERROR)
     {
+  printf("ReadBlocks error2!");
       goto error;
     }
 
@@ -392,6 +394,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
     }
     else
     {
+  printf("ReadBlocks error3!");
       goto error;
     }
     
@@ -406,7 +409,6 @@ error :
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  printf("ReadBlocks error!");
   /* Return the reponse */
   return retr;
 }
@@ -434,6 +436,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
   SD_IO_WriteByte(SD_DUMMY_BYTE);
   if ( response.r1 != SD_R1_NO_ERROR)
   {
+  printf("WriteBlocks error!1");
     goto error;
   }
   
@@ -445,6 +448,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
     response = SD_SendCmd(SD_CMD_WRITE_SINGLE_BLOCK, (WriteAddr + offset) * (flag_SDHC == 1 ? 1 : BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
     if (response.r1 != SD_R1_NO_ERROR)
     {
+  printf("WriteBlocks error!2");
       goto error;
     }
     
@@ -469,6 +473,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
     if (SD_GetDataResponse() != SD_DATA_OK)
     {
       /* Set response value to failure */
+  printf("WriteBlocks error3");
       goto error;
     }
 
@@ -481,7 +486,6 @@ error :
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);    
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  printf("WriteBlocks error!");
   /* Return the reponse */
   return retr;
 }
