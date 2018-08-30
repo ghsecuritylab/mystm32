@@ -1,10 +1,12 @@
 /**
   ******************************************************************************
-  * @file    FatFs/FatFs_uSD/Src/stm32f1xx_it.c
+  * @file    USB_Device/MSC_Standalone/Src/stm32f1xx_it.c 
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
   * @brief   Main Interrupt Service Routines.
+  *          This file provides template for all exceptions handler and 
+  *          peripherals interrupt service routine.
   ******************************************************************************
   * @attention
   *
@@ -45,23 +47,29 @@
   ******************************************************************************
   */
 
-/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------ */
 #include "main.h"
 #include "stm32f1xx_it.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/** @addtogroup Validation_Project
+  * @{
+  */
+
+/* Private typedef ----------------------------------------------------------- */
+/* Private define ------------------------------------------------------------ */
+/* Private macro ------------------------------------------------------------- */
+/* Private variables --------------------------------------------------------- */
+extern PCD_HandleTypeDef hpcd;
+
+/* Private function prototypes ----------------------------------------------- */
+/* Private functions --------------------------------------------------------- */
 
 /******************************************************************************/
-/*             Cortex-M3 Processor Exceptions Handlers                         */
+/* Cortex-M3 Processor Exceptions Handlers */
 /******************************************************************************/
 
 /**
-  * @brief  This function handles NMI exception.
+  * @brief   This function handles NMI exception.
   * @param  None
   * @retval None
   */
@@ -159,19 +167,25 @@ void SysTick_Handler(void)
 }
 
 /******************************************************************************/
-/*                 STM32F1xx Peripherals Interrupt Handlers                        */
-/*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
-/*  available peripheral interrupt handler's name please refer to the startup */
-/*  file (startup_stm32f1xx.s).                                               */
+/* STM32F1xx Peripherals Interrupt Handlers */
+/* Add here the Interrupt Handler for the used peripheral(s) (PPP), for the */
+/* available peripheral interrupt handler's name please refer to the startup */
+/* file (startup_stm32f1xx.s).  */
 /******************************************************************************/
 
 /**
-  * @brief  This function handles PPP interrupt request.
+  * @brief  This function handles USB Handler.
   * @param  None
   * @retval None
   */
-/*void PPP_IRQHandler(void)
+void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-}*/
+  HAL_PCD_IRQHandler(&hpcd);
+}
+
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

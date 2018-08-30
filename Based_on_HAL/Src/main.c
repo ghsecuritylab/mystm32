@@ -59,6 +59,8 @@ char SDPath[4]; /* SD card logical drive path */
 BYTE work[FF_MAX_SS];	// 用于格式化的工作区，值越大格式化越快
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
+/* USB declaration */
+USBD_HandleTypeDef USBD_Device;
 
 /* Private function prototypes -----------------------------------------------*/
 #ifdef __GNUC__
@@ -146,17 +148,12 @@ FRESULT scan_files (char path[FF_LFN_BUF + 1])
 #define GET_SECONDS(t)		((t & 0x1F)*2U)
 
 /**
-  * @brief  Main program 接线方式见 stm32f10c_eval.h 的 SPIx 和 SD 部分
+  * @brief  Main program
   * @param  None
   * @retval None
   */
 int main(void)
 {
-  FRESULT res;                                          /* FatFs function common result code */
-  uint32_t byteswritten, bytesread;                     /* File write/read counts */
-  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
-  uint8_t rtext[100];                                   /* File read buffer */
-  
   /* STM32F107xC HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
@@ -196,7 +193,25 @@ int main(void)
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
   printf("** Test finished successfully. ** \n\r");
   /* Infinite loop */
-  getchar();
+  //getchar();
+#if 1
+  /* Init MSC Application */
+  USBD_Init(&USBD_Device, &MSC_Desc, 0);
+
+  /* Add Supported Class */
+  USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
+
+  /* Add Storage callbacks for MSC Class */
+  USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
+
+  /* Start Device Process */
+  USBD_Start(&USBD_Device);
+#else
+  FRESULT res;                                          /* FatFs function common result code */
+  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t rtext[100];                                   /* File read buffer */
+
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {
@@ -229,13 +244,13 @@ int main(void)
 		// 注意：在 Windows 上进行格式化后，使用 FatFs 遍历目录
 		// 会失败（一直卡在 f_opendir 这个函数这里）
 		// 使用 FatFs 进行格式化不会出现这个情况
-      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
+//      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
+//      {
+//        /* FatFs Format Error */
+//        Error_Handler(3);
+//      }
+//      else
       {
-        /* FatFs Format Error */
-        Error_Handler(3);
-      }
-      else
-      {       
         /*##-4- Create and Open a new text file object with write access #####*/
         if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
         {
@@ -306,7 +321,7 @@ int main(void)
   
   /*##-11- Unlink the RAM disk I/O driver ####################################*/
   FATFS_UnLinkDriver(SDPath);
-  
+#endif /* FatFS */
   /* Infinite loop */
   while (1)
   {
@@ -391,8 +406,15 @@ void SystemClock_Config(void)
   if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
   {
     /* Initialization Error */
-    while(1);
+    //while(1);
+    Error_Handler(0);
   }
+
+  /* USB clock selection */
+  RCC_PeriphCLKInitTypeDef rccperiphclkinit = { 0 };
+  rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
 
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
      clocks dividers */
@@ -404,7 +426,8 @@ void SystemClock_Config(void)
   if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
   {
     /* Initialization Error */
-    while(1); 
+    //while(1); 
+    Error_Handler(0);
   }
 }
 

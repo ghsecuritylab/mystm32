@@ -311,7 +311,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE,USE_STM3210E_EVAL</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Inc;.\BSP;.\Middlewares\FatFs;.\Middlewares\FatFs\drivers;.\CMSIS\STM32F1xx\Include;.\STM32F1xx_HAL_Driver\Inc</IncludePath>
+              <IncludePath>.\Inc;.\BSP;.\CMSIS\STM32F1xx\Include;.\STM32F1xx_HAL_Driver\Inc;.\Middlewares\FatFs;.\Middlewares\FatFs\drivers;.\Middlewares\STM32_USB_Device_Library\Core\Inc;.\Middlewares\STM32_USB_Device_Library\Class\MSC\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -378,7 +378,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Src</GroupName>
+          <GroupName>Application/Src</GroupName>
           <Files>
             <File>
               <FileName>main.c</FileName>
@@ -395,40 +395,35 @@
               <FileType>1</FileType>
               <FilePath>.\Src\system_stm32f1xx.c</FilePath>
             </File>
+            <File>
+              <FileName>usbd_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\usbd_conf.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_storage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\usbd_storage.c</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\README.md</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Middleware/FatFs</GroupName>
+          <GroupName>Application/Startup</GroupName>
           <Files>
             <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff_gen_drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\ff_gen_drv.c</FilePath>
-            </File>
-            <File>
-              <FileName>ffsystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\ffsystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>ffunicode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\ffunicode.c</FilePath>
-            </File>
-            <File>
-              <FileName>sd_diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Middlewares\FatFs\drivers\sd_diskio.c</FilePath>
+              <FileName>startup_stm32f103xe.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\CMSIS\STM32F1xx\Source\Templates\arm\startup_stm32f103xe.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -448,7 +443,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>HAL</GroupName>
+          <GroupName>Driver/HAL</GroupName>
           <Files>
             <File>
               <FileName>stm32f1xx_hal.c</FileName>
@@ -496,19 +491,104 @@
               <FilePath>.\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c</FilePath>
             </File>
             <File>
+              <FileName>stm32f1xx_hal_pcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_pcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_pcd_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_pcd_ex.c</FilePath>
+            </File>
+            <File>
               <FileName>stm32f1xx_ll_sdmmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_sdmmc.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f1xx_ll_usb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_usb.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Statup</GroupName>
+          <GroupName>Middleware/FatFs</GroupName>
           <Files>
             <File>
-              <FileName>startup_stm32f103xe.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\CMSIS\STM32F1xx\Source\Templates\arm\startup_stm32f103xe.s</FilePath>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff_gen_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffsystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\ffsystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffunicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\ffunicode.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\FatFs\drivers\sd_diskio.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middleware/USB_Device/Class/MSC</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_msc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_msc_bot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_bot.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_msc_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_msc_scsi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_scsi.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middleware/USB_Device/Core</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Core\Src\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ctlreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Core\Src\usbd_ctlreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middlewares\STM32_USB_Device_Library\Core\Src\usbd_ioreq.c</FilePath>
             </File>
           </Files>
         </Group>

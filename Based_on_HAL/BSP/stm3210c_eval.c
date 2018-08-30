@@ -832,6 +832,13 @@ static void SPIx_Init(void)
   heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
   heval_Spi.Init.CLKPhase           = SPI_PHASE_2EDGE;
   heval_Spi.Init.CLKPolarity        = SPI_POLARITY_HIGH;
+//----------------stm3210e------------------------
+  /* SPI baudrate is set to 36 MHz (PCLK2/SPI_BaudRatePrescaler = 72/2 = 36 MHz) */
+//  heval_Spi.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_2;
+//  heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
+//  heval_Spi.Init.CLKPhase           = SPI_PHASE_1EDGE;
+//  heval_Spi.Init.CLKPolarity        = SPI_POLARITY_LOW;
+//------------------------------------------------
   heval_Spi.Init.CRCCalculation     = SPI_CRCCALCULATION_DISABLE;
   heval_Spi.Init.CRCPolynomial      = 7;
   heval_Spi.Init.DataSize           = SPI_DATASIZE_8BIT;
@@ -1218,7 +1225,7 @@ void SD_IO_CSState(uint8_t val)
   if(val == 1) 
   {
     SD_CS_HIGH();
-}
+  }
   else
   {
     SD_CS_LOW();

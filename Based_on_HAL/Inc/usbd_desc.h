@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/MSC_Standalone/Inc/stm32f1xx_it.h 
+  * @file    USB_Device/MSC_Standalone/Inc/usbd_desc.h
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   Header for usbd_desc.c module
   ******************************************************************************
   * @attention
   *
@@ -46,38 +46,23 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif 
+#ifndef __USBD_DESC_H
+#define __USBD_DESC_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"    
+#include "usbd_def.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+#define         DEVICE_ID1          (0x1FFFF7E8)
+#define         DEVICE_ID2          (0x1FFFF7EC)
+#define         DEVICE_ID3          (0x1FFFF7F0)
+
+#define  USB_SIZ_STRING_SERIAL      0x1A
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+extern USBD_DescriptorsTypeDef MSC_Desc;
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void USB_LP_CAN1_RX0_IRQHandler(void);
-void SDIO_IRQHandler(void);
-//void SD_DMAx_Rx_IRQHandler(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32F1xx_IT_H */
+#endif /* __USBD_DESC_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

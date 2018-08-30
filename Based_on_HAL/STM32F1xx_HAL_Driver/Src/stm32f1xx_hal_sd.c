@@ -2452,11 +2452,11 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
   {
     hsd->SdCard.CardVersion = CARD_V1_X;
       
-//	errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0U);
-//    if(errorstate == SDMMC_ERROR_CMD_RSP_TIMEOUT)      //MMC       
-//    {
-//      return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
-//    }
+	errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0U);
+    if(errorstate == SDMMC_ERROR_CMD_RSP_TIMEOUT)      //MMC       
+    {
+      return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+    }
 	  
     /* Send ACMD41 SD_APP_OP_COND with Argument 0x80100000 */
     while(validvoltage == 0U)

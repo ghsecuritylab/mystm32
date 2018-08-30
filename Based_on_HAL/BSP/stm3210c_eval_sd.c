@@ -285,7 +285,11 @@ uint8_t BSP_SD_Init(void)
   }
   
   /* SD initialized and set to SPI mode properly */
-  return (SD_GoIdleState());
+//  return (SD_GoIdleState());
+  uint8_t xx = SD_GoIdleState();
+  if (xx==BSP_SD_ERROR)
+  printf("SD_GoIdleState error!");
+  return xx;
 }
 
 /**
@@ -313,7 +317,7 @@ uint8_t BSP_SD_IsDetected(void)
   *         - MSD_ERROR : Sequence failed
   *         - MSD_OK    : Sequence succeed
   */
-uint8_t BSP_SD_GetCardInfo(SD_CardInfo *pCardInfo)
+uint8_t BSP_SD_GetCardInfo(BSP_SD_CardInfo *pCardInfo)
 {
   uint8_t status;
 
@@ -335,7 +339,6 @@ uint8_t BSP_SD_GetCardInfo(SD_CardInfo *pCardInfo)
     pCardInfo->CardCapacity *= pCardInfo->CardBlockSize;
     pCardInfo->LogBlockNbr = (pCardInfo->CardCapacity) / (pCardInfo->LogBlockSize);
   }
-  
   return status;
 }
 /**
@@ -403,7 +406,7 @@ error :
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  
+  printf("ReadBlocks error!");
   /* Return the reponse */
   return retr;
 }
@@ -478,7 +481,7 @@ error :
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);    
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  
+  printf("WriteBlocks error!");
   /* Return the reponse */
   return retr;
 }
@@ -540,7 +543,7 @@ uint8_t BSP_SD_GetCardState(void)
   {
     return BSP_SD_OK;
   }
-
+printf("get card state error!");
   return BSP_SD_ERROR;
 }
 
@@ -956,7 +959,6 @@ uint8_t SD_GoIdleState(void)
   {
     return BSP_SD_ERROR;
   }
-  
   return BSP_SD_OK; 
 }
 

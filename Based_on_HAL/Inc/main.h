@@ -54,11 +54,19 @@
 
 /* EVAL includes component */
 #include "stm3210c_eval.h"
+//#include "stm3210c_eval_sd.h"
 
 /* FatFs includes component */
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
 #include "stdio.h"
+
+/* USB includes component */
+#include "usbd_core.h"
+#include "stm32f1xx_hal_pcd.h"
+#include "usbd_desc.h"
+#include "usbd_msc.h"
+#include "usbd_storage.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
