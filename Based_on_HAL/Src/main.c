@@ -245,7 +245,7 @@ int main(void)
 		// 会失败（一直卡在 f_opendir 这个函数这里）
 		// 使用 FatFs 进行格式化不会出现这个情况
       if(res == FR_NO_FILESYSTEM && 
-		  (res=f_mkfs((TCHAR const*)SDPath, FM_EXFAT, 0, work, sizeof work)) != FR_OK)
+		  (res=f_mkfs((TCHAR const*)SDPath, FM_FAT32, 0, work, sizeof work)) != FR_OK)
       {
 		  printf("mkfs_err=%d",res);
         /* FatFs Format Error */

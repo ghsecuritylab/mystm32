@@ -356,11 +356,11 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
   uint8_t retr = BSP_SD_ERROR;
   SD_CmdAnswer_typedef response;
   uint16_t BlockSize = 512;
-    
+  
+  //---------wait--------------------
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  //---------wait--------------------
 	
   /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
@@ -378,7 +378,8 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
   {
     /* Send CMD17 (SD_CMD_READ_SINGLE_BLOCK) to read one block */
     /* Check if the SD acknowledged the read block command: R1 response (0x00: no errors) */
-    response = SD_SendCmd(SD_CMD_READ_SINGLE_BLOCK, (ReadAddr + offset) * (flag_SDHC == 1 ? 1: BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
+	  //--------------------------------------this------------------------------
+    response = SD_SendCmd(SD_CMD_READ_SINGLE_BLOCK, (ReadAddr + offset/BlockSize) * (flag_SDHC == 1 ? 1: BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
     if ( response.r1 != SD_R1_NO_ERROR)
     {
   printf("ReadBlocks error2!");
@@ -434,10 +435,10 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
   SD_CmdAnswer_typedef response;
   uint16_t BlockSize = 512;
     
+  //---------wait--------------------
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  //---------wait--------------------
 	
   /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
@@ -455,7 +456,8 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
   {
     /* Send CMD24 (SD_CMD_WRITE_SINGLE_BLOCK) to write blocks  and
        Check if the SD acknowledged the write block command: R1 response (0x00: no errors) */
-    response = SD_SendCmd(SD_CMD_WRITE_SINGLE_BLOCK, (WriteAddr + offset) * (flag_SDHC == 1 ? 1 : BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
+	  //--------------------------------------this------------------------------
+    response = SD_SendCmd(SD_CMD_WRITE_SINGLE_BLOCK, (WriteAddr + offset/BlockSize) * (flag_SDHC == 1 ? 1 : BlockSize), 0xFF, SD_ANSWER_R1_EXPECTED);
     if (response.r1 != SD_R1_NO_ERROR)
     {
   printf("WriteBlocks error!2");
@@ -547,10 +549,10 @@ uint8_t BSP_SD_GetCardState(void)
 {
   SD_CmdAnswer_typedef retr;
   
+  //---------wait--------------------
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
-  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  //---------wait--------------------
 	
   /* Send CMD13 (SD_SEND_STATUS) to get SD status */
   retr = SD_SendCmd(SD_CMD_SEND_STATUS, 0, 0xFF, SD_ANSWER_R2_EXPECTED);
