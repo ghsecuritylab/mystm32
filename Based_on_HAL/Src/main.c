@@ -215,24 +215,24 @@ int main(void)
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {
-    FRESULT result;
     /*##-2- Register the file system object to the FatFs module ##############*/
-    if((result=f_mount(&SDFatFs, (TCHAR const*)SDPath, 1)) != FR_OK)
+	res=f_mount(&SDFatFs, (TCHAR const*)SDPath, 1);
+    if(res != FR_OK && res!= FR_NO_FILESYSTEM)
     {
-		printf("RESULT=%d\r\n",result);
+		printf("RESULT=%d\r\n",res);
 		//printf("ERROR=%d,STATUS=%d\r\n",uSdHandle.ErrorCode,uSdHandle.State);
-		BSP_SD_CardInfo CardInfo;
-		BSP_SD_GetCardInfo(&CardInfo);
-//		printf("BlockNbr=%d\r\n",CardInfo.BlockNbr);
-//		printf("BlockSize=%d\r\n",CardInfo.BlockSize);
-//		printf("CardType=%d\r\n",CardInfo.CardType);
-//		printf("CardVersion=%d\r\n",CardInfo.CardVersion);
-//		printf("Class=%d\r\n",CardInfo.Class);
-		printf("CardCapacity=%d\r\n",CardInfo.CardBlockSize);
-		printf("CardCapacity=%d\r\n",CardInfo.CardCapacity);
-//		printf("LogBlockNbr=%d\r\n",CardInfo.LogBlockNbr);
-//		printf("LogBlockSize=%d\r\n",CardInfo.LogBlockSize);
-//		printf("RelCardAdd=%d\r\n",CardInfo.RelCardAdd);
+		BSP_SD_CardInfo info;
+		BSP_SD_GetCardInfo(&info);
+//		printf("BlockNbr=%u\r\n",info.BlockNbr);
+//		printf("BlockSize=%u\r\n",info.BlockSize);
+//		printf("CardType=%u\r\n",info.CardType);
+//		printf("CardVersion=%u\r\n",info.CardVersion);
+//		printf("Class=%u\r\n",info.Class);
+	  	printf("LogBlockNbr=%u\r\n",info.LogBlockNbr);
+		printf("LogBlockSize=%u\r\n",info.LogBlockSize);
+	  	printf("CardBlockSize=%u\r\n",info.CardBlockSize);
+		printf("CardCapacity=%llu\r\n",info.CardCapacity);
+//		printf("RelCardAdd=%d\r\n",info.RelCardAdd);
       /* FatFs Initialization Error */
       Error_Handler(2);
     }
@@ -244,12 +244,14 @@ int main(void)
 		// 注意：在 Windows 上进行格式化后，使用 FatFs 遍历目录
 		// 会失败（一直卡在 f_opendir 这个函数这里）
 		// 使用 FatFs 进行格式化不会出现这个情况
-//      if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, work, sizeof work) != FR_OK)
-//      {
-//        /* FatFs Format Error */
-//        Error_Handler(3);
-//      }
-//      else
+      if(res == FR_NO_FILESYSTEM && 
+		  (res=f_mkfs((TCHAR const*)SDPath, FM_EXFAT, 0, work, sizeof work)) != FR_OK)
+      {
+		  printf("mkfs_err=%d",res);
+        /* FatFs Format Error */
+        Error_Handler(3);
+      }
+      else
       {
         /*##-4- Create and Open a new text file object with write access #####*/
         if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)

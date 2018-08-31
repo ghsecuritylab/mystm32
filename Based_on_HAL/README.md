@@ -19,3 +19,4 @@ Inc/stm32f1xx_it.h         |Interrupt handlers header file
 
 - SPI SD 读写程序，接线方式见 `stm32f10c_eval.h` 的 SPIx 和 SD 部分
 - USB 接线方式：DM/DP = PA11/PA12
+- 先运行程序，再将 USB 插入

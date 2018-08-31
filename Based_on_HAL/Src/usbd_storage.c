@@ -129,7 +129,7 @@ int8_t STORAGE_GetCapacity(uint8_t lun, uint32_t * block_num,
     BSP_SD_GetCardInfo(&info);
 
     *block_num = info.LogBlockNbr - 1;
-    *block_size = info.LogBlockSize;
+    *block_size = (uint16_t)info.LogBlockSize;
     ret = 0;
   }
   return ret;

@@ -327,7 +327,7 @@ uint8_t BSP_SD_GetCardInfo(BSP_SD_CardInfo *pCardInfo)
   {
     pCardInfo->LogBlockSize = 512;
     pCardInfo->CardBlockSize = 512;
-    pCardInfo->CardCapacity = (pCardInfo->Csd.version.v2.DeviceSize + 1) * 1024 * pCardInfo->LogBlockSize;
+    pCardInfo->CardCapacity = (pCardInfo->Csd.version.v2.DeviceSize + 1) * (uint64_t)1024 * pCardInfo->LogBlockSize;
     pCardInfo->LogBlockNbr = (pCardInfo->CardCapacity) / (pCardInfo->LogBlockSize);
   }
   else
@@ -356,7 +356,12 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
   uint8_t retr = BSP_SD_ERROR;
   SD_CmdAnswer_typedef response;
   uint16_t BlockSize = 512;
-  
+    
+  SD_IO_CSState(1);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+	
   /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
   response = SD_SendCmd(SD_CMD_SET_BLOCKLEN, BlockSize, 0xFF, SD_ANSWER_R1_EXPECTED);
@@ -428,7 +433,12 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
   uint8_t retr = BSP_SD_ERROR;
   SD_CmdAnswer_typedef response;
   uint16_t BlockSize = 512;
-  
+    
+  SD_IO_CSState(1);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+	
   /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
   response = SD_SendCmd(SD_CMD_SET_BLOCKLEN, BlockSize, 0xFF, SD_ANSWER_R1_EXPECTED);
@@ -537,6 +547,11 @@ uint8_t BSP_SD_GetCardState(void)
 {
   SD_CmdAnswer_typedef retr;
   
+  SD_IO_CSState(1);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+  SD_IO_WriteByte(SD_DUMMY_BYTE);
+	
   /* Send CMD13 (SD_SEND_STATUS) to get SD status */
   retr = SD_SendCmd(SD_CMD_SEND_STATUS, 0, 0xFF, SD_ANSWER_R2_EXPECTED);
   SD_IO_CSState(1);    
