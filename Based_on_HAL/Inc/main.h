@@ -53,23 +53,65 @@
 #include "stm32f1xx_hal.h"
 
 /* EVAL includes component */
-#include "stm3210c_eval.h"
-//#include "stm3210c_eval_sd.h"
+#include "stm3210x_eval.h"
 
-/* FatFs includes component */
-#include "ff_gen_drv.h"
-#include "sd_diskio.h"
-#include "stdio.h"
+#ifdef USB_MODE_DEVICE
+  /* USB Device includes component */
+  #include "usbd_core.h"
+  #include "stm32f1xx_hal_pcd.h"
+  #include "usbd_desc.h"
+  #include "usbd_msc.h"
+  #include "usbd_storage.h"
+#else
+  /* FatFs includes component */
+  #include "ff_gen_drv.h"
+  #include "sd_diskio.h"
+  #include "stdio.h"
+#endif
 
-/* USB includes component */
-#include "usbd_core.h"
-#include "stm32f1xx_hal_pcd.h"
-#include "usbd_desc.h"
-#include "usbd_msc.h"
-#include "usbd_storage.h"
+#ifdef USB_MODE_HOST
+  /* USB Host includes component */
+  #include "usbh_core.h"
+  #include "usbh_msc.h"
+#endif
 
 /* Exported types ------------------------------------------------------------*/
+
+#ifdef USB_MODE_HOST
+
+typedef enum {
+  MSC_DEMO_IDLE = 0,
+  MSC_DEMO_WAIT,  
+  MSC_DEMO_FILE_OPERATIONS,
+  MSC_DEMO_EXPLORER,
+  MSC_REENUMERATE,  
+}MSC_Demo_State;
+
+typedef struct _DemoStateMachine {
+  __IO MSC_Demo_State state;
+  __IO uint8_t        select; 
+}MSC_DEMO_StateMachine;
+
+typedef enum {
+  APPLICATION_IDLE = 0,  
+  APPLICATION_READY,    
+  APPLICATION_DISCONNECT,
+}MSC_ApplicationTypeDef;
+
+extern USBH_HandleTypeDef hUSBHost;
+extern FATFS USBH_fatfs;
+extern MSC_ApplicationTypeDef Appli_state;
+
+#endif /* USB_MODE_HOST */
+
 /* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+
+#ifdef USB_MODE_HOST
+  FRESULT Explore_Disk(char *path, uint8_t recu_level);
+  void MSC_File_Operations(void);
+#endif /* USB_MODE_HOST */
 
 #endif /* __MAIN_H */
 

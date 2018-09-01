@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/MSC_Standalone/Inc/stm32f1xx_it.h 
+  * @file    USB_Host/MSC_Standalone/Inc/usbh_conf.h
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   General low level driver configuration
   ******************************************************************************
   * @attention
   *
@@ -46,56 +46,63 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif 
+#ifndef __USBH_CONF_H
+#define __USBH_CONF_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"    
+#include "stm32f1xx_hal.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+/* Common Config */
+#define USBH_MAX_NUM_ENDPOINTS                2
+#define USBH_MAX_NUM_INTERFACES               2
+#define USBH_MAX_NUM_CONFIGURATION            1
+#define USBH_MAX_NUM_SUPPORTED_CLASS          1
+#define USBH_KEEP_CFG_DESCRIPTOR              0
+#define USBH_MAX_SIZE_CONFIGURATION           0x200
+#define USBH_MAX_DATA_BUFFER                  0x200
+#define USBH_DEBUG_LEVEL                      2
+#define USBH_USE_OS                           0
+
 /* Exported macro ------------------------------------------------------------*/
+/* Memory management macros */   
+#define USBH_malloc               malloc
+#define USBH_free                 free
+#define USBH_memset               memset
+#define USBH_memcpy               memcpy
+    
+/* DEBUG macros */   
+#if (USBH_DEBUG_LEVEL > 0)
+#define USBH_UsrLog(...)   printf(__VA_ARGS__);\
+                           printf("\n");
+#else
+#define USBH_UsrLog(...)   
+#endif 
+                            
+                            
+#if (USBH_DEBUG_LEVEL > 1)
+
+#define USBH_ErrLog(...)   printf("ERROR: ") ;\
+                           printf(__VA_ARGS__);\
+                           printf("\n");
+#else
+#define USBH_ErrLog(...)   
+#endif 
+                                                      
+#if (USBH_DEBUG_LEVEL > 2)                         
+#define USBH_DbgLog(...)   printf("DEBUG : ") ;\
+                           printf(__VA_ARGS__);\
+                           printf("\n");
+#else
+#define USBH_DbgLog(...)                         
+#endif
+
 /* Exported functions ------------------------------------------------------- */
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-#if defined(STM32F105xC) || defined(STM32F107xC)
-	#if defined(USB_MODE_DEVICE)
-		void OTG_FS_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		void OTG_FS_WKUP_IRQHandler(void);
-		void EXTI15_10_IRQHandler(void);
-	#endif
-#elif defined(STM32F102xx) || defined(STM32F103xx)
-	#if defined(USB_MODE_DEVICE)
-		void USB_LP_CAN1_RX0_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		#error "STM32F102xx, STM32F103xx do not support usb host"
-	#endif
-#endif
-
-#if defined(SD_MODE_SPI)
-	;
-#elif defined(SD_MODE_SDIO)
-	void SD_DMAx_Rx_IRQHandler(void);
-	void SDIO_IRQHandler(void);
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32F1xx_IT_H */
+#endif /* __USBH_CONF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

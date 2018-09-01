@@ -53,36 +53,43 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-FATFS SDFatFs;  /* File system object for SD card logical drive */
-FIL MyFile;     /* File object */
-char SDPath[4]; /* SD card logical drive path */
-BYTE work[FF_MAX_SS];	// 用于格式化的工作区，值越大格式化越快
+
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
-/* USB declaration */
-USBD_HandleTypeDef USBD_Device;
+
+#ifdef FF_DEFINED
+  FATFS SDFatFs;  /* File system object for SD card logical drive */
+  FIL MyFile;     /* File object */
+  char SDPath[4]; /* SD card logical drive path */
+  BYTE work[FF_MAX_SS];   // 用于格式化的工作区，值越大格式化越快
+#endif
+
+#ifdef USB_MODE_DEVICE
+  /* USB declaration */
+  USBD_HandleTypeDef USBD_Device;
+#endif
 
 /* Private function prototypes -----------------------------------------------*/
 #ifdef __GNUC__
-/* With GCC, small printf (option LD Linker->Libraries->Small printf
-   set to 'Yes') calls __io_putchar() */
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#define GETCHAR_PROTOTYPE int __io_getchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+  /* With GCC, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
+  #else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
 #endif /* __GNUC__ */
+
 void SystemClock_Config(void);
 static void Error_Handler(uint8_t id);
 
 /* Private functions ---------------------------------------------------------*/
-// use this to learn sth about SDIO mode
-//extern SD_HandleTypeDef uSdHandle;
+#ifdef FF_DEFINED
 uint16_t _strlen(char* s)
 {
-	uint16_t i=0;
-	while (s[i])++i;
-	return i;
+    uint16_t i=0;
+    while (s[i])++i;
+    return i;
 }
 // 递归扫描 path 路径下的文件
 FRESULT scan_files (char path[FF_LFN_BUF + 1])
@@ -137,15 +144,15 @@ FRESULT scan_files (char path[FF_LFN_BUF + 1])
   return result;
 }
 
-
-#define MAKE_DATE(y,m,d)	((WORD)(((y - 1980) << 9) | m << 5 | d))
-#define MAKE_TIME(h,m,s)	((WORD)(h << 11 | m << 5 | s / 2U))
-#define GET_YEAR(d)			((d >> 9) + 1980)
-#define GET_MONTH(d)		(d >> 5 & 0x0F)
-#define GET_DAY(d)			(d & 0x1F)
-#define GET_HOUR(t)			(t >> 11)
-#define GET_MINUTE(t)		(t >> 5 & 0x3F)
-#define GET_SECONDS(t)		((t & 0x1F)*2U)
+#define MAKE_DATE(y,m,d)    ((WORD)(((y - 1980) << 9) | m << 5 | d))
+#define MAKE_TIME(h,m,s)    ((WORD)(h << 11 | m << 5 | s / 2U))
+#define GET_YEAR(d)         ((d >> 9) + 1980)
+#define GET_MONTH(d)        (d >> 5 & 0x0F)
+#define GET_DAY(d)          (d & 0x1F)
+#define GET_HOUR(t)         (t >> 11)
+#define GET_MINUTE(t)       (t >> 5 & 0x3F)
+#define GET_SECONDS(t)      ((t & 0x1F)*2U)
+#endif /* FF_DEFINED */
 
 /**
   * @brief  Main program
@@ -168,10 +175,6 @@ int main(void)
  
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
-  
-  /* Configure LED_GREEN and LED_RED */
-//  BSP_LED_Init(LED_GREEN);
-//  BSP_LED_Init(LED_RED);
 
   /*##-1- Configure the UART peripheral ######################################*/
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
@@ -191,10 +194,11 @@ int main(void)
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
-  printf("** Test finished successfully. ** \n\r");
+
   /* Infinite loop */
   //getchar();
-#if 1
+
+#ifdef USB_MODE_DEVICE
   /* Init MSC Application */
   USBD_Init(&USBD_Device, &MSC_Desc, 0);
 
@@ -206,7 +210,11 @@ int main(void)
 
   /* Start Device Process */
   USBD_Start(&USBD_Device);
-#else
+#else defined(USB_MODE_HOST)
+
+#endif /* USB_MODE_DEVICE */
+
+#ifdef FF_DEFINED
   FRESULT res;                                          /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
@@ -216,38 +224,38 @@ int main(void)
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {
     /*##-2- Register the file system object to the FatFs module ##############*/
-	res=f_mount(&SDFatFs, (TCHAR const*)SDPath, 1);
+    res=f_mount(&SDFatFs, (TCHAR const*)SDPath, 1);
     if(res != FR_OK && res!= FR_NO_FILESYSTEM)
     {
-		printf("RESULT=%d\r\n",res);
-		//printf("ERROR=%d,STATUS=%d\r\n",uSdHandle.ErrorCode,uSdHandle.State);
-		BSP_SD_CardInfo info;
-		BSP_SD_GetCardInfo(&info);
-//		printf("BlockNbr=%u\r\n",info.BlockNbr);
-//		printf("BlockSize=%u\r\n",info.BlockSize);
-//		printf("CardType=%u\r\n",info.CardType);
-//		printf("CardVersion=%u\r\n",info.CardVersion);
-//		printf("Class=%u\r\n",info.Class);
-	  	printf("LogBlockNbr=%u\r\n",info.LogBlockNbr);
-		printf("LogBlockSize=%u\r\n",info.LogBlockSize);
-	  	printf("CardBlockSize=%u\r\n",info.CardBlockSize);
-		printf("CardCapacity=%llu\r\n",info.CardCapacity);
-//		printf("RelCardAdd=%d\r\n",info.RelCardAdd);
+      printf("RESULT=%d\r\n",res);
+
+      #ifdef SD_MODE_SDIO
+      extern SD_HandleTypeDef uSdHandle;
+      printf("ERROR=%d,STATUS=%d\r\n",uSdHandle.ErrorCode,uSdHandle.State);
+      BSP_SD_CardInfo info;
+      BSP_SD_GetCardInfo(&info);
+      printf("BlockNbr=%u\r\n",info.BlockNbr);
+      printf("BlockSize=%u\r\n",info.BlockSize);
+      printf("CardType=%u\r\n",info.CardType);
+      printf("CardVersion=%u\r\n",info.CardVersion);
+      printf("Class=%u\r\n",info.Class);
+      printf("RelCardAdd=%d\r\n",info.RelCardAdd);
+      #endif 
       /* FatFs Initialization Error */
       Error_Handler(2);
     }
     else
     {
-	  printf("mount_ok\r\n");
+      printf("mount_ok\r\n");
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
-		// 注意：在 Windows 上进行格式化后，使用 FatFs 遍历目录
-		// 会失败（一直卡在 f_opendir 这个函数这里）
-		// 使用 FatFs 进行格式化不会出现这个情况
+        // 注意：在 Windows 上进行格式化后，使用 FatFs 遍历目录
+        // 会失败（一直卡在 f_opendir 这个函数这里）
+        // 使用 FatFs 进行格式化不会出现这个情况
       if(res == FR_NO_FILESYSTEM && 
-		  (res=f_mkfs((TCHAR const*)SDPath, FM_FAT32, 0, work, sizeof work)) != FR_OK)
+          (res=f_mkfs((TCHAR const*)SDPath, FM_FAT32, 0, work, sizeof work)) != FR_OK)
       {
-		  printf("mkfs_err=%d",res);
+          printf("mkfs_err=%d",res);
         /* FatFs Format Error */
         Error_Handler(3);
       }
@@ -313,17 +321,18 @@ int main(void)
           }
         }
       }
-		// 遍历目录
-		char path[FF_LFN_BUF + 1] = "0:/";
-		FRESULT result = scan_files(path);
-		if (result != FR_OK)
-			printf("FAILED_TO_LIST_FILES=%d\n", result);
+      // 遍历目录
+      char path[FF_LFN_BUF + 1] = "0:/";
+      FRESULT result = scan_files(path);
+      if (result != FR_OK)
+        printf("FAILED_TO_LIST_FILES=%d\n", result);
     }
-  }else printf("Link FAILED\r\n");
+  } else printf("Link FAILED\r\n");
   
   /*##-11- Unlink the RAM disk I/O driver ####################################*/
   FATFS_UnLinkDriver(SDPath);
-#endif /* FatFS */
+#endif /* FF_DEFINED */
+
   /* Infinite loop */
   while (1)
   {
@@ -369,12 +378,12 @@ GETCHAR_PROTOTYPE
   *            AHB Prescaler                  = 1
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
-//------------------stm3210c-------STM32F107VC---------------
+//-------------------------STM32F107xx---------------
   *            HSE Frequency(Hz)              = 25000000
   *            HSE PREDIV1                    = 5
   *            HSE PREDIV2                    = 5
   *            PLL2MUL                        = 8
-//------------------stm3210e-------STM32F103Zx---------------
+//-------------------------STM32F103xx---------------
   *            HSE Frequency(Hz)              = 8000000
   *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
@@ -396,15 +405,18 @@ void SystemClock_Config(void)
   /* Enable HSE Oscillator and activate PLL with HSE as source */
   oscinitstruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
   oscinitstruct.HSEState              = RCC_HSE_ON;
+#if defined(STM32F105xC) || defined(STM32F107xC)
+  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV5;
+  oscinitstruct.Prediv1Source         = RCC_PREDIV1_SOURCE_PLL2;
+  oscinitstruct.PLL2.PLL2State        = RCC_PLL2_ON;
+  oscinitstruct.PLL2.PLL2MUL          = RCC_PLL2_MUL8;
+  oscinitstruct.PLL2.HSEPrediv2Value  = RCC_HSE_PREDIV2_DIV5;
+#elif defined(STM32F102xx) || defined(STM32F103xx)
   oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV1;
-//  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV5;
-//  oscinitstruct.Prediv1Source         = RCC_PREDIV1_SOURCE_PLL2;
+#endif
   oscinitstruct.PLL.PLLState          = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
   oscinitstruct.PLL.PLLMUL            = RCC_PLL_MUL9;
-//  oscinitstruct.PLL2.PLL2State        = RCC_PLL2_ON;
-//  oscinitstruct.PLL2.PLL2MUL          = RCC_PLL2_MUL8;
-//  oscinitstruct.PLL2.HSEPrediv2Value  = RCC_HSE_PREDIV2_DIV5;
   if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
   {
     /* Initialization Error */
@@ -415,12 +427,18 @@ void SystemClock_Config(void)
   /* USB clock selection */
   RCC_PeriphCLKInitTypeDef rccperiphclkinit = { 0 };
   rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+
+#if defined(STM32F105xC) || defined(STM32F107xC)
+  rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV3;
+#elif defined(STM32F102xx) || defined(STM32F103xx)
   rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+#endif
   HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
 
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
      clocks dividers */
-  clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+  clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
+                             RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
   clkinitstruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;

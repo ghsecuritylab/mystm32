@@ -173,15 +173,52 @@ void SysTick_Handler(void)
 /* file (startup_stm32f1xx.s).  */
 /******************************************************************************/
 
-/**
-  * @brief  This function handles USB Handler.
-  * @param  None
-  * @retval None
-  */
-void USB_LP_CAN1_RX0_IRQHandler(void)
-{
-  HAL_PCD_IRQHandler(&hpcd);
-}
+#if defined(STM32F105xC) || defined(STM32F107xC)
+  #if defined(USB_MODE_DEVICE)
+    /**
+      * @brief  This function handles USB-On-The-Go FS global interrupt request.
+      * @param  None
+      * @retval None
+      */
+    void OTG_FS_IRQHandler(void)
+    {
+      HAL_PCD_IRQHandler(&hpcd);
+    }
+  #elif defined(USB_MODE_HOST)
+    /**
+      * @brief  This function handles USB-On-The-Go FS global interrupt request.
+      * @param  None
+      * @retval None
+      */
+    void OTG_FS_IRQHandler(void)
+    {
+      HAL_HCD_IRQHandler(&hhcd);
+    }
+
+    /**
+      * @brief  This function handles External lines 10 to 15 interrupt request.
+      * @param  None
+      * @retval None
+      */
+    void EXTI15_10_IRQHandler(void)
+    {
+      HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+    }
+  #endif
+#elif defined(STM32F102xx) || defined(STM32F103xx)
+  #if defined(USB_MODE_DEVICE)
+    /**
+    * @brief  This function handles USB Handler.
+    * @param  None
+    * @retval None
+    */
+    void USB_LP_CAN1_RX0_IRQHandler(void)
+    {
+      HAL_PCD_IRQHandler(&hpcd);
+    }
+  #endif
+#endif
+
 
 
 /**

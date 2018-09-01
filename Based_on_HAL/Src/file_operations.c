@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/MSC_Standalone/Inc/stm32f1xx_it.h 
+  * @file    USB_Host/MSC_Standalone/Src/file_operations.c 
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   Write/read file on the disk.
   ******************************************************************************
   * @attention
   *
@@ -45,57 +45,85 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
+/* Includes ------------------------------------------------------------------ */
+#include "main.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif 
+/* Private typedef ----------------------------------------------------------- */
+/* Private define ------------------------------------------------------------ */
+FATFS USBH_fatfs;
+FIL MyFile;
+FRESULT res;
+uint32_t bytesWritten;
+uint8_t rtext[200];
+uint8_t wtext[] = "USB Host Library : Mass Storage Example";
 
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"    
+/* Private macro ------------------------------------------------------------- */
+/* Private variables --------------------------------------------------------- */
+/* Private function prototypes ----------------------------------------------- */
+/* Private functions --------------------------------------------------------- */
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/**
+  * @brief  Files operations: Read/Write and compare
+  * @param  None
+  * @retval None
+  */
+void MSC_File_Operations(void)
+{
+  uint16_t bytesread;
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-#if defined(STM32F105xC) || defined(STM32F107xC)
-	#if defined(USB_MODE_DEVICE)
-		void OTG_FS_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		void OTG_FS_WKUP_IRQHandler(void);
-		void EXTI15_10_IRQHandler(void);
-	#endif
-#elif defined(STM32F102xx) || defined(STM32F103xx)
-	#if defined(USB_MODE_DEVICE)
-		void USB_LP_CAN1_RX0_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		#error "STM32F102xx, STM32F103xx do not support usb host"
-	#endif
-#endif
+  LCD_UsrLog("INFO : FatFs Initialized \n");
 
-#if defined(SD_MODE_SPI)
-	;
-#elif defined(SD_MODE_SDIO)
-	void SD_DMAx_Rx_IRQHandler(void);
-	void SDIO_IRQHandler(void);
-#endif
+  if (f_open(&MyFile, "0:USBHost.txt", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
+  {
+    LCD_ErrLog("Cannot Open 'USBHost.txt' file \n");
+  }
+  else
+  {
+    LCD_UsrLog("INFO : 'USBHost.txt' opened for write  \n");
+    res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&bytesWritten);
+    f_close(&MyFile);
 
-#ifdef __cplusplus
+    if ((bytesWritten == 0) || (res != FR_OK))  /* EOF or Error */
+    {
+      LCD_ErrLog("Cannot Write on the  'USBHost.txt' file \n");
+    }
+    else
+    {
+      if (f_open(&MyFile, "0:USBHost.txt", FA_READ) != FR_OK)
+      {
+        LCD_ErrLog("Cannot Open 'USBHost.txt' file for read.\n");
+      }
+      else
+      {
+        LCD_UsrLog("INFO : Text written on the 'USBHost.txt' file \n");
+
+        res = f_read(&MyFile, rtext, sizeof(rtext), (void *)&bytesread);
+
+        if ((bytesread == 0) || (res != FR_OK)) /* EOF or Error */
+        {
+          LCD_ErrLog("Cannot Read from the  'USBHost.txt' file \n");
+        }
+        else
+        {
+          LCD_UsrLog("Read Text : \n");
+          LCD_DbgLog((char *)rtext);
+          LCD_DbgLog("\n");
+        }
+        f_close(&MyFile);
+      }
+      /* Compare read data with the expected data */
+      if ((bytesread == bytesWritten))
+      {
+        LCD_UsrLog("INFO : FatFs data compare SUCCES");
+        LCD_UsrLog("\n");
+      }
+      else
+      {
+        LCD_ErrLog("FatFs data compare ERROR");
+        LCD_ErrLog("\n");
+      }
+    }
+  }
 }
-#endif
-
-#endif /* __STM32F1xx_IT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
