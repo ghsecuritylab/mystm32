@@ -10,16 +10,12 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "ff.h"
 #include "../mylib.h"
-//#define SUPPORT_SD
-#ifdef SUPPORT_SD
-#include "../SDCard/mySD_SDIO.h"
-extern SD_CardInfo SDCardInfo;
-#endif
+
 // 为每个设备定义一个物理编号
 // SD 卡
-#define ATA			    0
+#define ATA			    1
 // SPI FLASH 芯片
-#define SPI_FLASH		1
+#define SPI_FLASH		0
 
 //#define FLASH_ID				0xEF3015	/*W25X16*/
 //#define FLASH_ID				0xEF4015	/*W25Q16*/
@@ -59,12 +55,7 @@ DSTATUS disk_initialize(BYTE pdrv)
 	DSTATUS status = STA_NOINIT;	
 	switch (pdrv) {
 	case ATA:			// SD CARD
-		#ifdef SUPPORT_SD
-		if (SD_Init() == SD_OK)
-		{
-			status = RES_OK;
-		}
-		#endif
+		
 		break;
     case SPI_FLASH:		// SPI Flash
 		SPI_FLASH_Init();
@@ -92,45 +83,7 @@ DRESULT disk_read (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
-		#ifdef SUPPORT_SD
-		//传入的buff数据地址不是四字节对齐，需要额外处理
-		if ((uint32_t)buff % 4 != 0) 
-		{
-			uint8_t i;
-			for (i = 0; i<count; i++)
-			{
-				SD_ReadBlock(align_buffer, (sector+i)*SD_SectorSize, SD_SectorSize);
-				// Check if the Transfer is finished
-				// 循环查询DMA传输是否结束
-				SD_WaitReadOperation();
-				// Wait until end of DMA transfer
-				while (SD_GetStatus() != SD_TRANSFER_OK);
-
-				for (uint16_t j = 0; j<SD_SectorSize; ++j)
-					buff[j] = align_buffer[j];
-
-				buff += SD_SectorSize;
-			}
-		}
-		else	//传入的buff数据地址四字节对齐，直接读取
-		{
-			if (count > 1)
-			{
-				SD_ReadMultiBlocks(buff, sector*SD_SectorSize, SD_SectorSize, count);
-			}
-			else
-			{
-				SD_ReadBlock(buff, sector*SD_SectorSize, SD_SectorSize);
-			}
-			// Check if the Transfer is finished 
-			// 循环查询DMA传输是否结束
-			SD_WaitReadOperation();
-
-			// Wait until end of DMA transfer
-			while (SD_GetStatus() != SD_TRANSFER_OK);
-		}
-		status = RES_OK;
-		#endif
+		
 		break;
 	case SPI_FLASH:
 		SPI_FLASH_BufferRead(buff, sector*FLASH_SectorSize, count*FLASH_SectorSize);
@@ -158,48 +111,7 @@ DRESULT disk_write (
 	switch (pdrv)
 	{
 	case ATA:	// SD CARD
-		#ifdef SUPPORT_SD
-		// 若传入的buff地址不是4字节对齐，需要额外处理
-		if ((uint32_t)buff % 4 != 0)
-		{
-			uint8_t i;
-			for (i = 0; i<count; i++)
-			{
-				for (uint16_t j = 0; j<SD_SectorSize; ++j)
-					align_buffer[j] = buff[j];
-				
-				// 单个sector的写操作
-				SD_WriteBlock(align_buffer, (sector+i)*SD_SectorSize, SD_SectorSize);
 
-				// Check if the Transfer is finished
-				// 等待DMA传输结束
-				SD_WaitWriteOperation();
-
-				// 等待SDIO到SD卡传输结束
-				while (SD_GetStatus() != SD_TRANSFER_OK);
-
-				buff += SD_SectorSize;
-			}
-		}
-		else // 4字节对齐，不需要额外处理
-		{
-			if (count > 1)
-			{
-				SD_WriteMultiBlocks((uint8_t *)buff, sector*SD_SectorSize, SD_SectorSize, count);
-			}
-			else
-			{
-				SD_WriteBlock((uint8_t *)buff, sector*SD_SectorSize, SD_SectorSize);
-			}
-			// Check if the Transfer is finished
-			// 等待DMA传输结束
-			SD_WaitWriteOperation();
-
-			// 等待SDIO到SD卡传输结束
-			while (SD_GetStatus() != SD_TRANSFER_OK);
-		}
-		status = RES_OK;
-		#endif
 		break;
 	case SPI_FLASH:
 		write_addr = sector*FLASH_SectorSize;
@@ -223,22 +135,7 @@ DRESULT disk_ioctl (
 	switch (pdrv)
 	{
 	case ATA:		// SD CARD
-		#ifdef SUPPORT_SD
-		switch (cmd)
-		{
-		case GET_SECTOR_SIZE:	// Get R/W sector size (WORD) 
-			*(WORD *)buff = SD_SectorSize;
-			break;
-		case GET_SECTOR_COUNT:	// SDSC 不确定，SDHC 就是 512
-			*(DWORD *)buff = SDCardInfo.CardCapacity / SDCardInfo.CardBlockSize;
-		case GET_BLOCK_SIZE:	// Get erase block size in unit of sector (DWORD)
-			*(DWORD *)buff = SDCardInfo.CardBlockSize;
-			break;
-		case CTRL_SYNC:
-			break;
-		}
-		status = RES_OK;
-		#endif
+
 		break;
 	case SPI_FLASH:
 		switch (cmd)

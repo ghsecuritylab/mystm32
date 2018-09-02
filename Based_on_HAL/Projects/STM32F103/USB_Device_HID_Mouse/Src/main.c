@@ -62,6 +62,8 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 USBD_HandleTypeDef USBD_Device;
+/* UART handler declaration */
+UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
@@ -88,6 +90,22 @@ int main(void)
 
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
+
+  /*##-1- Configure the UART peripheral ######################################*/
+  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
+  /* UART configured as follows:
+      - Word Length = 8 Bits (7 data bit + 1 parity bit) : BE CAREFUL : Program 7 data bits + 1 parity bit in PC HyperTerminal
+      - Stop Bit    = One Stop bit
+      - Parity      = no parity
+      - BaudRate    = 115200 baud
+      - Hardware flow control disabled (RTS and CTS signals) */
+  UartHandle.Init.BaudRate   = 115200;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits   = UART_STOPBITS_1;
+  UartHandle.Init.Parity     = UART_PARITY_NONE;
+  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  UartHandle.Init.Mode       = UART_MODE_TX_RX;
+  BSP_COM_Init(COM1, &UartHandle);
 
   /* Initialize Joystick */
   BSP_JOY_Init(JOY_MODE_GPIO);

@@ -2,7 +2,6 @@
 #include "FATFS/ff.h"
 #include <stdio.h>
 #include <string.h>
-#include "SDCard/mySD_SDIO.h"
 
 // 递归扫描 path 路径下的文件
 FRESULT scan_files (char path[FF_LFN_BUF + 1])
@@ -88,31 +87,31 @@ void FATFS_EXAMPLE(void)
 	// 如果没有文件系统就格式化创建创建文件系统
 	if (result == FR_NO_FILESYSTEM)
 	{
-//		// 格式化 FM_ANY 使用 FM_FAT, FM_FAT32, FM_EXFAT
-//		result = f_mkfs("0:", FM_ANY, 0, work, sizeof work);
+		// 格式化 FM_ANY 使用 FM_FAT, FM_FAT32, FM_EXFAT
+		result = f_mkfs("0:", FM_FAT, 0, work, sizeof work);
 
-//		if (result == FR_OK)
-//		{
-//			printf("SUCCEED_TO_FORMAT\n");
-//			// 格式化后，先取消挂载
-//			result = f_mount(NULL, "1:", 1);	// 0：不立即执行，1：立即执行
-//			// 重新挂载
-//			result = f_mount(&fs, "1:", 1);		// 0：不立即执行，1：立即执行
-//			if (result == FR_OK)
-//			{
-//				printf("DEVICE_MOUNTED\n");
-//			}
-//			else
-//			{
-//				printf("DEVICE_NOT_MOUNTED\n");
-//				return;
-//			}
-//		}
-//		else
-//		{
-//			printf("FAILED_TO_FORMAT\n");
-//			return;
-//		}
+		if (result == FR_OK)
+		{
+			printf("SUCCEED_TO_FORMAT\n");
+			// 格式化后，先取消挂载
+			result = f_mount(NULL, "1:", 1);	// 0：不立即执行，1：立即执行
+			// 重新挂载
+			result = f_mount(&fs, "1:", 1);		// 0：不立即执行，1：立即执行
+			if (result == FR_OK)
+			{
+				printf("DEVICE_MOUNTED\n");
+			}
+			else
+			{
+				printf("DEVICE_NOT_MOUNTED\n");
+				return;
+			}
+		}
+		else
+		{
+			printf("FAILED_TO_FORMAT\n");
+			return;
+		}
 	}
 	else if (result != FR_OK)
 	{
@@ -121,134 +120,134 @@ void FATFS_EXAMPLE(void)
 		return;
 	}
 
-//	// 文件系统测试：写测试
-//	// 打开文件，每次都以新建的形式打开，属性为可写
-//	result = f_open(&fnew, "0:first_file.txt", FA_CREATE_ALWAYS | FA_WRITE);
-//	if (result == FR_OK)
-//	{
-//		// 将指定存储区内容写入到文件内
-//		result = f_write(&fnew, WriteBuffer, sizeof(WriteBuffer), &num);
-//		if (result == FR_OK)
-//		{
-//			printf("WRITE_BYTE_NUM=%d\n", num);
-//			printf("WRITE=%s\n", WriteBuffer);
-//		}
-//		else
-//		{
-//			printf("FAILED_TO_WRITE_FILE=%d\n", result);
-//		}
+	// 文件系统测试：写测试
+	// 打开文件，每次都以新建的形式打开，属性为可写
+	result = f_open(&fnew, "0:first_file.txt", FA_CREATE_ALWAYS | FA_WRITE);
+	if (result == FR_OK)
+	{
+		// 将指定存储区内容写入到文件内
+		result = f_write(&fnew, WriteBuffer, sizeof(WriteBuffer), &num);
+		if (result == FR_OK)
+		{
+			printf("WRITE_BYTE_NUM=%d\n", num);
+			printf("WRITE=%s\n", WriteBuffer);
+		}
+		else
+		{
+			printf("FAILED_TO_WRITE_FILE=%d\n", result);
+		}
 
-//		// 不再读写，关闭文件
-//		f_close(&fnew);
-//	}
-//	else
-//	{
-//		printf("FAILED_TO_OPEN_FILE\n");
-//	}
-//	
-//	// 文件系统测试：读测试
-//	result = f_open(&fnew, "0:first_file.txt", FA_OPEN_EXISTING | FA_READ);
-//	if (result == FR_OK)
-//	{
-//		result = f_read(&fnew, ReadBuffer, sizeof(ReadBuffer), &num); 
-//		if (result == FR_OK)
-//		{
-//			printf("BYTE_READ_NUM=%d\n", num);
-//			printf("READ=%s\n", ReadBuffer);
-//		}
-//		else
-//		{
-//			printf("FAILED_TO_READ_FILE=%d\n", result);
-//		}
-//	}
-//	else
-//	{
-//		printf("FAILED_TO_OPEN_FILE=%d\n",result);
-//	}
-//	// 不再读写，关闭文件
-//	f_close(&fnew);
+		// 不再读写，关闭文件
+		f_close(&fnew);
+	}
+	else
+	{
+		printf("FAILED_TO_OPEN_FILE\n");
+	}
+	
+	// 文件系统测试：读测试
+	result = f_open(&fnew, "0:first_file.txt", FA_OPEN_EXISTING | FA_READ);
+	if (result == FR_OK)
+	{
+		result = f_read(&fnew, ReadBuffer, sizeof(ReadBuffer), &num); 
+		if (result == FR_OK)
+		{
+			printf("BYTE_READ_NUM=%d\n", num);
+			printf("READ=%s\n", ReadBuffer);
+		}
+		else
+		{
+			printf("FAILED_TO_READ_FILE=%d\n", result);
+		}
+	}
+	else
+	{
+		printf("FAILED_TO_OPEN_FILE=%d\n",result);
+	}
+	// 不再读写，关闭文件
+	f_close(&fnew);
 
-//	// 获取设备信息和空簇大小
-//	result = f_getfree("0:", &free_clust, &pfs);
+	// 获取设备信息和空簇大小
+	result = f_getfree("0:", &free_clust, &pfs);
 
-//	// 计算得到总的扇区个数和空扇区个数
-//	total_sect = (pfs->n_fatent - 2) * pfs->csize;
-//	free_sect = free_clust * pfs->csize;
+	// 计算得到总的扇区个数和空扇区个数
+	total_sect = (pfs->n_fatent - 2) * pfs->csize;
+	free_sect = free_clust * pfs->csize;
 
-//	// 打印信息(4096 字节/扇区)
-//	printf("TOTAL_SIZE=%10lu KB\n", total_sect*4);
-//	printf("AVAILABLE=%10lu KB\n", free_sect*4);
+	// 打印信息(4096 字节/扇区)
+	printf("TOTAL_SIZE=%10lu KB\n", total_sect*4);
+	printf("AVAILABLE=%10lu KB\n", free_sect*4);
 
-//	result = f_open(&fnew, "0:first_file.txt", FA_OPEN_ALWAYS|FA_WRITE|FA_READ);
-//	if (result == FR_OK)
-//	{
-//		// 文件定位
-//		result = f_lseek(&fnew, f_size(&fnew));
-//		if (result == FR_OK)
-//		{
-//			// 格式化写入，参数格式类似printf函数
-//			f_printf(&fnew, "this is a new line\r\n");
+	result = f_open(&fnew, "0:first_file.txt", FA_OPEN_ALWAYS|FA_WRITE|FA_READ);
+	if (result == FR_OK)
+	{
+		// 文件定位
+		result = f_lseek(&fnew, f_size(&fnew));
+		if (result == FR_OK)
+		{
+			// 格式化写入，参数格式类似printf函数
+			f_printf(&fnew, "this is a new line\r\n");
 
-//			// 文件定位到文件起始位置
-//			result = f_lseek(&fnew, 0);
+			// 文件定位到文件起始位置
+			result = f_lseek(&fnew, 0);
 
-//			// 读取文件所有内容到缓存区
-//			result = f_read(&fnew, ReadBuffer, f_size(&fnew), &num);
+			// 读取文件所有内容到缓存区
+			result = f_read(&fnew, ReadBuffer, f_size(&fnew), &num);
 
-//			if (result == FR_OK)
-//			{
-//				printf("READ=%s\n", ReadBuffer);
-//			}
-//		}
-//		f_close(&fnew);
+			if (result == FR_OK)
+			{
+				printf("READ=%s\n", ReadBuffer);
+			}
+		}
+		f_close(&fnew);
 
-//		// 尝试打开目录
-//		result = f_opendir(&dir, "0:test");
-//		if (result != FR_OK)
-//		{
-//			// 打开目录失败，就创建目录
-//			result = f_mkdir("0:test");
-//			if (result == FR_OK)
-//			{
-//				// 重命名并移动文件
-//				result = f_rename("0:first_file.txt", "0:test/test_in_dir.txt");
-//				if (result != FR_OK)
-//					printf("FAIL_TO_RENAME=%d\n",result);
-//			}
-//			else
-//			{
-//				printf("FAIL_TO_MKDIR=%d\n",result);
-//			}
-//		}
-//		else
-//		{
-//			printf("DIR_ALREADY_EXISTS=%d\n",result);
-//			// 目录已经存在则打开成功，关闭目录
-//			result = f_closedir(&dir);
-//			// 删除文件
-//			// f_unlink("1:test/test_in_dir.txt");
-//		}
-//	}
-//	
-//	// 获取文件信息
-//	result = f_stat("0:test/test_in_dir.txt", &fno);
-//	if (result == FR_OK)
-//	{
-//		printf("FILE_SIZE=%ld Bytes\n", fno.fsize);
-//		printf("TimeStamp=%u/%02u/%02u, %02u:%02u:%02u\n",
-//				GET_YEAR(fno.fdate),GET_MONTH(fno.fdate),GET_DAY(fno.fdate),
-//				GET_HOUR(fno.ftime),GET_MINUTE(fno.ftime),GET_SECONDS(fno.ftime));
-//		printf("Attributes=%c%c%c%c%c\n",
-//				(fno.fattrib & AM_DIR) ? 'D' : '-',		// 是一个目录
-//				(fno.fattrib & AM_RDO) ? 'R' : '-',		// 只读文件
-//				(fno.fattrib & AM_HID) ? 'H' : '-',		// 隐藏文件
-//				(fno.fattrib & AM_SYS) ? 'S' : '-',		// 系统文件
-//				(fno.fattrib & AM_ARC) ? 'A' : '-');	// 档案文件
-//	}
-//	else
-//	{
-//		printf("FAILED_TO_GET_FILE_STAT=%d\n",result);
-//	}
+		// 尝试打开目录
+		result = f_opendir(&dir, "0:test");
+		if (result != FR_OK)
+		{
+			// 打开目录失败，就创建目录
+			result = f_mkdir("0:test");
+			if (result == FR_OK)
+			{
+				// 重命名并移动文件
+				result = f_rename("0:first_file.txt", "0:test/test_in_dir.txt");
+				if (result != FR_OK)
+					printf("FAIL_TO_RENAME=%d\n",result);
+			}
+			else
+			{
+				printf("FAIL_TO_MKDIR=%d\n",result);
+			}
+		}
+		else
+		{
+			printf("DIR_ALREADY_EXISTS=%d\n",result);
+			// 目录已经存在则打开成功，关闭目录
+			result = f_closedir(&dir);
+			// 删除文件
+			// f_unlink("1:test/test_in_dir.txt");
+		}
+	}
+	
+	// 获取文件信息
+	result = f_stat("0:test/test_in_dir.txt", &fno);
+	if (result == FR_OK)
+	{
+		printf("FILE_SIZE=%llu Bytes\n", fno.fsize);
+		printf("TimeStamp=%u/%02u/%02u, %02u:%02u:%02u\n",
+				GET_YEAR(fno.fdate),GET_MONTH(fno.fdate),GET_DAY(fno.fdate),
+				GET_HOUR(fno.ftime),GET_MINUTE(fno.ftime),GET_SECONDS(fno.ftime));
+		printf("Attributes=%c%c%c%c%c\n",
+				(fno.fattrib & AM_DIR) ? 'D' : '-',		// 是一个目录
+				(fno.fattrib & AM_RDO) ? 'R' : '-',		// 只读文件
+				(fno.fattrib & AM_HID) ? 'H' : '-',		// 隐藏文件
+				(fno.fattrib & AM_SYS) ? 'S' : '-',		// 系统文件
+				(fno.fattrib & AM_ARC) ? 'A' : '-');	// 档案文件
+	}
+	else
+	{
+		printf("FAILED_TO_GET_FILE_STAT=%d\n",result);
+	}
 
 	// 遍历目录
 	char path[FF_LFN_BUF + 1] = "0:";

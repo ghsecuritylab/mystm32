@@ -145,7 +145,17 @@ FRESULT scan_files (char path[FF_LFN_BUF + 1])
 #define GET_HOUR(t)         (t >> 11)
 #define GET_MINUTE(t)       (t >> 5 & 0x3F)
 #define GET_SECONDS(t)      ((t & 0x1F)*2U)
-
+#if _FS_NORTC==0
+// 返回当前时间戳
+DWORD get_fattime(void) {
+	return	((DWORD)(2018 - 1980) << 25)	// Year 25:31
+			| ((DWORD)1 << 21)				// Month 21:24
+			| ((DWORD)1 << 16)				// Mday 16:20
+			| ((DWORD)0 << 11)				// Hour 11:15
+			| ((DWORD)0 << 5)				// Min 5:10
+			| ((DWORD)0 / 2U);				// Sec 0:4
+}
+#endif
 
 /**
   * @brief  Main program

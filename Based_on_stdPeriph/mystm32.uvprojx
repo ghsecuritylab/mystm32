@@ -334,9 +334,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>SD_MODE_SPI</Define>
+              <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\STM32_USB_Device_Driver;.\Mass_Storage</IncludePath>
+              <IncludePath></IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -499,11 +499,6 @@
               <FileName>res.c</FileName>
               <FileType>1</FileType>
               <FilePath>Resource\res.c</FilePath>
-            </File>
-            <File>
-              <FileName>myUSB.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myUSB.c</FilePath>
             </File>
             <File>
               <FileName>myESP8266.c</FileName>
