@@ -502,6 +502,71 @@ typedef enum
 /** @addtogroup STM3210E_EVAL_Exported_Functions
   * @{
   */ 
+
+#if defined(HAL_SRAM_MODULE_ENABLED)
+
+static void     FSMC_BANK1NORSRAM4_WriteData(uint16_t Data);
+static void     FSMC_BANK1NORSRAM4_WriteReg(uint8_t Reg);
+static uint16_t FSMC_BANK1NORSRAM4_ReadData(uint8_t Reg);
+static void     FSMC_BANK1NORSRAM4_Init(void);
+static void     FSMC_BANK1NORSRAM4_MspInit(void);
+
+/* LCD IO functions */
+void            LCD_IO_Init(void);
+void            LCD_IO_WriteData(uint16_t RegValue);
+void            LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
+void            LCD_IO_WriteReg(uint8_t Reg);
+uint16_t        LCD_IO_ReadData(uint16_t Reg);
+void            LCD_Delay (uint32_t delay);
+#endif /*HAL_SRAM_MODULE_ENABLED*/
+
+/* I2Cx bus function */
+#ifdef HAL_I2C_MODULE_ENABLED
+/* Link function for I2C EEPROM peripheral */
+static void               I2Cx_Init(void);
+static void               I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
+static HAL_StatusTypeDef  I2Cx_WriteBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
+static uint8_t            I2Cx_ReadData(uint16_t Addr, uint8_t Reg);
+static HAL_StatusTypeDef  I2Cx_ReadBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
+static HAL_StatusTypeDef  I2Cx_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
+static void               I2Cx_Error (void);
+static void               I2Cx_MspInit(I2C_HandleTypeDef *hi2c);  
+
+/* Link functions for Temperature Sensor peripheral */
+void                      TSENSOR_IO_Init(void);
+void                      TSENSOR_IO_Write(uint16_t DevAddress, uint8_t* pBuffer, uint8_t WriteAddr, uint16_t Length);
+void                      TSENSOR_IO_Read(uint16_t DevAddress, uint8_t* pBuffer, uint8_t ReadAddr, uint16_t Length);
+uint16_t                  TSENSOR_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
+
+/* Link function for Audio peripheral */
+void                      AUDIO_IO_Init(void);
+void                      AUDIO_IO_DeInit(void);
+void                      AUDIO_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
+uint8_t                   AUDIO_IO_Read(uint8_t Addr, uint8_t Reg);
+
+#endif /* HAL_I2C_MODULE_ENABLED */
+
+#ifdef HAL_SPI_MODULE_ENABLED
+/* SPIx bus function */
+HAL_StatusTypeDef  SPIx_Init(void);
+uint8_t            SPIx_Write(uint8_t Value);
+uint8_t            SPIx_Read(void);
+void               SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
+void               SPIx_WriteData(const uint8_t *Data, uint16_t DataLength);
+void               SPIx_ReadData(const uint8_t *Data, uint16_t DataLength);
+void               SPIx_Error (void);
+void               SPIx_MspInit(SPI_HandleTypeDef *hspi);
+
+/* Link function for EEPROM peripheral over SPI */
+HAL_StatusTypeDef         FLASH_SPI_IO_Init(void);
+uint8_t                   FLASH_SPI_IO_WriteByte(uint8_t Data);
+uint8_t                   FLASH_SPI_IO_ReadByte(void);
+HAL_StatusTypeDef         FLASH_SPI_IO_ReadData(uint32_t MemAddress, uint8_t* pBuffer, uint32_t BufferSize);
+void                      FLASH_SPI_IO_WriteEnable(void);
+HAL_StatusTypeDef         FLASH_SPI_IO_WaitForWriteEnd(void);
+uint32_t                  FLASH_SPI_IO_ReadID(void);
+#endif /* HAL_SPI_MODULE_ENABLED */  
+
 uint32_t                BSP_GetVersion(void);
 void                    BSP_LED_Init(Led_TypeDef Led);
 void                    BSP_LED_On(Led_TypeDef Led);

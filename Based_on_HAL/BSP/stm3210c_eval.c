@@ -135,7 +135,7 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
                                        TAMPER_BUTTON_EXTI_IRQn,
                                        KEY_BUTTON_EXTI_IRQn};
 
-#if 0
+
 /**
  * @brief COM variables
  */
@@ -148,24 +148,6 @@ GPIO_TypeDef* COM_RX_PORT[COMn]   = {EVAL_COM1_RX_GPIO_PORT};
 const uint16_t COM_TX_PIN[COMn]   = {EVAL_COM1_TX_PIN};
 
 const uint16_t COM_RX_PIN[COMn]   = {EVAL_COM1_RX_PIN};
-#endif
-
-//------------------------
-// stm3210e
-//------------------------
-
-/**
- * @brief COM variables
- */
-USART_TypeDef* COM_USART[COMn]   = {EVAL_COM1, EVAL_COM2}; 
-
-GPIO_TypeDef* COM_TX_PORT[COMn]   = {EVAL_COM1_TX_GPIO_PORT, EVAL_COM2_TX_GPIO_PORT};
- 
-GPIO_TypeDef* COM_RX_PORT[COMn]   = {EVAL_COM1_RX_GPIO_PORT, EVAL_COM2_RX_GPIO_PORT};
-
-const uint16_t COM_TX_PIN[COMn]   = {EVAL_COM1_TX_PIN, EVAL_COM2_TX_PIN};
-
-const uint16_t COM_RX_PIN[COMn]   = {EVAL_COM1_RX_PIN, EVAL_COM2_RX_PIN};
 
 /**
  * @brief BUS variables
@@ -233,10 +215,10 @@ void                      ACCELERO_IO_Read(uint8_t* pBuffer, uint8_t ReadAddr, u
 #endif /* HAL_I2C_MODULE_ENABLED */
 
 /* SPIx bus function */
-#ifdef HAL_SPI_MODULE_ENABLED
+#ifdef HAL_SPI_MODULE_ENABLEDF
 static void               SPIx_Init(void);
 static void               SPIx_Write(uint8_t Value);
-static uint32_t           SPIx_Read(void);
+static uint8_t            SPIx_Read(void);
 static void               SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
 static void               SPIx_WriteData(const uint8_t *Data, uint16_t DataLength);
 static void               SPIx_ReadData(const uint8_t *Data, uint16_t DataLength);
@@ -794,9 +776,9 @@ static void SPIx_MspInit(void)
   /* Enable GPIO clock */
   EVAL_SPIx_SCK_GPIO_CLK_ENABLE();
   EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
-//  only used in stm3210c
-//  __HAL_RCC_AFIO_CLK_ENABLE();
-//  __HAL_AFIO_REMAP_SPI3_ENABLE();
+
+  __HAL_RCC_AFIO_CLK_ENABLE();
+  __HAL_AFIO_REMAP_SPI3_ENABLE();
   
   /* configure SPI SCK */
   gpioinitstruct.Pin        = EVAL_SPIx_SCK_PIN;
@@ -832,13 +814,6 @@ static void SPIx_Init(void)
   heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
   heval_Spi.Init.CLKPhase           = SPI_PHASE_2EDGE;
   heval_Spi.Init.CLKPolarity        = SPI_POLARITY_HIGH;
-//----------------stm3210e------------------------
-  /* SPI baudrate is set to 36 MHz (PCLK2/SPI_BaudRatePrescaler = 72/2 = 36 MHz) */
-//  heval_Spi.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_2;
-//  heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
-//  heval_Spi.Init.CLKPhase           = SPI_PHASE_1EDGE;
-//  heval_Spi.Init.CLKPolarity        = SPI_POLARITY_LOW;
-//------------------------------------------------
   heval_Spi.Init.CRCCalculation     = SPI_CRCCALCULATION_DISABLE;
   heval_Spi.Init.CRCPolynomial      = 7;
   heval_Spi.Init.DataSize           = SPI_DATASIZE_8BIT;
@@ -859,11 +834,11 @@ static void SPIx_Init(void)
   * @brief SPI Read 4 bytes from device
   * @retval Read data
 */
-static uint32_t SPIx_Read(void)
+static uint8_t SPIx_Read(void)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  uint32_t          readvalue = 0;
-  uint32_t          writevalue = 0xFFFFFFFF;
+  uint8_t          readvalue = 0;
+  uint8_t          writevalue = 0xFF;
   
   status = HAL_SPI_TransmitReceive(&heval_Spi, (uint8_t*) &writevalue, (uint8_t*) &readvalue, 1, SpixTimeout);
   

@@ -8,7 +8,11 @@
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-#include "stm3210c_eval_sd.h"
+#ifdef SD_MODE_SPI
+#include "stm3210e_eval_sd_spi.h"
+#else
+#include "stm3210e_eval_sd_sdio.h"
+#endif
 /*---------------------------------------------------------------------------/
 / Function Configurations
 /---------------------------------------------------------------------------*/

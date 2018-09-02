@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    FatFs/FatFs_uSD/Inc/main.h 
+  * @file    USB_Device/HID_Standalone/Inc/stm32f1xx_it.h 
   * @author  MCD Application Team
   * @version V1.6.0
-  * @date    12-May-2017 
-  * @brief   Header for main.c module
+  * @date    12-May-2017
+  * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   * @attention
   *
@@ -46,73 +46,38 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __STM32F1xx_IT_H
+#define __STM32F1xx_IT_H
+
+#ifdef __cplusplus
+ extern "C" {
+#endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-
-/* EVAL includes component */
-#include "stm3210x_eval.h"
-
-#ifdef USB_MODE_DEVICE
-  /* USB Device includes component */
-  #include "usbd_core.h"
-  #include "stm32f1xx_hal_pcd.h"
-  #include "usbd_desc.h"
-  #include "usbd_msc.h"
-  #include "usbd_storage.h"
-#else
-  /* FatFs includes component */
-  #include "ff_gen_drv.h"
-  #include "sd_diskio.h"
-  #include "stdio.h"
-#endif
-
-#ifdef USB_MODE_HOST
-  /* USB Host includes component */
-  #include "usbh_core.h"
-  #include "usbh_msc.h"
-#endif
+#include "main.h"    
 
 /* Exported types ------------------------------------------------------------*/
-
-#ifdef USB_MODE_HOST
-
-typedef enum {
-  MSC_DEMO_IDLE = 0,
-  MSC_DEMO_WAIT,  
-  MSC_DEMO_FILE_OPERATIONS,
-  MSC_DEMO_EXPLORER,
-  MSC_REENUMERATE,  
-}MSC_Demo_State;
-
-typedef struct _DemoStateMachine {
-  __IO MSC_Demo_State state;
-  __IO uint8_t        select; 
-}MSC_DEMO_StateMachine;
-
-typedef enum {
-  APPLICATION_IDLE = 0,  
-  APPLICATION_READY,    
-  APPLICATION_DISCONNECT,
-}MSC_ApplicationTypeDef;
-
-extern USBH_HandleTypeDef hUSBHost;
-extern FATFS USBH_fatfs;
-extern MSC_ApplicationTypeDef Appli_state;
-
-#endif /* USB_MODE_HOST */
-
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
-#ifdef USB_MODE_HOST
-  FRESULT Explore_Disk(char *path, uint8_t recu_level);
-  void MSC_File_Operations(void);
-#endif /* USB_MODE_HOST */
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void SVC_Handler(void);
+void DebugMon_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void USB_LP_CAN1_RX0_IRQHandler(void);
+void USBWakeUp_IRQHandler(void);
+void EXTI9_5_IRQHandler(void);
 
-#endif /* __MAIN_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __STM32F1xx_IT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

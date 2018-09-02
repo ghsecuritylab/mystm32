@@ -249,7 +249,7 @@ typedef enum
 /**
   * @}
   */ 
-#if 0
+
 /** @addtogroup STM3210C_EVAL_COM STM3210C EVAL COM
   * @{
   */
@@ -294,72 +294,6 @@ typedef enum
 /**
   * @}
   */ 
-#endif
-
-// -------------------------------
-// 我使用 STM32F103ZET6 所以改掉这个
-// -------------------------------
-
-/** @addtogroup STM3210E_EVAL_COM
-  * @{
-  */
-#define COMn                             2
-
-/**
- * @brief Definition for COM port1, connected to USART1
- */ 
-#define EVAL_COM1                        USART1
-#define EVAL_COM1_CLK_ENABLE()           __HAL_RCC_USART1_CLK_ENABLE()
-#define EVAL_COM1_CLK_DISABLE()          __HAL_RCC_USART1_CLK_DISABLE()
-
-#define EVAL_COM1_TX_PIN                 GPIO_PIN_9             /* PA.09*/
-#define EVAL_COM1_TX_GPIO_PORT           GPIOA
-#define EVAL_COM1_TX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_COM1_TX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-#define EVAL_COM1_RX_PIN                 GPIO_PIN_10             /* PA.10*/
-#define EVAL_COM1_RX_GPIO_PORT           GPIOA
-#define EVAL_COM1_RX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_COM1_RX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-#define EVAL_COM1_IRQn                   USART1_IRQn
-
-/**
- * @brief Definition for COM port2, connected to USART2
- */ 
-#define EVAL_COM2                        USART2
-#define EVAL_COM2_CLK_ENABLE()           __HAL_RCC_USART2_CLK_ENABLE()
-#define EVAL_COM2_CLK_DISABLE()          __HAL_RCC_USART2_CLK_DISABLE()
-
-#define EVAL_COM2_TX_PIN                 GPIO_PIN_2             /* PA.02*/
-#define EVAL_COM2_TX_GPIO_PORT           GPIOA
-#define EVAL_COM2_TX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_COM2_TX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-#define EVAL_COM2_RX_PIN                 GPIO_PIN_3             /* PA.03*/
-#define EVAL_COM2_RX_GPIO_PORT           GPIOA
-#define EVAL_COM2_RX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_COM2_RX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
-#define EVAL_COM2_IRQn                   USART2_IRQn
-
-#define COMx_CLK_ENABLE(__INDEX__)              do { if((__INDEX__) == COM1) EVAL_COM1_CLK_ENABLE(); else\
-                                                     if((__INDEX__) == COM2) EVAL_COM2_CLK_ENABLE();} while(0)
-
-#define COMx_CLK_DISABLE(__INDEX__)             (((__INDEX__) == COM1) ? EVAL_COM1_CLK_DISABLE() :\
-                                                 ((__INDEX__) == COM2) ? EVAL_COM2_CLK_DISABLE() : 0)
-
-#define COMx_TX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) EVAL_COM1_TX_GPIO_CLK_ENABLE(); else\
-                                                     if((__INDEX__) == COM2) EVAL_COM2_TX_GPIO_CLK_ENABLE();} while(0)
-
-#define COMx_TX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? EVAL_COM1_TX_GPIO_CLK_DISABLE() :\
-                                                 ((__INDEX__) == COM2) ? EVAL_COM2_TX_GPIO_CLK_DISABLE() : 0)
-
-#define COMx_RX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) EVAL_COM1_RX_GPIO_CLK_ENABLE(); else\
-                                                     if((__INDEX__) == COM2) EVAL_COM2_RX_GPIO_CLK_ENABLE();} while(0)
-
-#define COMx_RX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? EVAL_COM1_RX_GPIO_CLK_DISABLE() :\
-                                                 ((__INDEX__) == COM2) ? EVAL_COM2_RX_GPIO_CLK_DISABLE() : 0)
 
 /**
   * @}
@@ -399,7 +333,7 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground 
 
 /*##################### I2Cx ###################################*/
 /* User can use this section to tailor I2Cx instance used and associated 
-   resources 这里的配置跟 stm3210e 一样 */
+   resources */
 /* Definition for I2Cx Pins */
 #define EVAL_I2Cx_SCL_PIN                       GPIO_PIN_6        /* PB.06*/
 #define EVAL_I2Cx_SCL_GPIO_PORT                 GPIOB
@@ -421,7 +355,7 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground 
 #define EVAL_I2Cx_ER_IRQn                       I2C1_ER_IRQn
 #define EVAL_I2Cx_ER_IRQHandler                 I2C1_ER_IRQHandler
 
-/* I2C clock speed configuration (in Hz) stm3210e 这个是 100000 */
+/* I2C clock speed configuration (in Hz) */
 #ifndef BSP_I2C_SPEED
  #define BSP_I2C_SPEED                            400000
 #endif /* I2C_SPEED */
@@ -434,7 +368,6 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground 
    conditions (interrupts routines ...). */   
 #define EVAL_I2Cx_TIMEOUT_MAX                   3000
 
-#if 0
 /*##################### SPIx ###################################*/
 #define EVAL_SPIx                               SPI3
 #define EVAL_SPIx_CLK_ENABLE()                  __HAL_RCC_SPI3_CLK_ENABLE()
@@ -449,29 +382,6 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground 
 #define EVAL_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOC_CLK_DISABLE()
 #define EVAL_SPIx_MISO_PIN                      GPIO_PIN_11       /* PC.11*/
 #define EVAL_SPIx_MOSI_PIN                      GPIO_PIN_12       /* PC.12*/
-#endif 
-
-
-// -------------------------------
-// 我使用 STM32F103ZET6 所以改掉这个
-// stm3210e 这里是 SPI1
-// -------------------------------
-
-/*##################### SPIx ###################################*/
-#define EVAL_SPIx                               SPI1
-#define EVAL_SPIx_CLK_ENABLE()                  __HAL_RCC_SPI1_CLK_ENABLE()
-
-#define EVAL_SPIx_SCK_GPIO_PORT                 GPIOA             /* PA.05*/
-#define EVAL_SPIx_SCK_PIN                       GPIO_PIN_5
-#define EVAL_SPIx_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_SPIx_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOA_CLK_DISABLE()
-
-#define EVAL_SPIx_MISO_MOSI_GPIO_PORT           GPIOA
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-#define EVAL_SPIx_MISO_PIN                      GPIO_PIN_6       /* PA.06*/
-#define EVAL_SPIx_MOSI_PIN                      GPIO_PIN_7       /* PA.07*/
-
 
 /* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain

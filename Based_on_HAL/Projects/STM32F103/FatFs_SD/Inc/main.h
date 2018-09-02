@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Host/MSC_Standalone/Src/file_operations.c 
+  * @file    FatFs/FatFs_uSD/Inc/main.h 
   * @author  MCD Application Team
   * @version V1.6.0
-  * @date    12-May-2017
-  * @brief   Write/read file on the disk.
+  * @date    12-May-2017 
+  * @brief   Header for main.c module
   ******************************************************************************
   * @attention
   *
@@ -45,85 +45,26 @@
   ******************************************************************************
   */
 
-/* Includes ------------------------------------------------------------------ */
-#include "main.h"
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __MAIN_H
+#define __MAIN_H
 
-/* Private typedef ----------------------------------------------------------- */
-/* Private define ------------------------------------------------------------ */
-FATFS USBH_fatfs;
-FIL MyFile;
-FRESULT res;
-uint32_t bytesWritten;
-uint8_t rtext[200];
-uint8_t wtext[] = "USB Host Library : Mass Storage Example";
+/* Includes ------------------------------------------------------------------*/
+#include "stm32f1xx_hal.h"
 
-/* Private macro ------------------------------------------------------------- */
-/* Private variables --------------------------------------------------------- */
-/* Private function prototypes ----------------------------------------------- */
-/* Private functions --------------------------------------------------------- */
+/* EVAL includes component */
+#include "stm3210e_eval.h"
 
-/**
-  * @brief  Files operations: Read/Write and compare
-  * @param  None
-  * @retval None
-  */
-void MSC_File_Operations(void)
-{
-  uint16_t bytesread;
+/* FatFs includes component */
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
+#include "stdio.h"
 
-  LCD_UsrLog("INFO : FatFs Initialized \n");
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
 
-  if (f_open(&MyFile, "0:USBHost.txt", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
-  {
-    LCD_ErrLog("Cannot Open 'USBHost.txt' file \n");
-  }
-  else
-  {
-    LCD_UsrLog("INFO : 'USBHost.txt' opened for write  \n");
-    res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&bytesWritten);
-    f_close(&MyFile);
-
-    if ((bytesWritten == 0) || (res != FR_OK))  /* EOF or Error */
-    {
-      LCD_ErrLog("Cannot Write on the  'USBHost.txt' file \n");
-    }
-    else
-    {
-      if (f_open(&MyFile, "0:USBHost.txt", FA_READ) != FR_OK)
-      {
-        LCD_ErrLog("Cannot Open 'USBHost.txt' file for read.\n");
-      }
-      else
-      {
-        LCD_UsrLog("INFO : Text written on the 'USBHost.txt' file \n");
-
-        res = f_read(&MyFile, rtext, sizeof(rtext), (void *)&bytesread);
-
-        if ((bytesread == 0) || (res != FR_OK)) /* EOF or Error */
-        {
-          LCD_ErrLog("Cannot Read from the  'USBHost.txt' file \n");
-        }
-        else
-        {
-          LCD_UsrLog("Read Text : \n");
-          LCD_DbgLog((char *)rtext);
-          LCD_DbgLog("\n");
-        }
-        f_close(&MyFile);
-      }
-      /* Compare read data with the expected data */
-      if ((bytesread == bytesWritten))
-      {
-        LCD_UsrLog("INFO : FatFs data compare SUCCES");
-        LCD_UsrLog("\n");
-      }
-      else
-      {
-        LCD_ErrLog("FatFs data compare ERROR");
-        LCD_ErrLog("\n");
-      }
-    }
-  }
-}
+#endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

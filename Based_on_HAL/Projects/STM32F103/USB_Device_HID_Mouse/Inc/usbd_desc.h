@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Host/MSC_Standalone/Inc/usbh_conf.h
+  * @file    USB_Device/HID_Standalone/Inc/usbd_desc.h
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
-  * @brief   General low level driver configuration
+  * @brief   Header for usbd_desc.c module
   ******************************************************************************
   * @attention
   *
@@ -46,63 +46,23 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBH_CONF_H
-#define __USBH_CONF_H
+#ifndef __USBD_DESC_H
+#define __USBD_DESC_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "usbd_def.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-/* Common Config */
-#define USBH_MAX_NUM_ENDPOINTS                2
-#define USBH_MAX_NUM_INTERFACES               2
-#define USBH_MAX_NUM_CONFIGURATION            1
-#define USBH_MAX_NUM_SUPPORTED_CLASS          1
-#define USBH_KEEP_CFG_DESCRIPTOR              0
-#define USBH_MAX_SIZE_CONFIGURATION           0x200
-#define USBH_MAX_DATA_BUFFER                  0x200
-#define USBH_DEBUG_LEVEL                      2
-#define USBH_USE_OS                           0
+#define         DEVICE_ID1          (0x1FFFF7E8)
+#define         DEVICE_ID2          (0x1FFFF7EC)
+#define         DEVICE_ID3          (0x1FFFF7F0)
 
+#define  USB_SIZ_STRING_SERIAL               0x1A
 /* Exported macro ------------------------------------------------------------*/
-/* Memory management macros */   
-#define USBH_malloc               malloc
-#define USBH_free                 free
-#define USBH_memset               memset
-#define USBH_memcpy               memcpy
-    
-/* DEBUG macros */   
-#if (USBH_DEBUG_LEVEL > 0)
-#define USBH_UsrLog(...)   printf(__VA_ARGS__);\
-                           printf("\n");
-#else
-#define USBH_UsrLog(...)   
-#endif 
-                            
-                            
-#if (USBH_DEBUG_LEVEL > 1)
-
-#define USBH_ErrLog(...)   printf("ERROR: ") ;\
-                           printf(__VA_ARGS__);\
-                           printf("\n");
-#else
-#define USBH_ErrLog(...)   
-#endif 
-                                                      
-#if (USBH_DEBUG_LEVEL > 2)                         
-#define USBH_DbgLog(...)   printf("DEBUG : ") ;\
-                           printf(__VA_ARGS__);\
-                           printf("\n");
-#else
-#define USBH_DbgLog(...)                         
-#endif
-
 /* Exported functions ------------------------------------------------------- */
+extern USBD_DescriptorsTypeDef HID_Desc;
 
-#endif /* __USBH_CONF_H */
+#endif /* __USBD_DESC_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

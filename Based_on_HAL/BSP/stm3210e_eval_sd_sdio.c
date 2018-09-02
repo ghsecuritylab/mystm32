@@ -75,9 +75,9 @@
   *
   ******************************************************************************
   */ 
-
+#ifndef SD_MODE_SPI
 /* Includes ------------------------------------------------------------------*/
-#include "stm3210e_eval_sd.h"
+#include "stm3210e_eval_sd_sdio.h"
 
 /** @addtogroup BSP
   * @{
@@ -586,5 +586,5 @@ __weak void BSP_SD_ReadCpltCallback(void)
 /**
   * @}
   */ 
-
+#endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

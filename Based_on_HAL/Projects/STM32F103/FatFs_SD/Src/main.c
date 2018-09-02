@@ -57,17 +57,10 @@
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
 
-#ifdef FF_DEFINED
-  FATFS SDFatFs;  /* File system object for SD card logical drive */
-  FIL MyFile;     /* File object */
-  char SDPath[4]; /* SD card logical drive path */
-  BYTE work[FF_MAX_SS];   // 用于格式化的工作区，值越大格式化越快
-#endif
-
-#ifdef USB_MODE_DEVICE
-  /* USB declaration */
-  USBD_HandleTypeDef USBD_Device;
-#endif
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+char SDPath[4]; /* SD card logical drive path */
+BYTE work[FF_MAX_SS];   // 用于格式化的工作区，值越大格式化越快
 
 /* Private function prototypes -----------------------------------------------*/
 #ifdef __GNUC__
@@ -75,7 +68,7 @@ UART_HandleTypeDef UartHandle;
      set to 'Yes') calls __io_putchar() */
   #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
   #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
-  #else
+#else
   #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
   #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
 #endif /* __GNUC__ */
@@ -84,7 +77,7 @@ void SystemClock_Config(void);
 static void Error_Handler(uint8_t id);
 
 /* Private functions ---------------------------------------------------------*/
-#ifdef FF_DEFINED
+
 uint16_t _strlen(char* s)
 {
     uint16_t i=0;
@@ -152,7 +145,7 @@ FRESULT scan_files (char path[FF_LFN_BUF + 1])
 #define GET_HOUR(t)         (t >> 11)
 #define GET_MINUTE(t)       (t >> 5 & 0x3F)
 #define GET_SECONDS(t)      ((t & 0x1F)*2U)
-#endif /* FF_DEFINED */
+
 
 /**
   * @brief  Main program
@@ -198,23 +191,7 @@ int main(void)
   /* Infinite loop */
   //getchar();
 
-#ifdef USB_MODE_DEVICE
-  /* Init MSC Application */
-  USBD_Init(&USBD_Device, &MSC_Desc, 0);
 
-  /* Add Supported Class */
-  USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
-
-  /* Add Storage callbacks for MSC Class */
-  USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
-
-  /* Start Device Process */
-  USBD_Start(&USBD_Device);
-#else defined(USB_MODE_HOST)
-
-#endif /* USB_MODE_DEVICE */
-
-#ifdef FF_DEFINED
   FRESULT res;                                          /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
@@ -229,7 +206,7 @@ int main(void)
     {
       printf("RESULT=%d\r\n",res);
 
-      #ifdef SD_MODE_SDIO
+      #ifndef SD_MODE_SPI
       extern SD_HandleTypeDef uSdHandle;
       printf("ERROR=%d,STATUS=%d\r\n",uSdHandle.ErrorCode,uSdHandle.State);
       BSP_SD_CardInfo info;
@@ -331,7 +308,6 @@ int main(void)
   
   /*##-11- Unlink the RAM disk I/O driver ####################################*/
   FATFS_UnLinkDriver(SDPath);
-#endif /* FF_DEFINED */
 
   /* Infinite loop */
   while (1)

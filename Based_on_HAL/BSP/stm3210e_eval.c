@@ -189,66 +189,6 @@ I2C_HandleTypeDef heval_I2c;
   * @}
   */ 
 
-#if defined(HAL_SRAM_MODULE_ENABLED)
-
-static void     FSMC_BANK1NORSRAM4_WriteData(uint16_t Data);
-static void     FSMC_BANK1NORSRAM4_WriteReg(uint8_t Reg);
-static uint16_t FSMC_BANK1NORSRAM4_ReadData(uint8_t Reg);
-static void     FSMC_BANK1NORSRAM4_Init(void);
-static void     FSMC_BANK1NORSRAM4_MspInit(void);
-
-/* LCD IO functions */
-void            LCD_IO_Init(void);
-void            LCD_IO_WriteData(uint16_t RegValue);
-void            LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
-void            LCD_IO_WriteReg(uint8_t Reg);
-uint16_t        LCD_IO_ReadData(uint16_t Reg);
-void            LCD_Delay (uint32_t delay);
-#endif /*HAL_SRAM_MODULE_ENABLED*/
-
-/* I2Cx bus function */
-#ifdef HAL_I2C_MODULE_ENABLED
-/* Link function for I2C EEPROM peripheral */
-static void               I2Cx_Init(void);
-static void               I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
-static HAL_StatusTypeDef  I2Cx_WriteBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
-static uint8_t            I2Cx_ReadData(uint16_t Addr, uint8_t Reg);
-static HAL_StatusTypeDef  I2Cx_ReadBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
-static HAL_StatusTypeDef  I2Cx_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
-static void               I2Cx_Error (void);
-static void               I2Cx_MspInit(I2C_HandleTypeDef *hi2c);  
-
-/* Link functions for Temperature Sensor peripheral */
-void                      TSENSOR_IO_Init(void);
-void                      TSENSOR_IO_Write(uint16_t DevAddress, uint8_t* pBuffer, uint8_t WriteAddr, uint16_t Length);
-void                      TSENSOR_IO_Read(uint16_t DevAddress, uint8_t* pBuffer, uint8_t ReadAddr, uint16_t Length);
-uint16_t                  TSENSOR_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
-
-/* Link function for Audio peripheral */
-void                      AUDIO_IO_Init(void);
-void                      AUDIO_IO_DeInit(void);
-void                      AUDIO_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
-uint8_t                   AUDIO_IO_Read(uint8_t Addr, uint8_t Reg);
-
-#endif /* HAL_I2C_MODULE_ENABLED */
-
-#ifdef HAL_SPI_MODULE_ENABLED
-/* SPIx bus function */
-static HAL_StatusTypeDef  SPIx_Init(void);
-static uint8_t            SPIx_Write(uint8_t Value);
-static uint8_t            SPIx_Read(void);
-static void               SPIx_Error (void);
-static void               SPIx_MspInit(SPI_HandleTypeDef *hspi);
-
-/* Link function for EEPROM peripheral over SPI */
-HAL_StatusTypeDef         FLASH_SPI_IO_Init(void);
-uint8_t                   FLASH_SPI_IO_WriteByte(uint8_t Data);
-uint8_t                   FLASH_SPI_IO_ReadByte(void);
-HAL_StatusTypeDef         FLASH_SPI_IO_ReadData(uint32_t MemAddress, uint8_t* pBuffer, uint32_t BufferSize);
-void                      FLASH_SPI_IO_WriteEnable(void);
-HAL_StatusTypeDef         FLASH_SPI_IO_WaitForWriteEnd(void);
-uint32_t                  FLASH_SPI_IO_ReadID(void);
-#endif /* HAL_SPI_MODULE_ENABLED */
 
 /** @defgroup STM3210E_EVAL_Exported_Functions STM3210E EVAL Exported Functions
   * @{
@@ -865,7 +805,7 @@ static void I2Cx_Error (void)
 /**
   * @brief  Initializes SPI MSP.
   */
-static void SPIx_MspInit(SPI_HandleTypeDef *hspi)
+void SPIx_MspInit(SPI_HandleTypeDef *hspi)
 {
   GPIO_InitTypeDef  gpioinitstruct = {0};
   
@@ -903,11 +843,19 @@ HAL_StatusTypeDef SPIx_Init(void)
   HAL_SPI_DeInit(&heval_Spi);
 
   /* SPI Config */
+#ifdef SD_MODE_SPI
+  /* SPI baudrate is set to 9 MHz (PCLK2/SPI_BaudRatePrescaler = 72/8 = 9 MHz) */
+  heval_Spi.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_8;
+  heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
+  heval_Spi.Init.CLKPhase           = SPI_PHASE_2EDGE;
+  heval_Spi.Init.CLKPolarity        = SPI_POLARITY_HIGH;
+#else
   /* SPI baudrate is set to 36 MHz (PCLK2/SPI_BaudRatePrescaler = 72/2 = 36 MHz) */
   heval_Spi.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_2;
   heval_Spi.Init.Direction          = SPI_DIRECTION_2LINES;
   heval_Spi.Init.CLKPhase           = SPI_PHASE_1EDGE;
   heval_Spi.Init.CLKPolarity        = SPI_POLARITY_LOW;
+#endif
   heval_Spi.Init.CRCCalculation     = SPI_CRCCALCULATION_DISABLE;
   heval_Spi.Init.CRCPolynomial      = 7;
   heval_Spi.Init.DataSize           = SPI_DATASIZE_8BIT;
@@ -927,7 +875,7 @@ HAL_StatusTypeDef SPIx_Init(void)
   * @param  WriteValue to be written
   * @retval The value of the received byte.
   */
-static uint8_t SPIx_Write(uint8_t WriteValue)
+uint8_t SPIx_Write(uint8_t WriteValue)
 {
   HAL_StatusTypeDef status = HAL_OK;
   uint8_t ReadValue = 0;
@@ -949,16 +897,74 @@ static uint8_t SPIx_Write(uint8_t WriteValue)
   * @brief SPI Read 1 byte from device
   * @retval Read data
 */
-static uint8_t SPIx_Read(void)
+uint8_t SPIx_Read(void)
 {
   return (SPIx_Write(FLASH_SPI_DUMMY_BYTE));
+}
+
+/**
+  * @brief  SPI Write a byte to device
+  * @param  DataIn: value to be written
+  * @param  DataOut: value to be read
+  * @param  DataLength: length of data
+  */
+void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  status = HAL_SPI_TransmitReceive(&heval_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
+
+  /* Check the communication status */
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    SPIx_Error();
+  }
+}
+
+/**
+  * @brief  SPI Write Data to device
+  * @param  Data: value to be written
+  * @param  DataLength: length of data
+  */
+void SPIx_WriteData(const uint8_t *Data, uint16_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  status = HAL_SPI_Transmit(&heval_Spi, (uint8_t*) Data, DataLength, SpixTimeout);
+
+  /* Check the communication status */
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    SPIx_Error();
+  }
+}
+
+/**
+  * @brief  SPI Read Data from device
+  * @param  Data: value to be read
+  * @param  DataLength: length of data
+  */
+void SPIx_ReadData(const uint8_t *Data, uint16_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  status = HAL_SPI_Receive(&heval_Spi, (uint8_t*) Data, DataLength, SpixTimeout);
+
+  /* Check the communication status */
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    SPIx_Error();
+  }
 }
 
 
 /**
   * @brief SPI error treatment function
   */
-static void SPIx_Error (void)
+void SPIx_Error (void)
 {
   /* De-initialize the SPI communication BUS */
   HAL_SPI_DeInit(&heval_Spi);

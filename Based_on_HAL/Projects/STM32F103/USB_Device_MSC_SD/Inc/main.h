@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/MSC_Standalone/Inc/stm32f1xx_it.h 
+  * @file    FatFs/FatFs_uSD/Inc/main.h 
   * @author  MCD Application Team
   * @version V1.6.0
-  * @date    12-May-2017
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @date    12-May-2017 
+  * @brief   Header for main.c module
   ******************************************************************************
   * @attention
   *
@@ -46,56 +46,27 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif 
+#ifndef __MAIN_H
+#define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"    
+#include "stm32f1xx_hal.h"
+
+/* EVAL includes component */
+#include "stm3210e_eval.h"
+
+/* USB Device includes component */
+#include "usbd_core.h"
+#include "stm32f1xx_hal_pcd.h"
+#include "usbd_desc.h"
+#include "usbd_msc.h"
+#include "usbd_storage.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-#if defined(STM32F105xC) || defined(STM32F107xC)
-	#if defined(USB_MODE_DEVICE)
-		void OTG_FS_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		void OTG_FS_WKUP_IRQHandler(void);
-		void EXTI15_10_IRQHandler(void);
-	#endif
-#elif defined(STM32F102xx) || defined(STM32F103xx)
-	#if defined(USB_MODE_DEVICE)
-		void USB_LP_CAN1_RX0_IRQHandler(void);
-	#elif defined(USB_MODE_HOST)
-		#error "STM32F102xx, STM32F103xx do not support usb host"
-	#endif
-#endif
-
-#if defined(SD_MODE_SPI)
-	;
-#elif defined(SD_MODE_SDIO)
-	void SD_DMAx_Rx_IRQHandler(void);
-	void SDIO_IRQHandler(void);
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32F1xx_IT_H */
+#endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
