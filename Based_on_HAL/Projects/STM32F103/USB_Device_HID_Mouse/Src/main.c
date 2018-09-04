@@ -48,7 +48,6 @@
 /* Includes ------------------------------------------------------------------ */
 #include "main.h"
 
-
 /** @addtogroup STM32F1xx_HAL_Validation
   * @{
   */
@@ -70,6 +69,15 @@ void SystemClock_Config(void);
 static void Error_Handler(void);
 
 /* Private functions --------------------------------------------------------- */
+#ifdef __GNUC__
+  /* With GCC, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+#endif /* __GNUC__ */
 
 /**
   * @brief  Main program.
@@ -81,12 +89,6 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. 
    */
   HAL_Init();
-
-  /* Initialize LEDs */
-//  BSP_LED_Init(LED1);
-//  BSP_LED_Init(LED2);
-//  BSP_LED_Init(LED3);
-//  BSP_LED_Init(LED4);
 
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
@@ -107,11 +109,10 @@ int main(void)
   UartHandle.Init.Mode       = UART_MODE_TX_RX;
   BSP_COM_Init(COM1, &UartHandle);
 
-  /* Initialize Joystick */
-  BSP_JOY_Init(JOY_MODE_GPIO);
+  printf("please insert the device into your PC");
 
-  /* Configure Key push-button for remote wakeup */
-  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
+/* Configure Key push-button for remote wakeup */
+  //BSP_PB_Init(BUTTON_MODE_EXTI);
 
   /* Init Device Library */
   USBD_Init(&USBD_Device, &HID_Desc, 0);
@@ -126,6 +127,35 @@ int main(void)
   while (1)
   {
   }
+}
+
+/**
+  * @brief  Retargets the C library printf function to the USART.
+  * @param  None
+  * @retval None
+  */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
+
+  return ch;
+}
+
+/**
+  * @brief  Retargets the C library scanf function to the USART.
+  * @param  None
+  * @retval None
+  */
+GETCHAR_PROTOTYPE
+{
+  /* Place your implementation of fgetc here */
+  /* e.g. read a character to the USART1 and Loop until the end of transmission */
+  uint8_t ch;
+  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+
+  return ch;
 }
 
 /**
@@ -197,25 +227,6 @@ static void Error_Handler(void)
   //BSP_LED_On(LED3);
   while (1)
   {
-  }
-}
-
-/**
-  * @brief  Toggle LEDs to shows user input state.
-  * @param  None
-  * @retval None
-  */
-void Toggle_Leds(void)
-{
-  static uint32_t ticks;
-
-  if (ticks++ == 0xFFFFF)
-  {
-    BSP_LED_Toggle(LED1);
-    BSP_LED_Toggle(LED2);
-    BSP_LED_Toggle(LED3);
-    BSP_LED_Toggle(LED4);
-    ticks = 0;
   }
 }
 

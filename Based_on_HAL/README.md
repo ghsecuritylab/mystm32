@@ -11,6 +11,10 @@
 
 ## Applications
 
+#### SPI FLASH
+
+- 使用 SPI 读写 Flash 芯片
+
 #### SPI/SDIO SD + FatFs
 
 - 带文件系统的 SD 卡读写示例
@@ -25,16 +29,16 @@
 - USB 接线方式：DM/DP = PA11/PA12
 - 先运行程序，再将 USB 插入
 
-#### USB Host MSC FlashDisk
+#### USB Host MSC FlashDisk(not complemented)
 
 - U盘读写器 USB Flash Disk Reader/Writer
 - 所谓 OTG 就是说产品既可以作为设备端又可以作为主机端
 - 只有 STM32F107 等支持 OTG 功能的 MCU 才可以用作 USB Host，STM32F103 只能用作 Device
 
-#### USB Host HID Keyboard
+#### USB Host HID Keyboard(not complemented)
 
 - 接收键盘的按键内容
 
 #### USB Device HID Mouse 
 
-- 给 PC 模拟一个鼠标
+- 给 PC 模拟一个鼠标，使用 rand() 函数控制，因此鼠标是随机移动的

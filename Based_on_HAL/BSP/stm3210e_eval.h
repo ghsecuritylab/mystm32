@@ -80,22 +80,6 @@ typedef enum
 
 } Led_TypeDef;
 
-/**
- * @brief BUTTON Types Definition
- */
-typedef enum 
-{
-  BUTTON_WAKEUP = 0,
-  BUTTON_TAMPER = 1,
-  BUTTON_KEY    = 2,
-  BUTTON_SEL    = 3,
-  BUTTON_LEFT   = 4,
-  BUTTON_RIGHT  = 5,
-  BUTTON_DOWN   = 6,
-  BUTTON_UP     = 7,
-
-} Button_TypeDef;
-
 typedef enum 
 {  
   BUTTON_MODE_GPIO = 0,
@@ -103,27 +87,6 @@ typedef enum
   BUTTON_MODE_EVT  = 2
 
 } ButtonMode_TypeDef;
-
-/**
- * @brief JOYSTICK Types Definition
- */
-typedef enum 
-{ 
-  JOY_SEL   = 0,
-  JOY_LEFT  = 1,
-  JOY_RIGHT = 2,
-  JOY_DOWN  = 3,
-  JOY_UP    = 4,
-  JOY_NONE  = 5
-
-}JOYState_TypeDef;
-
-typedef enum 
-{ 
-  JOY_MODE_GPIO = 0,
-  JOY_MODE_EXTI = 1
-
-}JOYMode_TypeDef;
 
 /**
  * @brief COM Types Definition
@@ -190,118 +153,12 @@ typedef enum
 /**
   * @}
   */
-  
-/** @defgroup STM3210E_EVAL_BUTTON  STM3210E EVAL BUTTON
-  * @{
-  */  
-#define JOYn                             5
-#define BUTTONn                          3 + JOYn
 
-/**
- * @brief Tamper push-button
- */
-#define TAMPER_BUTTON_PIN                   GPIO_PIN_13             /* PC.13*/
-#define TAMPER_BUTTON_GPIO_PORT             GPIOC
-#define TAMPER_BUTTON_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOC_CLK_ENABLE()
-#define TAMPER_BUTTON_GPIO_CLK_DISABLE()    __HAL_RCC_GPIOC_CLK_DISABLE()
-#define TAMPER_BUTTON_EXTI_IRQn             EXTI15_10_IRQn
-
-/**
- * @brief Key push-button
- */
 #define KEY_BUTTON_PIN                      GPIO_PIN_8             /* PG.08*/
 #define KEY_BUTTON_GPIO_PORT                GPIOG
 #define KEY_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOG_CLK_ENABLE()
 #define KEY_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOG_CLK_DISABLE()
 #define KEY_BUTTON_EXTI_IRQn                EXTI9_5_IRQn
-
-/**
- * @brief Wake-up push-button
- */
-#define WAKEUP_BUTTON_PIN                   GPIO_PIN_0             /* PA.00*/
-#define WAKEUP_BUTTON_GPIO_PORT             GPIOA
-#define WAKEUP_BUTTON_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
-#define WAKEUP_BUTTON_GPIO_CLK_DISABLE()    __HAL_RCC_GPIOA_CLK_DISABLE()
-#define WAKEUP_BUTTON_EXTI_IRQn             EXTI0_IRQn
-
-/**
- * @brief Joystick Right push-button
- */
-#define RIGHT_JOY_PIN                       GPIO_PIN_13             /* PG.13*/
-#define RIGHT_JOY_GPIO_PORT                 GPIOG
-#define RIGHT_JOY_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOG_CLK_ENABLE()
-#define RIGHT_JOY_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOG_CLK_DISABLE()
-#define RIGHT_JOY_EXTI_IRQn                 EXTI15_10_IRQn
-
-/**
- * @brief Joystick Left push-button
- */    
-#define LEFT_JOY_PIN                        GPIO_PIN_14             /* PG.14*/
-#define LEFT_JOY_GPIO_PORT                  GPIOG
-#define LEFT_JOY_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOG_CLK_ENABLE()
-#define LEFT_JOY_GPIO_CLK_DISABLE()         __HAL_RCC_GPIOG_CLK_DISABLE()
-#define LEFT_JOY_EXTI_IRQn                  EXTI15_10_IRQn
-
-/**
- * @brief Joystick Up push-button
- */
-#define UP_JOY_PIN                          GPIO_PIN_15             /* PG.15*/
-#define UP_JOY_GPIO_PORT                    GPIOG
-#define UP_JOY_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOG_CLK_ENABLE()
-#define UP_JOY_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOG_CLK_DISABLE()
-#define UP_JOY_EXTI_IRQn                    EXTI15_10_IRQn
-
-/**
- * @brief Joystick Down push-button
- */   
-#define DOWN_JOY_PIN                        GPIO_PIN_3             /* PD.03*/
-#define DOWN_JOY_GPIO_PORT                  GPIOD
-#define DOWN_JOY_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOD_CLK_ENABLE()
-#define DOWN_JOY_GPIO_CLK_DISABLE()         __HAL_RCC_GPIOD_CLK_DISABLE()
-#define DOWN_JOY_EXTI_IRQn                  EXTI3_IRQn
-
-/**
- * @brief Joystick Sel push-button
- */  
-#define SEL_JOY_PIN                         GPIO_PIN_7             /* PG.07*/
-#define SEL_JOY_GPIO_PORT                   GPIOG
-#define SEL_JOY_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOG_CLK_ENABLE()
-#define SEL_JOY_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOG_CLK_DISABLE()
-#define SEL_JOY_EXTI_IRQn                   EXTI9_5_IRQn
-
-#define BUTTONx_GPIO_CLK_ENABLE(__BUTTON__) do { if ((__BUTTON__) == BUTTON_TAMPER) TAMPER_BUTTON_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_KEY) KEY_BUTTON_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_WAKEUP) WAKEUP_BUTTON_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_SEL) SEL_JOY_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_LEFT) LEFT_JOY_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_RIGHT) RIGHT_JOY_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_DOWN) DOWN_JOY_GPIO_CLK_ENABLE(); else\
-                                                 if ((__BUTTON__) == BUTTON_UP) UP_JOY_GPIO_CLK_ENABLE();} while(0)
-
-#define BUTTONx_GPIO_CLK_DISABLE(__BUTTON__)    (((__BUTTON__) == BUTTON_TAMPER) ? TAMPER_BUTTON_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_KEY) ? KEY_BUTTON_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_WAKEUP) ? WAKEUP_BUTTON_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_SEL) ? SEL_JOY_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_LEFT) ? LEFT_JOY_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_RIGHT) ? RIGHT_JOY_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_DOWN) ? DOWN_JOY_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_UP) ? UP_JOY_GPIO_CLK_DISABLE() : 0 )
-
-#define JOYx_GPIO_CLK_ENABLE(__JOY__)    do { if ((__JOY__) == JOY_SEL) SEL_JOY_GPIO_CLK_ENABLE(); else\
-                                              if ((__JOY__) == JOY_LEFT) LEFT_JOY_GPIO_CLK_ENABLE(); else\
-                                              if ((__JOY__) == JOY_RIGHT) RIGHT_JOY_GPIO_CLK_ENABLE(); else\
-                                              if ((__JOY__) == JOY_DOWN) DOWN_JOY_GPIO_CLK_ENABLE(); else\
-                                              if ((__JOY__) == JOY_UP) UP_JOY_GPIO_CLK_ENABLE();} while(0)
-
-#define JOYx_GPIO_CLK_DISABLE(__JOY__)   (((__JOY__) == JOY_SEL) ? SEL_JOY_GPIO_CLK_DISABLE() :\
-                                          ((__JOY__) == JOY_LEFT) ? LEFT_JOY_GPIO_CLK_DISABLE() :\
-                                          ((__JOY__) == JOY_RIGHT) ? RIGHT_JOY_GPIO_CLK_DISABLE() :\
-                                          ((__JOY__) == JOY_DOWN) ? DOWN_JOY_GPIO_CLK_DISABLE() :\
-                                          ((__JOY__) == JOY_UP) ? UP_JOY_GPIO_CLK_DISABLE() : 0 )
-
-/**
-  * @}
-  */ 
 
 /** @addtogroup STM3210E_EVAL_COM
   * @{
@@ -572,13 +429,12 @@ void                    BSP_LED_Init(Led_TypeDef Led);
 void                    BSP_LED_On(Led_TypeDef Led);
 void                    BSP_LED_Off(Led_TypeDef Led);
 void                    BSP_LED_Toggle(Led_TypeDef Led);
-void                    BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
-uint32_t                BSP_PB_GetState(Button_TypeDef Button);
+void                    BSP_PB_Init(ButtonMode_TypeDef Button_Mode);
+GPIO_PinState           BSP_PB_GetState(void);
 #ifdef HAL_UART_MODULE_ENABLED
 void                    BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart);
 #endif /* HAL_UART_MODULE_ENABLED */
-uint8_t                 BSP_JOY_Init(JOYMode_TypeDef Joy_Mode);
-JOYState_TypeDef        BSP_JOY_GetState(void);
+
 
 /**
   * @}

@@ -1,15 +1,14 @@
 /**
   ******************************************************************************
-  * @file    FatFs/FatFs_uSD/Src/main.c 
+  * @file    USB_Device/HID_Standalone/Src/main.c 
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
-  * @brief   Main program body
-  *          This sample code shows how to use FatFs with uSD card drive.
+  * @brief   USB device HID application main file.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright Â© 2016 STMicroelectronics International N.V. 
+  * <h2><center>&copy; Copyright © 2016 STMicroelectronics International N.V. 
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -46,20 +45,30 @@
   ******************************************************************************
   */
 
-/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------ */
 #include "main.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
+/** @addtogroup STM32F1xx_HAL_Validation
+  * @{
+  */
+
+/** @addtogroup STANDARD_CHECK
+  * @{
+  */
+
+/* Private typedef ----------------------------------------------------------- */
+/* Private define ------------------------------------------------------------ */
+/* Private macro ------------------------------------------------------------- */
+/* Private variables --------------------------------------------------------- */
 
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
-/* USB declaration */
-USBD_HandleTypeDef USBD_Device;
 
-/* Private function prototypes -----------------------------------------------*/
+/* Private function prototypes ----------------------------------------------- */
+void SystemClock_Config(void);
+static void Error_Handler(uint8_t id);
+
+/* Private functions --------------------------------------------------------- */
 #ifdef __GNUC__
   /* With GCC, small printf (option LD Linker->Libraries->Small printf
      set to 'Yes') calls __io_putchar() */
@@ -70,30 +79,17 @@ USBD_HandleTypeDef USBD_Device;
   #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
 #endif /* __GNUC__ */
 
-void SystemClock_Config(void);
-static void Error_Handler(uint8_t id);
-
-/* Private functions ---------------------------------------------------------*/
-
 /**
-  * @brief  Main program
+  * @brief  Main program.
   * @param  None
   * @retval None
   */
 int main(void)
 {
-  /* STM32F107xC HAL library initialization:
-       - Configure the Flash prefetch
-       - Systick timer is configured by default as source of time base, but user 
-         can eventually implement his proper time base source (a general purpose 
-         timer for example or other time source), keeping in mind that Time base 
-         duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
-         handled in milliseconds basis.
-       - Set NVIC Group Priority to 4
-       - Low Level Initialization
-     */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. 
+   */
   HAL_Init();
- 
+
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
 
@@ -115,21 +111,6 @@ int main(void)
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
-
-  /* Infinite loop */
-  //getchar();
-
-  /* Init MSC Application */
-  USBD_Init(&USBD_Device, &MSC_Desc, 0);
-
-  /* Add Supported Class */
-  USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
-
-  /* Add Storage callbacks for MSC Class */
-  USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
-
-  /* Start Device Process */
-  USBD_Start(&USBD_Device);
 
   /* Infinite loop */
   while (1)
@@ -166,7 +147,6 @@ GETCHAR_PROTOTYPE
   return ch;
 }
 
-
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
@@ -176,70 +156,52 @@ GETCHAR_PROTOTYPE
   *            AHB Prescaler                  = 1
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
-//-------------------------STM32F107xx---------------
-  *            HSE Frequency(Hz)              = 25000000
-  *            HSE PREDIV1                    = 5
-  *            HSE PREDIV2                    = 5
-  *            PLL2MUL                        = 8
-//-------------------------STM32F103xx---------------
   *            HSE Frequency(Hz)              = 8000000
   *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
-//------------------------------------------------
   *            Flash Latency(WS)              = 2
   * @param  None
   * @retval None
   */
 void SystemClock_Config(void)
 {
-  RCC_ClkInitTypeDef clkinitstruct = {0};
-  RCC_OscInitTypeDef oscinitstruct = {0};
+  RCC_ClkInitTypeDef clkinitstruct = { 0 };
+  RCC_OscInitTypeDef oscinitstruct = { 0 };
   
-  /* Configure PLLs ------------------------------------------------------*/
-  /* PLL2 configuration: PLL2CLK = (HSE / HSEPrediv2Value) * PLL2MUL = (25 / 5) * 8 = 40 MHz */
-  /* PREDIV1 configuration: PREDIV1CLK = PLL2CLK / HSEPredivValue = 40 / 5 = 8 MHz */
-  /* PLL configuration: PLLCLK = PREDIV1CLK * PLLMUL = 8 * 9 = 72 MHz */ 
-
   /* Enable HSE Oscillator and activate PLL with HSE as source */
-  oscinitstruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
-  oscinitstruct.HSEState              = RCC_HSE_ON;
-  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV1;
-  oscinitstruct.PLL.PLLState          = RCC_PLL_ON;
-  oscinitstruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
-  oscinitstruct.PLL.PLLMUL            = RCC_PLL_MUL9;
-  if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
+  oscinitstruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  oscinitstruct.HSEState = RCC_HSE_ON;
+  oscinitstruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  oscinitstruct.PLL.PLLMUL = RCC_PLL_MUL9;
+
+  oscinitstruct.PLL.PLLState = RCC_PLL_ON;
+  oscinitstruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+
+  if (HAL_RCC_OscConfig(&oscinitstruct) != HAL_OK)
   {
-    /* Initialization Error */
-    //while(1);
-    Error_Handler(0);
+    /* Start Conversation Error */
+    Error_Handler();
   }
 
-  /* USB clock selection */
-  RCC_PeriphCLKInitTypeDef rccperiphclkinit = { 0 };
-  rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-  rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-  HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
+  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
+   * clocks dividers */
+  clkinitstruct.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
+                            RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 
-  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
-     clocks dividers */
-  clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
-                             RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
   clkinitstruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;
   clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
-  clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
-  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
+  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2) != HAL_OK)
   {
-    /* Initialization Error */
-    //while(1); 
-    Error_Handler(0);
+    /* Start Conversation Error */
+    Error_Handler();
   }
 }
 
-
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  id: error id
+  * @param  None
   * @retval None
   */
 static void Error_Handler(uint8_t id)
@@ -251,8 +213,9 @@ static void Error_Handler(uint8_t id)
   }
 }
 
-  
-#ifdef USE_FULL_ASSERT
+
+#ifdef  USE_FULL_ASSERT
+
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
@@ -260,29 +223,26 @@ static void Error_Handler(uint8_t id)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
-{ 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+void assert_failed(uint8_t * file, uint32_t line)
+{
+  /* User can add his own implementation to report the file name and line
+   * number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file, 
+   * line) */
 
   /* Infinite loop */
   while (1)
-  {}
+  {
+  }
 }
 
 #endif
 
+/**
+  * @}
+  */
 
 /**
-* @}
-*/ 
-
-/**
-* @}
-*/ 
-
-/**
-* @}
-*/
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

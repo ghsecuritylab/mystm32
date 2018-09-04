@@ -109,57 +109,6 @@ const uint16_t LED_PIN[LEDn] = {LED1_PIN,
                                 LED4_PIN};
 
 /**
- * @brief BUTTON variables
- */
-GPIO_TypeDef* BUTTON_PORT[BUTTONn] = {WAKEUP_BUTTON_GPIO_PORT,
-                                      TAMPER_BUTTON_GPIO_PORT, 
-                                      KEY_BUTTON_GPIO_PORT,
-                                      SEL_JOY_GPIO_PORT,
-                                      LEFT_JOY_GPIO_PORT, 
-                                      RIGHT_JOY_GPIO_PORT,
-                                      DOWN_JOY_GPIO_PORT, 
-                                      UP_JOY_GPIO_PORT}; 
-
-const uint16_t BUTTON_PIN[BUTTONn] = {WAKEUP_BUTTON_PIN,
-                                      TAMPER_BUTTON_PIN, 
-                                      KEY_BUTTON_PIN,
-                                      SEL_JOY_PIN,
-                                      LEFT_JOY_PIN, 
-                                      RIGHT_JOY_PIN,
-                                      DOWN_JOY_PIN, 
-                                      UP_JOY_PIN}; 
-
-const uint8_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
-                                      TAMPER_BUTTON_EXTI_IRQn,
-                                      KEY_BUTTON_EXTI_IRQn,
-                                      SEL_JOY_EXTI_IRQn,
-                                      LEFT_JOY_EXTI_IRQn,
-                                      RIGHT_JOY_EXTI_IRQn,
-                                      DOWN_JOY_EXTI_IRQn,
-                                      UP_JOY_EXTI_IRQn};
-
-/**
- * @brief JOYSTICK variables
- */
-GPIO_TypeDef* JOY_PORT[JOYn] = {SEL_JOY_GPIO_PORT,
-                                LEFT_JOY_GPIO_PORT, 
-                                RIGHT_JOY_GPIO_PORT, 
-                                DOWN_JOY_GPIO_PORT, 
-                                UP_JOY_GPIO_PORT}; 
-
-const uint16_t JOY_PIN[JOYn] = {SEL_JOY_PIN, 
-                                LEFT_JOY_PIN, 
-                                RIGHT_JOY_PIN, 
-                                DOWN_JOY_PIN, 
-                                UP_JOY_PIN}; 
-
-const uint8_t JOY_IRQn[JOYn] = {SEL_JOY_EXTI_IRQn,
-                                LEFT_JOY_EXTI_IRQn, 
-                                RIGHT_JOY_EXTI_IRQn, 
-                                DOWN_JOY_EXTI_IRQn, 
-                                UP_JOY_EXTI_IRQn};
-
-/**
  * @brief COM variables
  */
 USART_TypeDef* COM_USART[COMn]   = {EVAL_COM1, EVAL_COM2}; 
@@ -290,55 +239,39 @@ void BSP_LED_Toggle(Led_TypeDef Led)
   *     @arg BUTTON_MODE_EXTI: Button will be connected to EXTI line
   *                            with interrupt generation capability
   */
-void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
+void BSP_PB_Init(ButtonMode_TypeDef Button_Mode)
 {
   GPIO_InitTypeDef gpioinitstruct = {0};
 
   /* Enable the corresponding Push Button clock */
-  BUTTONx_GPIO_CLK_ENABLE(Button);
+  KEY_BUTTON_GPIO_CLK_ENABLE();
   
   /* Configure Push Button pin as input */
-  gpioinitstruct.Pin    = BUTTON_PIN[Button];
+  gpioinitstruct.Pin    = KEY_BUTTON_PIN;
   gpioinitstruct.Pull   = GPIO_PULLDOWN;
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-    
+
   if (Button_Mode == BUTTON_MODE_GPIO)
   {
     /* Configure Button pin as input */
     gpioinitstruct.Mode = GPIO_MODE_INPUT;
-    HAL_GPIO_Init(BUTTON_PORT[Button], &gpioinitstruct);
+    HAL_GPIO_Init(KEY_BUTTON_GPIO_PORT, &gpioinitstruct);
   }
   else if (Button_Mode == BUTTON_MODE_EXTI)
   {
-    if(Button != BUTTON_WAKEUP)
-    {
-      /* Configure Joystick Button pin as input with External interrupt, falling edge */
-      gpioinitstruct.Mode = GPIO_MODE_IT_FALLING;
-    }
-    else
-    { 
-      /* Configure Key Push Button pin as input with External interrupt, rising edge */
-      gpioinitstruct.Mode = GPIO_MODE_IT_RISING;
-    }
-    HAL_GPIO_Init(BUTTON_PORT[Button], &gpioinitstruct);
+    /* Configure Joystick Button pin as input with External interrupt, falling edge */
+    gpioinitstruct.Mode = GPIO_MODE_IT_FALLING;
+    HAL_GPIO_Init(KEY_BUTTON_GPIO_PORT, &gpioinitstruct);
 
     /* Enable and set Button EXTI Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority((IRQn_Type)(BUTTON_IRQn[Button]), 0x0F, 0);
-    HAL_NVIC_EnableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));
+    HAL_NVIC_SetPriority((IRQn_Type)(KEY_BUTTON_EXTI_IRQn), 0x0F, 0);
+    HAL_NVIC_EnableIRQ((IRQn_Type)(KEY_BUTTON_EXTI_IRQn));
   }
   else if (Button_Mode == BUTTON_MODE_EVT)
   {
-    if(Button != BUTTON_WAKEUP)
-    {
-      /* Configure Joystick Button pin as input with External interrupt, falling edge */
-      gpioinitstruct.Mode = GPIO_MODE_EVT_FALLING;
-    }
-    else
-    { 
-      /* Configure Key Push Button pin as input with External interrupt, rising edge */
-      gpioinitstruct.Mode = GPIO_MODE_EVT_RISING;
-    }
-    HAL_GPIO_Init(BUTTON_PORT[Button], &gpioinitstruct);
+    /* Configure Joystick Button pin as input with External interrupt, falling edge */
+    gpioinitstruct.Mode = GPIO_MODE_EVT_FALLING;
+    HAL_GPIO_Init(KEY_BUTTON_GPIO_PORT, &gpioinitstruct);
   }
 }
 
@@ -349,84 +282,11 @@ void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
   *     @arg BUTTON_TAMPER: Key/Tamper Push Button 
   * @retval Button state
   */
-uint32_t BSP_PB_GetState(Button_TypeDef Button)
+GPIO_PinState BSP_PB_GetState(void)
 {
-  return HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]);
+  return HAL_GPIO_ReadPin(KEY_BUTTON_GPIO_PORT, KEY_BUTTON_PIN);
 }
 
-/**
-  * @brief  Configures all button of the joystick in GPIO or EXTI modes.
-  * @param  Joy_Mode: Joystick mode.
-  *    This parameter can be one of the following values:
-  *     @arg  JOY_MODE_GPIO: Joystick pins will be used as simple IOs
-  *     @arg  JOY_MODE_EXTI: Joystick pins will be connected to EXTI line 
-  *                                 with interrupt generation capability  
-  * @retval HAL_OK: if all initializations are OK. Other value if error.
-  */
-uint8_t BSP_JOY_Init(JOYMode_TypeDef Joy_Mode)
-{
-  JOYState_TypeDef joykey = JOY_NONE;
-  GPIO_InitTypeDef gpioinitstruct = {0};
-
-  /* Initialized the Joystick. */
-  for(joykey = JOY_SEL; joykey < (JOY_SEL+JOYn) ; joykey++)
-  {
-    /* Enable the JOY clock */
-    JOYx_GPIO_CLK_ENABLE(joykey);
-
-    gpioinitstruct.Pin    = JOY_PIN[joykey];
-    gpioinitstruct.Pull   = GPIO_NOPULL;
-    gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-
-    if (Joy_Mode == JOY_MODE_GPIO)
-    {
-      /* Configure Joy pin as input */
-      gpioinitstruct.Mode = GPIO_MODE_INPUT;
-      HAL_GPIO_Init(JOY_PORT[joykey], &gpioinitstruct);
-    }
-    
-    if (Joy_Mode == JOY_MODE_EXTI)
-    {
-      /* Configure Joy pin as input with External interrupt */
-      gpioinitstruct.Mode = GPIO_MODE_IT_FALLING;
-      HAL_GPIO_Init(JOY_PORT[joykey], &gpioinitstruct);
-
-      /* Enable and set Joy EXTI Interrupt to the lowest priority */
-      HAL_NVIC_SetPriority((IRQn_Type)(JOY_IRQn[joykey]), 0x0F, 0);
-      HAL_NVIC_EnableIRQ((IRQn_Type)(JOY_IRQn[joykey]));
-    }
-  }
-  
-  return HAL_OK;
-}
-
-/**
-  * @brief  Returns the current joystick status.
-  * @retval Code of the joystick key pressed
-  *          This code can be one of the following values:
-  *            @arg  JOY_SEL
-  *            @arg  JOY_DOWN
-  *            @arg  JOY_LEFT
-  *            @arg  JOY_RIGHT
-  *            @arg  JOY_UP
-  *            @arg  JOY_NONE
-  */
-JOYState_TypeDef BSP_JOY_GetState(void)
-{
-  JOYState_TypeDef joykey = JOY_NONE;
-  
-  for(joykey = JOY_SEL; joykey < (JOY_SEL+JOYn) ; joykey++)
-  {
-    if(HAL_GPIO_ReadPin(JOY_PORT[joykey], JOY_PIN[joykey]) == GPIO_PIN_RESET)
-    {
-      /* Return Code Joystick key pressed */
-      return joykey;
-    }
-  }
-  
-  /* No Joystick key pressed */
-  return JOY_NONE;
-}
 
 #ifdef HAL_UART_MODULE_ENABLED
 /**
