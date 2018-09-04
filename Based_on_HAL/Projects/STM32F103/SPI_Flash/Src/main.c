@@ -67,6 +67,7 @@ UART_HandleTypeDef UartHandle;
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
 static void Error_Handler(uint8_t id);
+void FLASH_demo(void);
 
 /* Private functions --------------------------------------------------------- */
 #ifdef __GNUC__
@@ -111,6 +112,8 @@ int main(void)
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
+
+  FLASH_demo();
 
   /* Infinite loop */
   while (1)
@@ -180,7 +183,7 @@ void SystemClock_Config(void)
   if (HAL_RCC_OscConfig(&oscinitstruct) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
@@ -195,7 +198,7 @@ void SystemClock_Config(void)
   if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 }
 

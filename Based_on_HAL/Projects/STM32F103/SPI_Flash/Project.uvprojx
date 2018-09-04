@@ -390,6 +390,11 @@
               <FileType>1</FileType>
               <FilePath>./Src/main.c</FilePath>
             </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -399,6 +404,11 @@
               <FileName>stm3210e_eval.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\BSP\stm3210e_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm3210e_eval_serialflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\BSP\stm3210e_eval_serialflash.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -459,6 +469,11 @@
               <FileName>stm32f1xx_hal_rtc_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rtc_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_spi.c</FilePath>
             </File>
           </Files>
         </Group>

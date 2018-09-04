@@ -13,7 +13,7 @@
 
 #### SPI FLASH
 
-- 使用 SPI 读写 Flash 芯片
+- 使用 SPI 读写 Flash 芯片（基于 M25Pxx 芯片代码修改，同时支持 W25Qxx）
 
 #### SPI/SDIO SD + FatFs
 
