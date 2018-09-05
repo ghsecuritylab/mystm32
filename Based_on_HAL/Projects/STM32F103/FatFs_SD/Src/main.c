@@ -391,15 +391,7 @@ void SystemClock_Config(void)
   /* Enable HSE Oscillator and activate PLL with HSE as source */
   oscinitstruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
   oscinitstruct.HSEState              = RCC_HSE_ON;
-#if defined(STM32F105xC) || defined(STM32F107xC)
-  oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV5;
-  oscinitstruct.Prediv1Source         = RCC_PREDIV1_SOURCE_PLL2;
-  oscinitstruct.PLL2.PLL2State        = RCC_PLL2_ON;
-  oscinitstruct.PLL2.PLL2MUL          = RCC_PLL2_MUL8;
-  oscinitstruct.PLL2.HSEPrediv2Value  = RCC_HSE_PREDIV2_DIV5;
-#elif defined(STM32F102xx) || defined(STM32F103xx)
   oscinitstruct.HSEPredivValue        = RCC_HSE_PREDIV_DIV1;
-#endif
   oscinitstruct.PLL.PLLState          = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
   oscinitstruct.PLL.PLLMUL            = RCC_PLL_MUL9;
@@ -413,12 +405,7 @@ void SystemClock_Config(void)
   /* USB clock selection */
   RCC_PeriphCLKInitTypeDef rccperiphclkinit = { 0 };
   rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-
-#if defined(STM32F105xC) || defined(STM32F107xC)
-  rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV3;
-#elif defined(STM32F102xx) || defined(STM32F103xx)
   rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-#endif
   HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
 
   /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 

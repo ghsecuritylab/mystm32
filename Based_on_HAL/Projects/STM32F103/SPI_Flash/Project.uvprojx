@@ -334,7 +334,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F103xE</Define>
+              <Define>USE_HAL_DRIVER,STM32F103xE,FLASH_SPI_W25Qxx</Define>
               <Undefine></Undefine>
               <IncludePath>./Inc;../../../CMSIS/STM32F1xx/Include;../../../STM32F1xx_HAL_Driver/Inc;../../../BSP/</IncludePath>
             </VariousControls>

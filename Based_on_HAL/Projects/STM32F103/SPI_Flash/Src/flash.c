@@ -48,6 +48,55 @@
 
 /* Private typedef -----------------------------------------------------------*/
 typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
+volatile TestStatus TransferStatus1 = PASSED,
+					TransferStatus2 = PASSED,
+					TransferStatus3 = PASSED,
+					Test = PASSED;
+
+#ifdef FLASH_SPI_W25Qxx
+
+void FLASH_demo(void)
+{
+	BSP_SERIAL_FLASH_Init();
+	
+	#define BufferSize		(sizeof(Tx_Buffer) - 1)
+	uint8_t Tx_Buffer[] = "STM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
+	uint8_t Rx_Buffer[BufferSize+1] = {0};
+	
+	// Flash Device ID
+	printf("DeviceID=%x\n", FLASH_SPI_IO_ReadID());
+
+	// SPI Flash ID
+	if (FLASH_SPI_W25Q64_ID == FLASH_SPI_IO_ReadID())
+	{
+		BSP_SERIAL_FLASH_EraseSector(FLASH_SPI_SECTORSIZE*0);
+		
+        BSP_SERIAL_FLASH_WritePage(FLASH_SPI_SECTORSIZE*0, Tx_Buffer, BufferSize);
+		
+        /* Read Erase data from SPI FLASH memory, shal be 0xFF */
+        BSP_SERIAL_FLASH_ReadData(FLASH_SPI_SECTORSIZE*0, Rx_Buffer, BufferSize);
+		
+		printf("Data=%s\n", Rx_Buffer);
+		
+		/* Check the correctness of written data */
+		TransferStatus2 = Buffercmp(Tx_Buffer, Rx_Buffer, BufferSize);
+		
+		if(TransferStatus2 == PASSED)
+		{
+		  printf("FLASH WRITE : OK.");
+		  printf("FLASH READ  : OK.");
+		}
+		else
+		{
+		  printf("FLASH WRITE : FAILED.");
+		  printf("FLASH READ  : FAILED.");
+		}
+	}
+	else
+		printf("Cannot find specified Flash!\n");
+}
+#else
 
 /* Private define ------------------------------------------------------------*/
 #define  FLASH_WriteSector127 0x7F0000 /* End of Sector 0x7FFFFF */
@@ -192,11 +241,7 @@ uint8_t Rx_Buffer[BufferSize];
 __IO uint32_t FlashID = 0;
 __IO uint8_t Index = 0x0;
 
-volatile TestStatus TransferStatus1 = PASSED, TransferStatus2 = PASSED, TransferStatus3 = PASSED, Test = PASSED;
-
-
 /* Private functions ---------------------------------------------------------*/
-static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 static void Flush_Rx_Buffers(uint8_t* pBuffer, uint16_t BufferLength);
 
 /**
@@ -292,6 +337,22 @@ void FLASH_demo(void)
 }
 
 /**
+  * @brief  Flushes the receive buffers.
+  * @param  None
+  * @retval None
+  */
+static void Flush_Rx_Buffers(uint8_t* pBuffer, uint16_t BufferLength)
+{
+  while(BufferLength--)
+  {
+    *pBuffer = 0;
+    pBuffer++;
+  }
+}
+
+#endif
+
+/**
   * @brief  Compares two buffers.
   * @param  pBuffer1, pBuffer2: buffers to be compared.
   * @param  BufferLength: buffer's length
@@ -314,19 +375,6 @@ static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t Buffe
   return PASSED;  
 }
 
-/**
-  * @brief  Flushes the receive buffers.
-  * @param  None
-  * @retval None
-  */
-static void Flush_Rx_Buffers(uint8_t* pBuffer, uint16_t BufferLength)
-{
-  while(BufferLength--)
-  {
-    *pBuffer = 0;
-    pBuffer++;
-  }
-}
 /**
   * @}
   */ 
