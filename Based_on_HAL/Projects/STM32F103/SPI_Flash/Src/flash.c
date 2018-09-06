@@ -61,7 +61,7 @@ void FLASH_demo(void)
 	BSP_SERIAL_FLASH_Init();
 	
 	#define BufferSize		(sizeof(Tx_Buffer) - 1)
-	uint8_t Tx_Buffer[] = "XTM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
+	uint8_t Tx_Buffer[] = "STM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
 	uint8_t Rx_Buffer[BufferSize+1] = {0};
 	
 	// Flash Device ID

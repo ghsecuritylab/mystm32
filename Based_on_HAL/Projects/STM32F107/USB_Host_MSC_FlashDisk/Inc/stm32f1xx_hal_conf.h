@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/HID_Standalone/Inc/stm32f1xx_hal_conf.h
+  * @file    USB_Host/MSC_Standalone/Inc/stm32f1xx_hal_conf.h
   * @author  MCD Application Team
   * @version V1.6.0
   * @date    12-May-2017
@@ -61,7 +61,8 @@
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_GPIO_MODULE_ENABLED
-/* #define HAL_I2C_MODULE_ENABLED */
+#define HAL_HCD_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
 /* #define HAL_I2S_MODULE_ENABLED */
 /* #define HAL_IRDA_MODULE_ENABLED */
 /* #define HAL_IWDG_MODULE_ENABLED */
@@ -80,7 +81,6 @@
 #define HAL_UART_MODULE_ENABLED
 /* #define HAL_USART_MODULE_ENABLED */
 /* #define HAL_WWDG_MODULE_ENABLED */
-/* #define HAL_MMC_MODULE_ENABLED */
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**
@@ -138,7 +138,7 @@
   * @brief This is the HAL system configuration section
   */     
 #define  VDD_VALUE                    3300U /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            0x00U /*!< tick interrupt priority */
+#define  TICK_INT_PRIORITY            0x0FU /*!< tick interrupt priority */
 #define  USE_RTOS                     0U
 #define  PREFETCH_ENABLE              1U
 
@@ -337,9 +337,9 @@
  #include "stm32f1xx_hal_pcd.h"
 #endif /* HAL_PCD_MODULE_ENABLED */
 
-#ifdef HAL_MMC_MODULE_ENABLED
- #include "stm32f1xx_hal_mmc.h"
-#endif /* HAL_MMC_MODULE_ENABLED */
+#ifdef HAL_HCD_MODULE_ENABLED
+ #include "stm32f1xx_hal_hcd.h"
+#endif /* HAL_HCD_MODULE_ENABLED */
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
