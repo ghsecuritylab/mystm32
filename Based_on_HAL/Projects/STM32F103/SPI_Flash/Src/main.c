@@ -176,7 +176,6 @@ void SystemClock_Config(void)
   oscinitstruct.HSEState = RCC_HSE_ON;
   oscinitstruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   oscinitstruct.PLL.PLLMUL = RCC_PLL_MUL9;
-
   oscinitstruct.PLL.PLLState = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 

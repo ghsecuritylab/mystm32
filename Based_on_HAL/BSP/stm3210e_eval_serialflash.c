@@ -292,7 +292,10 @@ uint8_t BSP_SERIAL_FLASH_EraseSector(uint32_t SectorAddr)
   FLASH_SPI_IO_WriteByte((SectorAddr & 0xFF00) >> 8);
   /*!< Send SectorAddr low nibble address byte */
   FLASH_SPI_IO_WriteByte(SectorAddr & 0xFF);
-
+	
+  /*!< Deselect the FLASH: Chip Select high */
+  FLASH_SPI_CS_HIGH();
+	
   /*!< Wait the end of Flash writing and Deselect the FLASH*/
   if(FLASH_SPI_IO_WaitForWriteEnd()!= HAL_OK)
   {
@@ -317,6 +320,9 @@ uint8_t BSP_SERIAL_FLASH_EraseBulk(void)
   
   /*!< Send Bulk Erase instruction  */
   FLASH_SPI_IO_WriteByte(FLASH_SPI_CMD_CE);
+
+  /*!< Deselect the FLASH: Chip Select high */
+  FLASH_SPI_CS_HIGH();
 
   /*!< Wait the end of Flash writing and Deselect the FLASH*/
   if(FLASH_SPI_IO_WaitForWriteEnd()!= HAL_OK)
@@ -363,7 +369,10 @@ uint8_t BSP_SERIAL_FLASH_WritePage(uint32_t uwStartAddress, uint8_t* pData, uint
     /*!< Point on the next byte to be written */
     pData++;
   }
-
+  
+  /*!< Deselect the FLASH: Chip Select high */
+  FLASH_SPI_CS_HIGH();
+  
   /*!< Wait the end of Flash writing */
   if (FLASH_SPI_IO_WaitForWriteEnd()!= HAL_OK)
   {

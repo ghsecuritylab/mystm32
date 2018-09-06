@@ -61,7 +61,7 @@ void FLASH_demo(void)
 	BSP_SERIAL_FLASH_Init();
 	
 	#define BufferSize		(sizeof(Tx_Buffer) - 1)
-	uint8_t Tx_Buffer[] = "STM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
+	uint8_t Tx_Buffer[] = "XTM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
 	uint8_t Rx_Buffer[BufferSize+1] = {0};
 	
 	// Flash Device ID
@@ -71,12 +71,8 @@ void FLASH_demo(void)
 	if (FLASH_SPI_W25Q64_ID == FLASH_SPI_IO_ReadID())
 	{
 		BSP_SERIAL_FLASH_EraseSector(FLASH_SPI_SECTORSIZE*0);
-		
         BSP_SERIAL_FLASH_WritePage(FLASH_SPI_SECTORSIZE*0, Tx_Buffer, BufferSize);
-		
-        /* Read Erase data from SPI FLASH memory, shal be 0xFF */
         BSP_SERIAL_FLASH_ReadData(FLASH_SPI_SECTORSIZE*0, Rx_Buffer, BufferSize);
-		
 		printf("Data=%s\n", Rx_Buffer);
 		
 		/* Check the correctness of written data */

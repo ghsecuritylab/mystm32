@@ -72,7 +72,7 @@
 /**
   * @brief  M25P FLASH SPI Control Interface pins
   */
-#define FLASH_SPI_CS_PIN                           GPIO_PIN_2        /* PB.02*/
+#define FLASH_SPI_CS_PIN                           GPIO_PIN_1        /* PB.01*/
 #define FLASH_SPI_CS_GPIO_PORT                     GPIOB
 #define FLASH_SPI_CS_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOB_CLK_ENABLE()
 #define FLASH_SPI_CS_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOB_CLK_DISABLE()
