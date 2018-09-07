@@ -93,89 +93,19 @@ extern USBH_HandleTypeDef hUSBHost;
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 /* Private function prototypes ----------------------------------------------- */
-static void USR_MOUSE_Init(void);
 static void HID_MOUSE_UpdatePosition(int8_t x, int8_t y);
 
 /* Private functions --------------------------------------------------------- */
 
-/**
-  * @brief  Manages Mouse Menu Process.  
-  * @param  None
-  * @retval None
-  */
-void HID_MouseMenuProcess(void)
+void USR_MOUSE_Init(void)
 {
-  switch (hid_demo.mouse_state)
-  {
-  case HID_MOUSE_IDLE:
-    hid_demo.mouse_state = HID_MOUSE_START;
-    HID_SelectItem(DEMO_MOUSE_menu, 0);
-    hid_demo.select = 0;
-    prev_select = 0;
-    break;
-
-  case HID_MOUSE_WAIT:
-    if (hid_demo.select != prev_select)
-    {
-      prev_select = hid_demo.select;
-      HID_SelectItem(DEMO_MOUSE_menu, hid_demo.select & 0x7F);
-
-      /* Handle select item */
-      if (hid_demo.select & 0x80)
-      {
-        hid_demo.select &= 0x7F;
-        switch (hid_demo.select)
-        {
-        case 0:
-          hid_demo.mouse_state = HID_MOUSE_START;
-          break;
-
-        case 1:                /* Return */
-          LCD_LOG_ClearTextZone();
-          hid_demo.state = HID_DEMO_REENUMERATE;
-          hid_demo.select = 0;
-          break;
-
-        default:
-          break;
-        }
-      }
-    }
-    break;
-
-  case HID_MOUSE_START:
-    USR_MOUSE_Init();
-    hid_demo.mouse_state = HID_MOUSE_WAIT;
-    HID_MOUSE_UpdatePosition(0, 0);
-    break;
-
-  default:
-    break;
-  }
-}
-
-/**
-  * @brief  Init Mouse window.    
-  * @param  None
-  * @retval None
-  */
-static void USR_MOUSE_Init(void)
-{
-  LCD_LOG_ClearTextZone();
-  BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-  BSP_LCD_DisplayStringAtLine(4, (uint8_t *) "USB HID Host Mouse Demo...");
-  BSP_LCD_SetTextColor(LCD_LOG_DEFAULT_COLOR);
-
   /* Display Mouse Window */
-  BSP_LCD_DrawRect(MOUSE_WINDOW_X, MOUSE_WINDOW_Y, MOUSE_WINDOW_WIDTH,
-                   MOUSE_WINDOW_HEIGHT);
+  printf("%d,%d,%d,%d",MOUSE_WINDOW_X, MOUSE_WINDOW_Y, MOUSE_WINDOW_WIDTH,
+				   MOUSE_WINDOW_HEIGHT);
 
   HID_MOUSE_ButtonReleased(0);
   HID_MOUSE_ButtonReleased(1);
   HID_MOUSE_ButtonReleased(2);
-
-  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-  BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 
   HID_MOUSE_UpdatePosition(0, 0);
 }
@@ -226,12 +156,11 @@ static void HID_MOUSE_UpdatePosition(int8_t x, int8_t y)
     {
       x_loc = 2;
     }
-    BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-    BSP_LCD_DisplayChar(MOUSE_WINDOW_X + prev_x, MOUSE_WINDOW_Y + prev_y, 'x');
+	
+	
+    printf("%d,%d,%c",MOUSE_WINDOW_X + prev_x, MOUSE_WINDOW_Y + prev_y, 'x');
 
-    BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-    BSP_LCD_DisplayChar(MOUSE_WINDOW_X + x_loc, MOUSE_WINDOW_Y + y_loc, 'x');
+    printf("%d,%d,%c",MOUSE_WINDOW_X + x_loc, MOUSE_WINDOW_Y + y_loc, 'x');
 
     prev_x = x_loc;
     prev_y = y_loc;
@@ -246,27 +175,26 @@ static void HID_MOUSE_UpdatePosition(int8_t x, int8_t y)
 void HID_MOUSE_ButtonPressed(uint8_t button_idx)
 {
   /* Set the color for button press status */
-  BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-  BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	
 
   /* Change the color of button pressed to indicate button press */
   switch (button_idx)
   {
     /* Left Button Pressed */
   case 0:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON1_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON1_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
 
     /* Right Button Pressed */
   case 1:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON2_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON2_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
 
     /* Middle button Pressed */
   case 2:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON3_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON3_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
   }
@@ -280,27 +208,26 @@ void HID_MOUSE_ButtonPressed(uint8_t button_idx)
 void HID_MOUSE_ButtonReleased(uint8_t button_idx)
 {
   /* Set the color for release status */
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-  BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+	
 
   /* Change the color of button released to default button color */
   switch (button_idx)
   {
     /* Left Button Released */
   case 0:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON1_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON1_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
 
     /* Right Button Released */
   case 1:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON2_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON2_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
 
     /* Middle Button Released */
   case 2:
-    BSP_LCD_FillRect(HID_MOUSE_BUTTON3_XCHORD, HID_MOUSE_BUTTON_YCHORD,
+    printf("%d,%d,%d,%d",HID_MOUSE_BUTTON3_XCHORD, HID_MOUSE_BUTTON_YCHORD,
                      HID_MOUSE_BUTTON_WIDTH, HID_MOUSE_BUTTON_HEIGHT);
     break;
   }

@@ -62,13 +62,24 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 USBH_HandleTypeDef hUSBHost;
-MSC_ApplicationTypeDef Appli_state = APPLICATION_IDLE;
+/* UART handler declaration */
+UART_HandleTypeDef UartHandle;
 
-/* Private function prototypes ----------------------------------------------- */
+/* Private function prototypes -----------------------------------------------*/
+#ifdef __GNUC__
+  /* With GCC, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+#endif /* __GNUC__ */
+
+void SystemClock_Config(void);
+static void Error_Handler(uint8_t id);
 static void SystemClock_Config(void);
 static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id);
-static void MSC_InitApplication(void);
-static void Error_Handler(void);
 
 /* Private functions --------------------------------------------------------- */
 
@@ -87,7 +98,10 @@ int main(void)
   SystemClock_Config();
 
   /* Init MSC Application */
-  MSC_InitApplication();
+  printf("USB Host library started.\n");
+
+  /* Initialize menu and MSC process */
+  USBH_UsrLog("Starting MSC Demo");
 
   /* Init Host Library */
   USBH_Init(&hUSBHost, USBH_UserProcess, 0);
@@ -104,44 +118,17 @@ int main(void)
     /* USB Host Background task */
     USBH_Process(&hUSBHost);
 
-    /* MSC Menu Process */
-    MSC_MenuProcess();
+    /* Read and Write File Here */
+    MSC_File_Operations();
+	  
+    /* Display disk content */
+    Explore_Disk("0:/", 1);
+	
+    /* Force MSC Device to re-enumerate */
+    USBH_ReEnumerate(&hUSBHost);
   }
 }
 
-/**
-  * @brief  MSC application Init.
-  * @param  None
-  * @retval None
-  */
-static void MSC_InitApplication(void)
-{
-  /* Configure KEY Button */
-  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
-
-  /* Configure Joystick in EXTI mode */
-  BSP_JOY_Init(JOY_MODE_EXTI);
-
-  /* Configure LED1, LED2, LED3 and LED4 */
-  BSP_LED_Init(LED1);
-  BSP_LED_Init(LED2);
-  BSP_LED_Init(LED3);
-  BSP_LED_Init(LED4);
-
-  /* Initialize the LCD */
-  BSP_LCD_Init();
-
-  /* Initialize the LCD Log module */
-  LCD_LOG_Init();
-
-  LCD_LOG_SetHeader((uint8_t *) " USB OTG FS MSC Host");
-
-  LCD_UsrLog("USB Host library started.\n");
-
-  /* Initialize menu and MSC process */
-  USBH_UsrLog("Starting MSC Demo");
-  Menu_Init();
-}
 
 /**
   * @brief  User Process
@@ -157,21 +144,19 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
     break;
 
   case HOST_USER_DISCONNECTION:
-    Appli_state = APPLICATION_DISCONNECT;
     if(f_mount(NULL, "", 0) != FR_OK)
     {
-      LCD_ErrLog("ERROR : Cannot DeInitialize FatFs! \n");
+      printf("ERROR : Cannot DeInitialize FatFs! \n");
     }
     break;
 
   case HOST_USER_CLASS_ACTIVE:
-    Appli_state = APPLICATION_READY;
     break;
 
   case HOST_USER_CONNECTION:
     if(f_mount(&USBH_fatfs, "", 0) != FR_OK)
     {  
-      LCD_ErrLog("ERROR : Cannot Initialize FatFs! \n");
+      printf("ERROR : Cannot Initialize FatFs! \n");
     }
     break;
 
@@ -180,24 +165,36 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
   }
 }
 
+
 /**
-  * @brief  Toggles LEDs to show user input state.
+  * @brief  Retargets the C library printf function to the USART.
   * @param  None
   * @retval None
   */
-void Toggle_Leds(void)
+PUTCHAR_PROTOTYPE
 {
-  static uint32_t ticks;
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
 
-  if (ticks++ == 100)
-  {
-    BSP_LED_Toggle(LED1);
-    BSP_LED_Toggle(LED2);
-    BSP_LED_Toggle(LED3);
-    BSP_LED_Toggle(LED4);
-    ticks = 0;
-  }
+  return ch;
 }
+
+/**
+  * @brief  Retargets the C library scanf function to the USART.
+  * @param  None
+  * @retval None
+  */
+GETCHAR_PROTOTYPE
+{
+  /* Place your implementation of fgetc here */
+  /* e.g. read a character to the USART1 and Loop until the end of transmission */
+  uint8_t ch;
+  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+
+  return ch;
+}
+
 
 /**
   * @brief  System Clock Configuration
@@ -244,7 +241,7 @@ void SystemClock_Config(void)
   if (HAL_RCC_OscConfig(&oscinitstruct) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 
   /* USB clock selection */
@@ -264,21 +261,22 @@ void SystemClock_Config(void)
   if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 }
 
+
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  id: error id
   * @retval None
   */
-static void Error_Handler(void)
+static void Error_Handler(uint8_t id)
 {
-  /* Turn LED3 on */
-  BSP_LED_On(LED3);
-  while (1)
+  printf("an error corrupted=%d\r\n",id);
+  while(1)
   {
+    HAL_Delay(40);
   }
 }
 

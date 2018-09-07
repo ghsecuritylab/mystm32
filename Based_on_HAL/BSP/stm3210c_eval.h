@@ -100,34 +100,13 @@ typedef enum
   BUTTON_MODE_EXTI = 1
 } ButtonMode_TypeDef;
 
-/**
- * @brief JOYSTICK Types Definition
- */
-typedef enum 
-{ 
-  JOY_SEL   = 0,
-  JOY_LEFT  = 1,
-  JOY_RIGHT = 2,
-  JOY_DOWN  = 3,
-  JOY_UP    = 4,
-  JOY_NONE  = 5
-
-}JOYState_TypeDef;
-
-typedef enum 
-{ 
-  JOY_MODE_GPIO = 0,
-  JOY_MODE_EXTI = 1
-
-}JOYMode_TypeDef;
 
 /**
  * @brief COM Types Definition
  */
 typedef enum 
 {
-  COM1 = 0,
-  COM2 = 1
+  COM1 = 0
 } COM_TypeDef;
 /**
   * @}
@@ -227,16 +206,7 @@ typedef enum
 
 /**
   * @brief IO Pins definition 
-  */ 
-/* Joystick */
-#define JOY_SEL_PIN                  (IO2_PIN_7) /* IO_Expander_2 */
-#define JOY_DOWN_PIN                 (IO2_PIN_6) /* IO_Expander_2 */
-#define JOY_LEFT_PIN                 (IO2_PIN_5) /* IO_Expander_2 */
-#define JOY_RIGHT_PIN                (IO2_PIN_4) /* IO_Expander_2 */
-#define JOY_UP_PIN                   (IO2_PIN_3) /* IO_Expander_2 */
-#define JOY_NONE_PIN                 JOY_ALL_PINS
-#define JOY_ALL_PINS                 (JOY_SEL_PIN | JOY_DOWN_PIN | JOY_LEFT_PIN | JOY_RIGHT_PIN | JOY_UP_PIN)
-
+  */
 /* MEMS */
 #define MEMS_INT1_PIN                (IO1_PIN_3) /* IO_Expander_1 */ /* Input */
 #define MEMS_INT2_PIN                (IO1_PIN_2) /* IO_Expander_1 */ /* Input */
@@ -467,10 +437,6 @@ uint32_t                BSP_PB_GetState(Button_TypeDef Button);
 #ifdef HAL_UART_MODULE_ENABLED
 void                    BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart);
 #endif /* HAL_UART_MODULE_ENABLED */
-#ifdef HAL_I2C_MODULE_ENABLED
-uint8_t                 BSP_JOY_Init(JOYMode_TypeDef Joy_Mode);
-JOYState_TypeDef        BSP_JOY_GetState(void);
-#endif /* HAL_I2C_MODULE_ENABLED */
 
 /**
   * @}

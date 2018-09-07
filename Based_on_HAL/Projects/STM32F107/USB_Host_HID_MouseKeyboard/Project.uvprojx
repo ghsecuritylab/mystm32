@@ -396,19 +396,9 @@
               <FilePath>.\Src\keyboard.c</FilePath>
             </File>
             <File>
-              <FileName>menu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Src\menu.c</FilePath>
-            </File>
-            <File>
               <FileName>mouse.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\mouse.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f1xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Src\system_stm32f1xx.c</FilePath>
             </File>
             <File>
               <FileName>usbh_conf.c</FileName>
@@ -424,11 +414,6 @@
               <FileName>stm3210c_eval.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\BSP\stm3210c_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm3210c_eval_io.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210c_eval_io.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -504,6 +489,11 @@
               <FileName>stm32f1xx_ll_usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_spi.c</FilePath>
             </File>
           </Files>
         </Group>

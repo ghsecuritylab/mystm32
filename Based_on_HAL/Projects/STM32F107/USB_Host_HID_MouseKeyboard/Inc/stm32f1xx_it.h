@@ -72,7 +72,6 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void OTG_FS_IRQHandler(void);
 void OTG_FS_WKUP_IRQHandler(void);
-void EXTI15_10_IRQHandler(void);
 
 #ifdef __cplusplus
 }

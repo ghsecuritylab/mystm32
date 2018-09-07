@@ -62,13 +62,25 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 USBH_HandleTypeDef hUSBHost;
-HID_ApplicationTypeDef Appli_state = APPLICATION_IDLE;
+UART_HandleTypeDef UartHandle;
 
-/* Private function prototypes ----------------------------------------------- */
+/* Private function prototypes -----------------------------------------------*/
+#ifdef __GNUC__
+  /* With GCC, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+#endif /* __GNUC__ */
+
+static void Error_Handler(uint8_t id);
 static void SystemClock_Config(void);
+static void USBH_MouseDemo(USBH_HandleTypeDef * phost);
+static void USBH_KeybdDemo(USBH_HandleTypeDef * phost);
 static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id);
-static void HID_InitApplication(void);
-static void Error_Handler(void);
+
 /* Private functions --------------------------------------------------------- */
 
 /**
@@ -84,9 +96,29 @@ int main(void)
 
   /* Configure the system clock to 72 Mhz */
   SystemClock_Config();
+	
+  /*##-1- Configure the UART peripheral ######################################*/
+  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
+  /* UART configured as follows:
+      - Word Length = 8 Bits (7 data bit + 1 parity bit) : BE CAREFUL : Program 7 data bits + 1 parity bit in PC HyperTerminal
+      - Stop Bit    = One Stop bit
+      - Parity      = no parity
+      - BaudRate    = 115200 baud
+      - Hardware flow control disabled (RTS and CTS signals) */
+  UartHandle.Init.BaudRate   = 115200;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits   = UART_STOPBITS_1;
+  UartHandle.Init.Parity     = UART_PARITY_NONE;
+  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  UartHandle.Init.Mode       = UART_MODE_TX_RX;
+  BSP_COM_Init(COM1, &UartHandle);
+
+  /* Output a message on Hyperterminal using printf function */
+  printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
   /* Init HID Application */
-  HID_InitApplication();
+  /* Init the LCD Log module */
+  printf("USB Host library started.\n");
 
   /* Init Host Library */
   USBH_Init(&hUSBHost, USBH_UserProcess, 0);
@@ -104,36 +136,22 @@ int main(void)
     USBH_Process(&hUSBHost);
 
     /* HID Menu Process */
-    HID_MenuProcess();
+	if (USBH_HID_GetDeviceType(&hUSBHost) == HID_KEYBOARD)
+	{
+      printf("Use Keyboard to tape characters:");
+      USR_KEYBRD_Init();
+	  USBH_KeybdDemo(&hUSBHost);
+	}
+	else if (USBH_HID_GetDeviceType(&hUSBHost) == HID_MOUSE)
+	{
+      printf("USB HID Host Mouse Demo...");
+      USR_MOUSE_Init();
+	  USBH_MouseDemo(&hUSBHost);
+	}
+	
+	/* Force HID Device to re-enumerate */
+    USBH_ReEnumerate(&hUSBHost);
   }
-}
-
-/**
-  * @brief  HID application Init
-  * @param  None
-  * @retval None
-  */
-static void HID_InitApplication(void)
-{
-  /* Configure Joystick in EXTI mode */
-  BSP_JOY_Init(JOY_MODE_EXTI);
-
-  /* Configure the LEDs */
-  BSP_LED_Init(LED1);
-  BSP_LED_Init(LED2);
-  BSP_LED_Init(LED3);
-  BSP_LED_Init(LED4);
-
-  /* Initialize the LCD */
-  BSP_LCD_Init();
-
-  /* Init the LCD Log module */
-  LCD_LOG_Init();
-  LCD_LOG_SetHeader((uint8_t *) " USB OTG FS HID Host");
-  LCD_UsrLog("USB Host library started.\n");
-
-  /* Start HID Interface */
-  HID_MenuInit();
 }
 
 /**
@@ -150,15 +168,15 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
     break;
 
   case HOST_USER_DISCONNECTION:
-    Appli_state = APPLICATION_DISCONNECT;
+	  
     break;
 
   case HOST_USER_CLASS_ACTIVE:
-    Appli_state = APPLICATION_READY;
+	  
     break;
 
   case HOST_USER_CONNECTION:
-    Appli_state = APPLICATION_START;
+	  
     break;
 
   default:
@@ -166,23 +184,99 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
   }
 }
 
+
 /**
-  * @brief  Toggles LEDs to show user input state.
+  * @brief  Main routine for Mouse application
+  * @param  phost: Host handle
+  * @retval None
+  */
+static void USBH_MouseDemo(USBH_HandleTypeDef * phost)
+{
+  HID_MOUSE_Info_TypeDef *m_pinfo;
+
+  m_pinfo = USBH_HID_GetMouseInfo(phost);
+  if (m_pinfo != NULL)
+  {
+    /* Handle Mouse data position */
+    USR_MOUSE_ProcessData(&mouse_info);
+
+    if (m_pinfo->buttons[0])
+    {
+      HID_MOUSE_ButtonPressed(0);
+    }
+    else
+    {
+      HID_MOUSE_ButtonReleased(0);
+    }
+
+    if (m_pinfo->buttons[1])
+    {
+      HID_MOUSE_ButtonPressed(2);
+    }
+    else
+    {
+      HID_MOUSE_ButtonReleased(2);
+    }
+
+    if (m_pinfo->buttons[2])
+    {
+      HID_MOUSE_ButtonPressed(1);
+    }
+    else
+    {
+      HID_MOUSE_ButtonReleased(1);
+    }
+  }
+}
+
+/**
+  * @brief  Main routine for Keyboard application
+  * @param  phost: Host handle
+  * @retval None
+  */
+static void USBH_KeybdDemo(USBH_HandleTypeDef * phost)
+{
+  HID_KEYBD_Info_TypeDef *k_pinfo;
+  char c;
+  k_pinfo = USBH_HID_GetKeybdInfo(phost);
+
+  if (k_pinfo != NULL)
+  {
+    c = USBH_HID_GetASCIICode(k_pinfo);
+    if (c != 0)
+    {
+      USR_KEYBRD_ProcessData(c);
+    }
+  }
+}
+
+/**
+  * @brief  Retargets the C library printf function to the USART.
   * @param  None
   * @retval None
   */
-void Toggle_Leds(void)
+PUTCHAR_PROTOTYPE
 {
-  static uint32_t ticks;
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
 
-  if (ticks++ == 100)
-  {
-    BSP_LED_Toggle(LED1);
-    BSP_LED_Toggle(LED2);
-    BSP_LED_Toggle(LED3);
-    BSP_LED_Toggle(LED4);
-    ticks = 0;
-  }
+  return ch;
+}
+
+/**
+  * @brief  Retargets the C library scanf function to the USART.
+  * @param  None
+  * @retval None
+  */
+GETCHAR_PROTOTYPE
+{
+  /* Place your implementation of fgetc here */
+  /* e.g. read a character to the USART1 and Loop until the end of transmission */
+  uint8_t ch;
+  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+
+  return ch;
 }
 
 /**
@@ -230,7 +324,7 @@ void SystemClock_Config(void)
   if (HAL_RCC_OscConfig(&oscinitstruct) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 
   /* USB clock selection */
@@ -250,21 +344,23 @@ void SystemClock_Config(void)
   if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2) != HAL_OK)
   {
     /* Start Conversation Error */
-    Error_Handler();
+    Error_Handler(0);
   }
 }
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  id: error id
   * @retval None
   */
-static void Error_Handler(void)
+static void Error_Handler(uint8_t id)
 {
-  /* Turn LED3 on */
-  BSP_LED_On(LED3);
-  while (1)
+  printf("an error corrupted=%d\r\n",id);
+  while(1)
   {
+    /* Toggle LED_RED fast */
+    //BSP_LED_Toggle(LED_RED);
+    HAL_Delay(40);
   }
 }
 

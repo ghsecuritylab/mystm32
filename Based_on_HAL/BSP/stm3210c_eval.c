@@ -215,7 +215,7 @@ void                      ACCELERO_IO_Read(uint8_t* pBuffer, uint8_t ReadAddr, u
 #endif /* HAL_I2C_MODULE_ENABLED */
 
 /* SPIx bus function */
-#ifdef HAL_SPI_MODULE_ENABLEDF
+#ifdef HAL_SPI_MODULE_ENABLED
 static void               SPIx_Init(void);
 static void               SPIx_Write(uint8_t Value);
 static uint8_t            SPIx_Read(void);
@@ -344,12 +344,12 @@ void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
 
   /* Enable the corresponding Push Button clock */
   BUTTONx_GPIO_CLK_ENABLE(Button);
-  
+
   /* Configure Push Button pin as input */
   gpioinitstruct.Pin    = BUTTON_PIN[Button];
   gpioinitstruct.Pull   = GPIO_NOPULL;
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-    
+
   if (Button_Mode == BUTTON_MODE_GPIO)
   {
     /* Configure Button pin as input */
@@ -364,7 +364,7 @@ void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
       gpioinitstruct.Mode = GPIO_MODE_IT_FALLING;
     }
     else
-    { 
+    {
       /* Configure Key Push Button pin as input with External interrupt, rising edge */
       gpioinitstruct.Mode = GPIO_MODE_IT_RISING;
     }
@@ -389,80 +389,8 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 }
 
 #ifdef HAL_I2C_MODULE_ENABLED
-/**
-  * @brief  Configures joystick GPIO and EXTI modes.
-  * @param  Joy_Mode: Button mode.
-  *          This parameter can be one of the following values:
-  *            @arg  JOY_MODE_GPIO: Joystick pins will be used as simple IOs
-  *            @arg  JOY_MODE_EXTI: Joystick pins will be connected to EXTI line 
-  *                                 with interrupt generation capability  
-  * @retval IO_OK: if all initializations are OK. Other value if error.
-  */
-uint8_t BSP_JOY_Init(JOYMode_TypeDef Joy_Mode)
-{
-  uint8_t ret = 0;
-  
-  /* Initialize the IO functionalities */
-  ret = BSP_IO_Init();
-  
-  /* Configure joystick pins in IT mode */
-  if((ret == IO_OK) && (Joy_Mode == JOY_MODE_EXTI))
-  {
-    /* Configure joystick pins in IT mode */
-    BSP_IO_ConfigPin(JOY_ALL_PINS, IO_MODE_IT_FALLING_EDGE);
-  }
 
-  return ret; 
-}
 
-/**
-  * @brief  Returns the current joystick status.
-  * @retval Code of the joystick key pressed
-  *          This code can be one of the following values:
-  *            @arg  JOY_NONE
-  *            @arg  JOY_SEL
-  *            @arg  JOY_DOWN
-  *            @arg  JOY_LEFT
-  *            @arg  JOY_RIGHT
-  *            @arg  JOY_UP
-  */
-JOYState_TypeDef BSP_JOY_GetState(void)
-{
-  uint32_t tmp = 0;
-  
-  /* Read the status joystick pins */
-  tmp = BSP_IO_ReadPin(JOY_ALL_PINS);
-  
-  /* Check the pressed keys */  
-  if((tmp & JOY_NONE_PIN) == JOY_NONE)
-  {
-    return(JOYState_TypeDef) JOY_NONE;
-  }
-  else if(!(tmp & JOY_SEL_PIN))
-  {
-    return(JOYState_TypeDef) JOY_SEL;
-  }
-  else if(!(tmp & JOY_DOWN_PIN))
-  {
-    return(JOYState_TypeDef) JOY_DOWN;
-  } 
-  else if(!(tmp & JOY_LEFT_PIN))
-  {
-    return(JOYState_TypeDef) JOY_LEFT;
-  }
-  else if(!(tmp & JOY_RIGHT_PIN))
-  {
-    return(JOYState_TypeDef) JOY_RIGHT;
-  }
-  else if(!(tmp & JOY_UP_PIN))
-  {
-    return(JOYState_TypeDef) JOY_UP;
-  }
-  else
-  { 
-    return(JOYState_TypeDef) JOY_NONE;
-  }  
-}
 #endif /*HAL_I2C_MODULE_ENABLED*/ 
 
 #ifdef HAL_UART_MODULE_ENABLED
@@ -495,12 +423,12 @@ void BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart)
   gpioinitstruct.Speed      = GPIO_SPEED_FREQ_HIGH;
   gpioinitstruct.Pull       = GPIO_PULLUP;
   HAL_GPIO_Init(COM_TX_PORT[COM], &gpioinitstruct);
-    
+
   /* Configure USART Rx as alternate function push-pull */
   gpioinitstruct.Mode       = GPIO_MODE_INPUT;
   gpioinitstruct.Pin        = COM_RX_PIN[COM];
   HAL_GPIO_Init(COM_RX_PORT[COM], &gpioinitstruct);
-  
+
   /* USART configuration */
   huart->Instance = COM_USART[COM];
   HAL_UART_Init(huart);

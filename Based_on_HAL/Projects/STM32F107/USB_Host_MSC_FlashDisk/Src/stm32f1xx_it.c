@@ -183,15 +183,6 @@ void OTG_FS_IRQHandler(void)
   HAL_HCD_IRQHandler(&hhcd);
 }
 
-/**
-  * @brief  This function handles External lines 10 to 15 interrupt request.
-  * @param  None
-  * @retval None
-  */
-void EXTI15_10_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
-}
 
 /**
   * @}

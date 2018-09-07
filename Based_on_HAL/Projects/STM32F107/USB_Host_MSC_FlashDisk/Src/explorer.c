@@ -102,7 +102,7 @@ FRESULT Explore_Disk(char *path, uint8_t recu_level)
       if (line_idx > 9)
       {
         line_idx = 0;
-        LCD_UsrLog("> Press [Key] To Continue.\n");
+        printf("> Press [Key] To Continue.\n");
 
         /* KEY Button in polling */
         while (BSP_PB_GetState(BUTTON_KEY) != RESET)
@@ -113,31 +113,31 @@ FRESULT Explore_Disk(char *path, uint8_t recu_level)
 
       if (recu_level == 1)
       {
-        LCD_DbgLog("   |__");
+        printf("   |__");
       }
       else if (recu_level == 2)
       {
-        LCD_DbgLog("   |   |__");
+        printf("   |   |__");
       }
-      if ((fno.fattrib & AM_MASK) == AM_DIR)
+      if (fno.fattrib & AM_DIR)
       {
         strcat(tmp, "\n");
-        LCD_UsrLog((void *)tmp);
+        printf("%s",tmp);
         Explore_Disk(fn, 2);
       }
       else
       {
         strcat(tmp, "\n");
-        LCD_DbgLog((void *)tmp);
+        printf("%s",tmp);
       }
 
-      if (((fno.fattrib & AM_MASK) == AM_DIR) && (recu_level == 2))
+      if ((fno.fattrib & AM_DIR) && (recu_level == 2))
       {
         Explore_Disk(fn, 2);
       }
     }
     f_closedir(&dir);
-    LCD_UsrLog("> Select an operation to Continue.\n");
+    printf("> Select an operation to Continue.\n");
   }
   return res;
 }

@@ -58,7 +58,6 @@
 #define KYBRD_LAST_LINE                  (uint16_t)155
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
-extern HID_DEMO_StateMachine hid_demo;
 extern uint8_t *DEMO_KEYBOARD_menu[];
 extern uint8_t prev_select;
 extern uint32_t hid_demo_ready;
@@ -66,79 +65,14 @@ uint8_t KeybrdCharXpos = 0;
 uint16_t KeybrdCharYpos = 0;
 
 /* Private function prototypes ----------------------------------------------- */
-static void USR_KEYBRD_Init(void);
+
 
 /* Private functions --------------------------------------------------------- */
 
-/**
-  * @brief  Manages Keyboard Menu Process.  
-  * @param  None
-  * @retval None
-  */
-void HID_KeyboardMenuProcess(void)
+void USR_KEYBRD_Init(void)
 {
-  switch (hid_demo.keyboard_state)
-  {
-  case HID_KEYBOARD_IDLE:
-    hid_demo.keyboard_state = HID_KEYBOARD_START;
-    HID_SelectItem(DEMO_KEYBOARD_menu, 0);
-    hid_demo.select = 0;
-    prev_select = 0;
-    break;
-
-  case HID_KEYBOARD_WAIT:
-    if (hid_demo.select != prev_select)
-    {
-      prev_select = hid_demo.select;
-      HID_SelectItem(DEMO_KEYBOARD_menu, hid_demo.select & 0x7F);
-      /* Handle select item */
-      if (hid_demo.select & 0x80)
-      {
-        hid_demo.select &= 0x7F;
-        switch (hid_demo.select)
-        {
-        case 0:
-          hid_demo.keyboard_state = HID_KEYBOARD_START;
-          break;
-
-        case 1:                /* Return */
-          LCD_LOG_ClearTextZone();
-          hid_demo.state = HID_DEMO_REENUMERATE;
-          hid_demo.select = 0;
-          break;
-
-        default:
-          break;
-        }
-      }
-    }
-    break;
-
-  case HID_KEYBOARD_START:
-    USR_KEYBRD_Init();
-    hid_demo.keyboard_state = HID_KEYBOARD_WAIT;
-    break;
-
-  default:
-    break;
-  }
-}
-
-/**
-  * @brief  Init Keyboard window.     
-  * @param  None
-  * @retval None
-  */
-static void USR_KEYBRD_Init(void)
-{
-  LCD_LOG_ClearTextZone();
-  BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-
-  BSP_LCD_DisplayStringAtLine(4, (uint8_t *)"Use Keyboard to tape characters:");
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-
-  KeybrdCharXpos = KYBRD_FIRST_LINE;
-  KeybrdCharYpos = KYBRD_FIRST_COLUMN;
+   KeybrdCharXpos = KYBRD_FIRST_LINE;
+   KeybrdCharYpos = KYBRD_FIRST_COLUMN;
 }
 
 /**
@@ -157,7 +91,7 @@ void USR_KEYBRD_ProcessData(uint8_t data)
 
     if (KeybrdCharXpos > KYBRD_LAST_LINE)
     {
-      LCD_LOG_ClearTextZone();
+		
       KeybrdCharXpos = KYBRD_FIRST_LINE;
       KeybrdCharYpos = KYBRD_FIRST_COLUMN;
     }
@@ -182,12 +116,12 @@ void USR_KEYBRD_ProcessData(uint8_t data)
     {
       KeybrdCharYpos -= SMALL_FONT_COLUMN_WIDTH;
     }
-    BSP_LCD_DisplayChar(KeybrdCharYpos, KeybrdCharXpos, ' ');
+    printf("Y:%d,X:%d,C:%c",KeybrdCharYpos, KeybrdCharXpos, ' ');
   }
   else
   {
     /* Update the cursor position on LCD */
-    BSP_LCD_DisplayChar(KeybrdCharYpos, KeybrdCharXpos, data);
+    printf("Y:%d,X:%d,C:%c",KeybrdCharYpos, KeybrdCharXpos, data);
 
     /* Increment char Y position */
     KeybrdCharYpos += SMALL_FONT_COLUMN_WIDTH;
@@ -203,10 +137,9 @@ void USR_KEYBRD_ProcessData(uint8_t data)
 
     if (KeybrdCharXpos > KYBRD_LAST_LINE)
     {
-      LCD_LOG_ClearTextZone();
       KeybrdCharXpos = KYBRD_FIRST_LINE;
       /* Start New Display of the cursor position on LCD */
-      BSP_LCD_DisplayChar(KeybrdCharYpos, KeybrdCharXpos, data);
+    printf("Y:%d,X:%d,C:%c",KeybrdCharYpos, KeybrdCharXpos, data);
     }
   }
 }
