@@ -157,9 +157,7 @@ static void HID_MOUSE_UpdatePosition(int8_t x, int8_t y)
       x_loc = 2;
     }
 	
-	
     printf("%d,%d,%c",MOUSE_WINDOW_X + prev_x, MOUSE_WINDOW_Y + prev_y, 'x');
-
     printf("%d,%d,%c",MOUSE_WINDOW_X + x_loc, MOUSE_WINDOW_Y + y_loc, 'x');
 
     prev_x = x_loc;
@@ -207,9 +205,6 @@ void HID_MOUSE_ButtonPressed(uint8_t button_idx)
   */
 void HID_MOUSE_ButtonReleased(uint8_t button_idx)
 {
-  /* Set the color for release status */
-	
-
   /* Change the color of button released to default button color */
   switch (button_idx)
   {

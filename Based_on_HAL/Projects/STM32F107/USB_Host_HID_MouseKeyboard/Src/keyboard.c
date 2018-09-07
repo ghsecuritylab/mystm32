@@ -58,15 +58,9 @@
 #define KYBRD_LAST_LINE                  (uint16_t)155
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
-extern uint8_t *DEMO_KEYBOARD_menu[];
-extern uint8_t prev_select;
-extern uint32_t hid_demo_ready;
 uint8_t KeybrdCharXpos = 0;
 uint16_t KeybrdCharYpos = 0;
-
 /* Private function prototypes ----------------------------------------------- */
-
-
 /* Private functions --------------------------------------------------------- */
 
 void USR_KEYBRD_Init(void)
@@ -139,7 +133,7 @@ void USR_KEYBRD_ProcessData(uint8_t data)
     {
       KeybrdCharXpos = KYBRD_FIRST_LINE;
       /* Start New Display of the cursor position on LCD */
-    printf("Y:%d,X:%d,C:%c",KeybrdCharYpos, KeybrdCharXpos, data);
+      printf("Y:%d,X:%d,C:%c",KeybrdCharYpos, KeybrdCharXpos, data);
     }
   }
 }

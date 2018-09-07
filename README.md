@@ -1,4 +1,4 @@
-# STM32F103 sample codes
+# STM32 sample codes
 
 ## Description
 

@@ -112,20 +112,11 @@ int main(void)
   /* Start Host Process */
   USBH_Start(&hUSBHost);
 
-  /* Run Application (Blocking mode) */
+  /* USB Host Background task */
+  USBH_Process(&hUSBHost);
+
   while (1)
   {
-    /* USB Host Background task */
-    USBH_Process(&hUSBHost);
-
-    /* Read and Write File Here */
-    MSC_File_Operations();
-	  
-    /* Display disk content */
-    Explore_Disk("0:/", 1);
-	
-    /* Force MSC Device to re-enumerate */
-    USBH_ReEnumerate(&hUSBHost);
   }
 }
 
@@ -144,6 +135,7 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
     break;
 
   case HOST_USER_DISCONNECTION:
+	printf("Disconnected!\n");
     if(f_mount(NULL, "", 0) != FR_OK)
     {
       printf("ERROR : Cannot DeInitialize FatFs! \n");
@@ -151,11 +143,23 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
     break;
 
   case HOST_USER_CLASS_ACTIVE:
+	/* Read and Write File Here */
+    MSC_File_Operations();
+
+    /* Display disk content */
+    Explore_Disk("0:/", 1);
+
+	getchar();
+  
+    /* Force MSC Device to re-enumerate */
+    USBH_ReEnumerate(&hUSBHost);
     break;
 
   case HOST_USER_CONNECTION:
+	printf("Connected!\n");
+	// opt=0, do not mount immediately
     if(f_mount(&USBH_fatfs, "", 0) != FR_OK)
-    {  
+    {
       printf("ERROR : Cannot Initialize FatFs! \n");
     }
     break;

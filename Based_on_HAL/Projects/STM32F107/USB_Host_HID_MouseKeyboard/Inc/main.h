@@ -58,27 +58,10 @@
 #include "usbh_hid_parser.h"
 
 /* Exported types ------------------------------------------------------------*/
-typedef enum {
-  HID_MOUSE_IDLE = 0,
-  HID_MOUSE_WAIT, 
-  HID_MOUSE_START,       
-}HID_mouse_State;
-
-typedef enum {
-  HID_KEYBOARD_IDLE = 0,
-  HID_KEYBOARD_WAIT,  
-  HID_KEYBOARD_START,    
-}HID_keyboard_State;
-
-extern USBH_HandleTypeDef hUSBHost;
-extern HID_MOUSE_Info_TypeDef mouse_info;
-extern uint8_t *DEMO_MOUSE_menu[];
-extern uint8_t prev_select;
-
 /* Exported constants --------------------------------------------------------*/
+extern USBH_HandleTypeDef hUSBHost;
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void HID_SelectItem(uint8_t **menu, uint8_t item);
 void USR_MOUSE_Init(void);
 void HID_MOUSE_ButtonReleased(uint8_t button_idx);
 void HID_MOUSE_ButtonPressed(uint8_t button_idx);

@@ -63,6 +63,7 @@
 /* Private variables --------------------------------------------------------- */
 USBH_HandleTypeDef hUSBHost;
 UART_HandleTypeDef UartHandle;
+extern HID_MOUSE_Info_TypeDef mouse_info;
 
 /* Private function prototypes -----------------------------------------------*/
 #ifdef __GNUC__
@@ -129,28 +130,14 @@ int main(void)
   /* Start Host Process */
   USBH_Start(&hUSBHost);
 
+  /* USB Host Background task */
+  USBH_Process(&hUSBHost);
+
+
+
   /* Run Application (Blocking mode) */
   while (1)
   {
-    /* USB Host Background task */
-    USBH_Process(&hUSBHost);
-
-    /* HID Menu Process */
-	if (USBH_HID_GetDeviceType(&hUSBHost) == HID_KEYBOARD)
-	{
-      printf("Use Keyboard to tape characters:");
-      USR_KEYBRD_Init();
-	  USBH_KeybdDemo(&hUSBHost);
-	}
-	else if (USBH_HID_GetDeviceType(&hUSBHost) == HID_MOUSE)
-	{
-      printf("USB HID Host Mouse Demo...");
-      USR_MOUSE_Init();
-	  USBH_MouseDemo(&hUSBHost);
-	}
-	
-	/* Force HID Device to re-enumerate */
-    USBH_ReEnumerate(&hUSBHost);
   }
 }
 
@@ -168,15 +155,34 @@ static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
     break;
 
   case HOST_USER_DISCONNECTION:
-	  
+	printf("Disconnected!\n");
     break;
 
   case HOST_USER_CLASS_ACTIVE:
-	  
+	/* HID Menu Process */
+	if (USBH_HID_GetDeviceType(&hUSBHost) == HID_KEYBOARD)
+	{
+	  printf("Use Keyboard to tape characters:");
+	  USR_KEYBRD_Init();
+	  USBH_KeybdDemo(&hUSBHost);
+	}
+	else if (USBH_HID_GetDeviceType(&hUSBHost) == HID_MOUSE)
+	{
+	  printf("USB HID Host Mouse Demo...");
+	  USR_MOUSE_Init();
+	  USBH_MouseDemo(&hUSBHost);
+	}
+	else
+	{
+	  printf("No supported HID device!\n");
+	}
+
+	/* Force HID Device to re-enumerate */
+	USBH_ReEnumerate(&hUSBHost);
     break;
 
   case HOST_USER_CONNECTION:
-	  
+	printf("Connected!\n");
     break;
 
   default:
