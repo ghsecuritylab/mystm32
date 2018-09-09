@@ -59,7 +59,6 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 extern PCD_HandleTypeDef hpcd;
-extern USBD_HandleTypeDef USBD_Device;
 /* Private function prototypes ----------------------------------------------- */
 /* Private functions --------------------------------------------------------- */
 
@@ -162,39 +161,9 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-#define CURSOR_STEP     5
-  uint8_t HID_Buffer[4];
-
-  static __IO uint32_t counter = 0;
+extern TM_USB_HIDDEVICE_Mouse_t mouse;
   HAL_IncTick();
-
-  /* check Joystick state every 50ms */
-  if (counter++ == 50)
-  {
-    int8_t x = 0, y = 0;
-
-    if (rand() > RAND_MAX/2)
-    	x -= CURSOR_STEP;
-	else
-		x += CURSOR_STEP;
-
-    if (rand() > RAND_MAX/2)
-    	y -= CURSOR_STEP;
-	else
-		y += CURSOR_STEP;
-
-    HID_Buffer[0] = 0;
-    HID_Buffer[1] = x;
-    HID_Buffer[2] = y;
-    HID_Buffer[3] = 0;
-	
-    /* send data though IN endpoint */
-    if ((HID_Buffer[1] != 0) || (HID_Buffer[2] != 0))
-    {
-      USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
-    }
-    counter = 0;
-  }
+  //USB_HIDDEVICE_MouseSend(&mouse);
 }
 
 /******************************************************************************/

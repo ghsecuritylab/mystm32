@@ -67,6 +67,8 @@ UART_HandleTypeDef UartHandle;
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
 static void Error_Handler(void);
+uint8_t USB_HID_Ready(void);
+unsigned char KEY_PAGE_ASCII(char c);
 
 /* Private functions --------------------------------------------------------- */
 #ifdef __GNUC__
@@ -109,7 +111,7 @@ int main(void)
   UartHandle.Init.Mode       = UART_MODE_TX_RX;
   BSP_COM_Init(COM1, &UartHandle);
 
-  printf("please insert the device into your PC");
+  printf("please insert the device into your PC\n");
 
 /* Configure Key push-button for remote wakeup */
   //BSP_PB_Init(BUTTON_MODE_EXTI);
@@ -123,11 +125,250 @@ int main(void)
   /* Start Device Process */
   USBD_Start(&USBD_Device);
 
+  printf("waiting...\n");
+  while (!USB_HID_Ready())
+  {
+  }
+  printf("demo started!\n");
+  
+  TM_USB_HIDDEVICE_Keyboard_t keyboard = {
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  0,0,0,0,0,0
+  };
+
+  /* Win+R */
+//    keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
+//    USB_HIDDEVICE_KeyboardSend(&keyboard);
+//    keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Released;
+  keyboard.Key1 = KEY_PAGE_S;
+  keyboard.Key2 = KEY_PAGE_Q;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  keyboard.Key1 = 0;
+  keyboard.Key2 = 0;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  while(1)
+  {
+	//HAL_Delay(10);
+  }
+  keyboard.Key2 = KEY_PAGE_R;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  
+  /* Key Release */
+  keyboard.Key1 = KEY_PAGE_NONE;
+  keyboard.Key2 = KEY_PAGE_NONE;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  
+  /* notepad */
+  char buff1[] = "notepad";
+  for (uint8_t i=0; i < sizeof(buff1)-1; ++i)
+  {
+    /* key pressed */
+    keyboard.Key1 = KEY_PAGE_ASCII(buff1[i]);
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+
+    /* Key Release */
+    keyboard.Key1 = KEY_PAGE_NONE;
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+  }
+
+  /* Enter */
+  keyboard.Key1 = KEY_PAGE_ENTER;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  keyboard.Key1 = KEY_PAGE_NONE;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  
+  /* notepad */
+  char buff2[] = "hello,world!";
+  for (uint8_t i=0; i < sizeof(buff2)-1; ++i)
+  {
+    /* key pressed */
+    keyboard.Key1 = KEY_PAGE_ASCII(buff2[i]);
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+
+    /* Key Release */
+    keyboard.Key1 = KEY_PAGE_NONE;
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+  }
+  
   /* Infinite loop */
   while (1)
   {
   }
 }
+
+uint8_t USB_HID_Ready(void)
+{
+	return (USBD_Device.dev_state == USBD_STATE_CONFIGURED) &&
+		(((USBD_HID_HandleTypeDef *)USBD_Device.pClassData)->state == HID_IDLE);
+}
+
+/* convert ascii character to KEY_PAGE_xx for a-zA-Z0-9 */
+unsigned char KEY_PAGE_ASCII(char c)
+{
+	if (c>='a' && c<='z')
+	{
+		c -= 'a';
+		c += KEY_PAGE_A;
+	}
+	else if (c>='A' && c<='Z')
+	{
+		c -= 'A';
+		c += KEY_PAGE_A;
+	}
+	else if (c>='1' && c<='9')
+	{
+		c -= '1';
+		c += KEY_PAGE_1;
+	}
+	else if (c=='0')
+	{
+		c = KEY_PAGE_0;
+	}
+	return c;
+}
+
+void USB_HIDDEVICE_KeyboardSend(TM_USB_HIDDEVICE_Keyboard_t* keyboard)
+{
+	uint8_t HID_Buffer[9] = {0}; /* 9 bytes long report */
+
+	/* Report ID */
+	HID_Buffer[0] = 0x01; /* Keyboard */
+
+	/* Control buttons */
+	HID_Buffer[1] = 0;
+	HID_Buffer[1] |= keyboard->L_CTRL 	<< 0;	/* Bit 0 */
+	HID_Buffer[1] |= keyboard->L_SHIFT 	<< 1;	/* Bit 1 */
+	HID_Buffer[1] |= keyboard->L_ALT 	<< 2;	/* Bit 2 */
+	HID_Buffer[1] |= keyboard->L_GUI 	<< 3;	/* Bit 3 */
+	HID_Buffer[1] |= keyboard->R_CTRL 	<< 4;	/* Bit 4 */
+	HID_Buffer[1] |= keyboard->R_SHIFT 	<< 5;	/* Bit 5 */
+	HID_Buffer[1] |= keyboard->R_ALT 	<< 6;	/* Bit 6 */
+	HID_Buffer[1] |= keyboard->R_GUI 	<< 7;	/* Bit 7 */
+
+	/* Padding */
+	HID_Buffer[2] = 0x00;
+
+	/* Keys */
+	HID_Buffer[3] = keyboard->Key1;
+	HID_Buffer[4] = keyboard->Key2;
+	HID_Buffer[5] = keyboard->Key3;
+	HID_Buffer[6] = keyboard->Key4;
+	HID_Buffer[7] = keyboard->Key5;
+	HID_Buffer[8] = keyboard->Key6;
+
+	/* Send to USB gamepad data */
+    USBD_HID_SendReport(&USBD_Device, HID_Buffer, sizeof HID_Buffer);
+}
+
+TM_USB_HIDDEVICE_Mouse_t mouse = {
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  0,0,0
+};
+void USB_HIDDEVICE_MouseSend(TM_USB_HIDDEVICE_Mouse_t* mouse)
+{
+#define CURSOR_STEP     4
+  uint8_t HID_Buffer[5];
+
+  static __IO uint32_t counter = 0;
+  /* check Joystick state every 50ms */
+  if (counter++ == 100)
+  {
+    if (rand() > RAND_MAX/2)
+    	mouse->XAxis = -CURSOR_STEP;
+	else
+		mouse->XAxis = CURSOR_STEP;
+
+    if (rand() > RAND_MAX/2)
+    	mouse->YAxis = -CURSOR_STEP;
+	else
+		mouse->YAxis = CURSOR_STEP;
+	
+	HID_Buffer[0] = 0x02;			// report ID = 2: mouse
+    HID_Buffer[1] |= mouse->LeftButton << 0;		// buttons modifier bits(leftbutton-0)
+    HID_Buffer[1] |= mouse->RightButton << 1;	// buttons modifier bits(rightbutton-1)
+    HID_Buffer[1] |= mouse->MiddleButton << 2;	// buttons modifier bits(middlebutton-2)
+    HID_Buffer[2] = mouse->XAxis;	// x
+    HID_Buffer[3] = mouse->YAxis;	// y
+    HID_Buffer[4] = mouse->Wheel;	// wheel
+	
+    /* send data though IN endpoint */
+    if ((mouse->XAxis != 0) || (mouse->YAxis != 0))
+    {
+      USBD_HID_SendReport(&USBD_Device, HID_Buffer, sizeof HID_Buffer);
+    }
+    counter = 0;
+  }
+}
+
+static TM_USB_HIDDEVICE_Gamepad_t gamepad = {
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  TM_USB_HIDDEVICE_Button_Released,
+  0,0,0,0
+};
+void USB_HIDDEVICE_GamepadSend(TM_USB_HIDDEVICE_Gamepad_t* gamepad)
+{
+	uint8_t HID_Buffer[7]; /* 7 bytes long report */
+	
+	/* Report ID */
+	HID_Buffer[0] = 0x03; /* gamepad id */
+	
+	/* Buttons pressed, byte 1 */
+	HID_Buffer[1] = 0;
+	HID_Buffer[1] |= gamepad->Button1 << 0;	/* Bit 0 */
+	HID_Buffer[1] |= gamepad->Button2 << 1;	/* Bit 1 */
+	HID_Buffer[1] |= gamepad->Button3 << 2;	/* Bit 2 */
+	HID_Buffer[1] |= gamepad->Button4 << 3;	/* Bit 3 */
+	HID_Buffer[1] |= gamepad->Button5 << 4;	/* Bit 4 */
+	HID_Buffer[1] |= gamepad->Button6 << 5;	/* Bit 5 */
+	HID_Buffer[1] |= gamepad->Button7 << 6;	/* Bit 6 */
+	HID_Buffer[1] |= gamepad->Button8 << 7;	/* Bit 7 */
+	
+	/* Buttons pressed, byte 2 */
+	HID_Buffer[2] = 0;
+	HID_Buffer[2] |= gamepad->Button9 << 0;	/* Bit 0 */
+	HID_Buffer[2] |= gamepad->Button10 << 1;	/* Bit 1 */
+	HID_Buffer[2] |= gamepad->Button11 << 2;	/* Bit 2 */
+	HID_Buffer[2] |= gamepad->Button12 << 3;	/* Bit 3 */
+	HID_Buffer[2] |= gamepad->Button13 << 4;	/* Bit 4 */
+	HID_Buffer[2] |= gamepad->Button14 << 5;	/* Bit 5 */
+	HID_Buffer[2] |= gamepad->Button15 << 6;	/* Bit 6 */
+	HID_Buffer[2] |= gamepad->Button16 << 7;	/* Bit 7 */
+	
+	/* Left joystick */
+	HID_Buffer[3] = gamepad->LeftXAxis;
+	HID_Buffer[4] = gamepad->LeftYAxis;
+	
+	/* Right joystick */
+	HID_Buffer[5] = gamepad->RightXAxis;
+	HID_Buffer[6] = gamepad->RightYAxis;
+	
+	/* Send to USB gamepad data */
+    USBD_HID_SendReport(&USBD_Device, HID_Buffer, sizeof HID_Buffer);
+}
+
 
 /**
   * @brief  Retargets the C library printf function to the USART.
@@ -223,8 +464,6 @@ void SystemClock_Config(void)
   */
 static void Error_Handler(void)
 {
-  /* Turn LED3 on */
-  //BSP_LED_On(LED3);
   while (1)
   {
   }
