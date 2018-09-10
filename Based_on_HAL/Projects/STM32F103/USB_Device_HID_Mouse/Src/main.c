@@ -142,29 +142,17 @@ int main(void)
   TM_USB_HIDDEVICE_Button_Released,
   0,0,0,0,0,0
   };
-
   /* Win+R */
-//    keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
-//    USB_HIDDEVICE_KeyboardSend(&keyboard);
-//    keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Released;
-  keyboard.Key1 = KEY_PAGE_S;
-  keyboard.Key2 = KEY_PAGE_Q;
+  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
+  keyboard.Key1 = KEY_PAGE_R;
   USB_HIDDEVICE_KeyboardSend(&keyboard);
-  keyboard.Key1 = 0;
-  keyboard.Key2 = 0;
-  USB_HIDDEVICE_KeyboardSend(&keyboard);
-  while(1)
-  {
-	//HAL_Delay(10);
-  }
-  keyboard.Key2 = KEY_PAGE_R;
-  USB_HIDDEVICE_KeyboardSend(&keyboard);
-  
+  HAL_Delay(60);
   /* Key Release */
+  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Released;
   keyboard.Key1 = KEY_PAGE_NONE;
-  keyboard.Key2 = KEY_PAGE_NONE;
   USB_HIDDEVICE_KeyboardSend(&keyboard);
-  
+  HAL_Delay(200);
+
   /* notepad */
   char buff1[] = "notepad";
   for (uint8_t i=0; i < sizeof(buff1)-1; ++i)
@@ -172,17 +160,22 @@ int main(void)
     /* key pressed */
     keyboard.Key1 = KEY_PAGE_ASCII(buff1[i]);
     USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(50);
 
     /* Key Release */
     keyboard.Key1 = KEY_PAGE_NONE;
     USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(200);
   }
 
   /* Enter */
   keyboard.Key1 = KEY_PAGE_ENTER;
   USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(50);
+  /* Key Release */
   keyboard.Key1 = KEY_PAGE_NONE;
   USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(200);
   
   /* notepad */
   char buff2[] = "hello,world!";
@@ -191,10 +184,12 @@ int main(void)
     /* key pressed */
     keyboard.Key1 = KEY_PAGE_ASCII(buff2[i]);
     USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(50);
 
     /* Key Release */
     keyboard.Key1 = KEY_PAGE_NONE;
     USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(200);
   }
   
   /* Infinite loop */
@@ -239,7 +234,7 @@ void USB_HIDDEVICE_KeyboardSend(TM_USB_HIDDEVICE_Keyboard_t* keyboard)
 	uint8_t HID_Buffer[9] = {0}; /* 9 bytes long report */
 
 	/* Report ID */
-	HID_Buffer[0] = 0x01; /* Keyboard */
+	//HID_Buffer[0] = 0x01; /* Keyboard */
 
 	/* Control buttons */
 	HID_Buffer[1] = 0;
@@ -264,7 +259,7 @@ void USB_HIDDEVICE_KeyboardSend(TM_USB_HIDDEVICE_Keyboard_t* keyboard)
 	HID_Buffer[8] = keyboard->Key6;
 
 	/* Send to USB gamepad data */
-    USBD_HID_SendReport(&USBD_Device, HID_Buffer, sizeof HID_Buffer);
+    USBD_HID_SendReport(&USBD_Device, HID_Buffer+1, sizeof HID_Buffer-1);
 }
 
 TM_USB_HIDDEVICE_Mouse_t mouse = {

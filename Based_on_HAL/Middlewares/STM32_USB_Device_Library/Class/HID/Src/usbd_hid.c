@@ -157,8 +157,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIGN_
   0x00,         /*bAlternateSetting: Alternate setting*/
   0x01,         /*bNumEndpoints*/
   0x03,         /*bInterfaceClass: HID*/
-  0x00/*0x01*/,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
-  0x00/*0x02*/,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
+  0x01/*0x01*/,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
+  0x01/*0x02*/,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
   0,            /*iInterface: Index of string descriptor*/
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
@@ -216,11 +216,11 @@ __ALIGN_BEGIN static uint8_t USBD_HID_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_
 
 __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE]  __ALIGN_END =
 {
-	/* 47 */
+	/* 45 */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x06,                    // USAGE (Keyboard)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x85, 0x01,                    //   REPORT_ID (1)
+//    0x85, 0x01,                    //   REPORT_ID (1)
     0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
     0x19, 0xe0,                    //   USAGE_MINIMUM (Keyboard LeftControl)
     0x29, 0xe7,                    //   USAGE_MAXIMUM (Keyboard Right GUI)
@@ -241,8 +241,8 @@ __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE]  _
     0x29, 0x65,                    //   USAGE_MAXIMUM (Keyboard Application)
     0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
     0xc0,                          // END_COLLECTION
-	
-	/* 54 */
+	/*
+	// 54 
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,                    // USAGE (Mouse)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -272,7 +272,7 @@ __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE]  _
     0xc0,                          //   END_COLLECTION
     0xc0,                          // END_COLLECTION
 	
-	/* 48 */
+	// 48 
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -299,7 +299,7 @@ __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE]  _
     0xc0,                          //   END_COLLECTION
     0xc0,                          // END_COLLECTION
 	
-	/* 48 */
+	// 48 
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -325,53 +325,52 @@ __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE]  _
     0x81, 0x02,                    //     INPUT (Data,Var,Abs)
     0xc0,                          //     END_COLLECTION
     0xc0,                           // END_COLLECTION
-
-/*  0x05,   0x01,
-  0x09,   0x02,
-  0xA1,   0x01,
-  0x09,   0x01,
+*/
+/*
+0x05, 0x01, // Usage Page (Generic Desktop Ctrls)
+0x09, 0x02, // Usage (Mouse)
+ 0xA1, 0x01, // Collection (Application)
+ 0x09, 0x01, // Usage (Pointer)
+ 0xA1, 0x00, // Collection (Physical)
+ 0x05, 0x09, // Usage Page (Button)
+ 0x19, 0x01, // Usage Minimum (0x01)
+ 0x29, 0x03, // Usage Maximum (0x03)
   
-  0xA1,   0x00,
-  0x05,   0x09,
-  0x19,   0x01,
-  0x29,   0x03,
+ 0x15, 0x00, // Logical Minimum (0)
+ 0x25, 0x01, // Logical Maximum (1)
+ 0x95, 0x03, // Report Count (3)
+ 0x75, 0x01, // Report Size (1)
+ 0x81, 0x02, // Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
   
-  0x15,   0x00,
-  0x25,   0x01,
-  0x95,   0x03,
-  0x75,   0x01,
+ 0x95, 0x01, // Report Count (1)
+ 0x75, 0x05, // Report Size (5)
+ 0x81, 0x01, // Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
   
-  0x81,   0x02,
-  0x95,   0x01,
-  0x75,   0x05,
-  0x81,   0x01,
+ 0x05, 0x01, // Usage Page (Generic Desktop Ctrls)
+ 0x09, 0x30, // Usage (X)
+ 0x09, 0x31, // Usage (Y)
+ 0x09, 0x38, // Usage (Wheel)
+ 0x15, 0x81, // Logical Minimum (-127)
+ 0x25, 0x7F, // Logical Maximum (127)
+ 0x75, 0x08, // Report Size (8)
+ 0x95, 0x03, // Report Count (3)
+ 0x81, 0x06, // Input (Data,Var,Rel,No Wrap,Linear,Preferred State,No Null Position)
+ 0xC0, // End Collection
   
-  0x05,   0x01,
-  0x09,   0x30,
-  0x09,   0x31,
-  0x09,   0x38,
+ 0x09, 0x3C, // Usage (Motion Wakeup)
+ 0x05, 0xFF, // Usage Page (Reserved 0xFF)
+ 0x09, 0x01, // Usage (0x01)
+ 0x15, 0x00, // Logical Minimum (0)
+ 0x25, 0x01, // Logical Maximum (1)
+ 0x75, 0x01, // Report Size (1)
+ 0x95, 0x02, // Report Count (2)
+ 0xB1, 0x22, // Feature (Data,Var,Abs,No Wrap,Linear,No Preferred State,No Null Position,Non-volatile)
   
-  0x15,   0x81,
-  0x25,   0x7F,
-  0x75,   0x08,
-  0x95,   0x03,
-  
-  0x81,   0x06,
-  0xC0,   0x09,
-  0x3c,   0x05,
-  0xff,   0x09,
-  
-  0x01,   0x15,
-  0x00,   0x25,
-  0x01,   0x75,
-  0x01,   0x95,
-  
-  0x02,   0xb1,
-  0x22,   0x75,
-  0x06,   0x95,
-  0x01,   0xb1,
-  
-  0x01,   0xc0*/
+ 0x75, 0x06, // Report Size (6)
+ 0x95, 0x01, // Report Count (1)
+ 0xB1, 0x01, // Feature (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+ 0xC0, // End Collection
+ */
 }; 
 
 /**

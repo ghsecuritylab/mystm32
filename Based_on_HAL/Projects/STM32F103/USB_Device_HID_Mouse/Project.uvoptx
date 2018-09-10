@@ -26,7 +26,7 @@
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
-      <CLKADS>8000000</CLKADS>
+      <CLKADS>12000000</CLKADS>
       <OPTTT>
         <gFlags>1</gFlags>
         <BeepAtEnd>1</BeepAtEnd>
@@ -150,9 +150,25 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>233</LineNumber>
+          <LineNumber>539</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134226768</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../../../Middlewares/STM32_USB_Device_Library/Class/HID/Src/usbd_hid.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Project\../../../Middlewares/STM32_USB_Device_Library/Class/HID/Src/usbd_hid.c\539</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>266</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134228408</Address>
+          <Address>134231794</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -161,9 +177,17 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>./Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\Project\./Src/main.c\233</Expression>
+          <Expression>\\Project\./Src/main.c\266</Expression>
         </Bp>
       </Breakpoint>
+      <MemoryWindow1>
+        <Mm>
+          <WinNumber>1</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>0x20000dd9</ItemText>
+          <AccSizeX>0</AccSizeX>
+        </Mm>
+      </MemoryWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
