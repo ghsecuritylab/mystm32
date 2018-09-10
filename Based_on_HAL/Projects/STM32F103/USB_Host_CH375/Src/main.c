@@ -79,6 +79,8 @@ static void Error_Handler(uint8_t id);
   #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
 #endif /* __GNUC__ */
 
+
+  
 /**
   * @brief  Main program.
   * @param  None
@@ -112,9 +114,12 @@ int main(void)
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
+
+
   /* Infinite loop */
   while (1)
   {
+	  
   }
 }
 
