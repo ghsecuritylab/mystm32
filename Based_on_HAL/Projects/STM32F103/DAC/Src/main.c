@@ -59,8 +59,25 @@
 /* Private typedef ----------------------------------------------------------- */
 /* Private define ------------------------------------------------------------ */
 /* Private macro ------------------------------------------------------------- */
-/* Private variables --------------------------------------------------------- */
+/* User can use this section to tailor DACx instance used and associated
+   resources */
+/* Definition for DACx clock resources */
+#define DACx                            DAC
+#define DACx_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
 
+#define DACx_CLK_ENABLE()               __HAL_RCC_DAC_CLK_ENABLE()
+#define DACx_FORCE_RESET()              __HAL_RCC_DAC_FORCE_RESET()
+#define DACx_RELEASE_RESET()            __HAL_RCC_DAC_RELEASE_RESET()
+
+/* Definition for DACx Channel Pin */
+#define DACx_CHANNEL_PIN                GPIO_PIN_4
+#define DACx_CHANNEL_GPIO_PORT          GPIOA
+
+/* Definition for DACx's Channel */
+#define DACx_CHANNEL                    DAC_CHANNEL_1
+/* Private variables --------------------------------------------------------- */
+DAC_HandleTypeDef    DacHandle;
+static DAC_ChannelConfTypeDef sConfig;
 /* UART handler declaration */
 UART_HandleTypeDef UartHandle;
 
@@ -112,12 +129,42 @@ int main(void)
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
+  /*##-1- Configure the DAC peripheral #######################################*/
+  DacHandle.Instance = DACx;
 
+  if (HAL_DAC_Init(&DacHandle) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler(0);
+  }
+
+  /*##-2- Configure DAC channel1 #############################################*/
+  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
+
+  if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DACx_CHANNEL) != HAL_OK)
+  {
+    /* Channel configuration Error */
+    Error_Handler(1);
+  }
+
+  /*##-3- Set DAC Channel1 DHR register ######################################*/
+  if (HAL_DAC_SetValue(&DacHandle, DACx_CHANNEL, DAC_ALIGN_8B_R, 0xFF) != HAL_OK)
+  {
+    /* Setting value Error */
+    Error_Handler(2);
+  }
+
+  /*##-4- Enable DAC Channel1 ################################################*/
+  if (HAL_DAC_Start(&DacHandle, DACx_CHANNEL) != HAL_OK)
+  {
+    /* Start Error */
+    Error_Handler(3);
+  }
 
   /* Infinite loop */
   while (1)
   {
-	  
   }
 }
 
@@ -148,6 +195,47 @@ GETCHAR_PROTOTYPE
   HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
 
   return ch;
+}
+
+/**
+  * @brief DAC MSP Initialization
+  *        This function configures the hardware resources used in this example:
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration
+  * @param hdac: DAC handle pointer
+  * @retval None
+  */
+void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
+{
+  GPIO_InitTypeDef          GPIO_InitStruct;
+
+  /*##-1- Enable peripherals and GPIO Clocks #################################*/
+  /* Enable GPIO clock ****************************************/
+  DACx_CHANNEL_GPIO_CLK_ENABLE();
+  /* DAC Periph clock enable */
+  DACx_CLK_ENABLE();
+
+  /*##-2- Configure peripheral GPIO ##########################################*/
+  /* DAC Channel1 GPIO pin configuration */
+  GPIO_InitStruct.Pin = DACx_CHANNEL_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(DACx_CHANNEL_GPIO_PORT, &GPIO_InitStruct);
+}
+
+/**
+  * @brief  DeInitializes the DAC MSP.
+  * @param  hdac: pointer to a DAC_HandleTypeDef structure that contains
+  *         the configuration information for the specified DAC.
+  * @retval None
+  */
+void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac)
+{
+  /* Enable DAC reset state */
+  DACx_FORCE_RESET();
+
+  /* Release DAC from reset state */
+  DACx_RELEASE_RESET();
 }
 
 /**
