@@ -3,12 +3,12 @@
 
 #include "mySPI_OLED.h"
 
-#define SPI_G_ClockCmd	RCC_APB2PeriphClockCmd
-#define SPI_G_ 			RCC_APB2Periph_GPIOA
-#define SPI_ClockCmd	RCC_APB2PeriphClockCmd
-#define SPI_			RCC_APB2Periph_SPI1
-
+#define SPI_APBxClkCmd			RCC_APB2PeriphClockCmd
+#define SPI_APBxClk				RCC_APB2Periph_SPI1
 #define SPIX			SPI1
+
+#define SPI_GPIO_APBxClkCmd		RCC_APB2PeriphClockCmd
+#define SPI_GPIO_APBxClk 		RCC_APB2Periph_GPIOA
 #define GPIOX			GPIOA
 #define GPIO_DC			GPIO_Pin_3
 #define GPIO_RST		GPIO_Pin_4
@@ -18,8 +18,8 @@
 
 void SPI_OLED_CONFIG()
 {
-	SPI_G_ClockCmd(SPI_G_, ENABLE);
-	SPI_ClockCmd(SPI_, ENABLE);
+	SPI_GPIO_APBxClkCmd(SPI_GPIO_APBxClk, ENABLE);
+	SPI_APBxClkCmd(SPI_APBxClk, ENABLE);
 
 	// CS/SS 普通即可
 	GPIO_InitTypeDef gpio_init_t;
@@ -57,6 +57,7 @@ void SPI_OLED_CONFIG()
 	SPI_Cmd(SPIX, ENABLE);
 }
 
+// OLED 的 SPI 功能无需 SPI_ReadByte
 //uint32_t SPI_WriteByte(uint8_t c
 void SPI_WriteByte(uint8_t c)
 {

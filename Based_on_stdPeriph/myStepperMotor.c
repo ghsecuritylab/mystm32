@@ -1,13 +1,13 @@
-#include <mylib.h>
+#include "mylib.h"
 
 #define STEPPER_MOTOR_CLK			RCC_APB2Periph_GPIOB
-#define STEPPER_MOTOR_APBxClock_FUN	RCC_APB2PeriphClockCmd
+#define STEPPER_MOTOR_APBxClkCmd	RCC_APB2PeriphClockCmd
 
-#define STEPPER_MOTOR_PORT		GPIOC
-#define STEPPER_MOTOR_PHASE_A	GPIO_Pin_0
-#define STEPPER_MOTOR_PHASE_B	GPIO_Pin_1
-#define STEPPER_MOTOR_PHASE_C	GPIO_Pin_2
-#define STEPPER_MOTOR_PHASE_D	GPIO_Pin_3
+#define STEPPER_MOTOR_PORT		GPIOB
+#define STEPPER_MOTOR_PHASE_A	GPIO_Pin_5
+#define STEPPER_MOTOR_PHASE_B	GPIO_Pin_6
+#define STEPPER_MOTOR_PHASE_C	GPIO_Pin_7
+#define STEPPER_MOTOR_PHASE_D	GPIO_Pin_8
 
 #define STEPPER_MOTOR_PAHSE		(STEPPER_MOTOR_PHASE_A | \
 								 STEPPER_MOTOR_PHASE_B | \
@@ -104,13 +104,13 @@ void rotateStop(void)
 void STEPPER_MOTOR_EXAMPLE(void)
 {
 	// initialize GPIO Pins
-	STEPPER_MOTOR_APBxClock_FUN(STEPPER_MOTOR_CLK, ENABLE);
+	STEPPER_MOTOR_APBxClkCmd(STEPPER_MOTOR_CLK, ENABLE);
 	
 	GPIO_InitTypeDef gpio_init_t;
 	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_PP;
 	gpio_init_t.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_t.GPIO_Pin = STEPPER_MOTOR_PAHSE;
-	GPIO_Init(NRF24L01_CSN_PORT, &gpio_init_t);
+	GPIO_Init(STEPPER_MOTOR_PORT, &gpio_init_t);
 	
 	delay_ms(50);	// wait for system to be steady
 	while(1)

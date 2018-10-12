@@ -52,34 +52,34 @@ struct STRUCT_USARTx_Frame
 	};
 };
 
-#define macESP8266_CH_PD_APBxClock_FUN		RCC_APB2PeriphClockCmd
-#define macESP8266_CH_PD_CLK				RCC_APB2Periph_GPIOB
-#define macESP8266_CH_PD_PORT				GPIOB
-#define macESP8266_CH_PD_PIN				GPIO_Pin_8
+#define ESP8266_CH_PD_APBxClkCmd		RCC_APB2PeriphClockCmd
+#define ESP8266_CH_PD_CLK				RCC_APB2Periph_GPIOB
+#define ESP8266_CH_PD_PORT				GPIOB
+#define ESP8266_CH_PD_PIN				GPIO_Pin_8
 
-#define macESP8266_RST_APBxClock_FUN		RCC_APB2PeriphClockCmd
-#define macESP8266_RST_CLK					RCC_APB2Periph_GPIOB
-#define macESP8266_RST_PORT					GPIOB
-#define macESP8266_RST_PIN					GPIO_Pin_9
+#define ESP8266_RST_APBxClkCmd			RCC_APB2PeriphClockCmd
+#define ESP8266_RST_CLK					RCC_APB2Periph_GPIOB
+#define ESP8266_RST_PORT				GPIOB
+#define ESP8266_RST_PIN					GPIO_Pin_9
 
-#define macESP8266_USART_GPIO_APBxClock_FUN	RCC_APB2PeriphClockCmd
-#define macESP8266_USART_GPIO_CLK			RCC_APB2Periph_GPIOB
-#define macESP8266_USART_TX_PORT			GPIOB
-#define macESP8266_USART_TX_PIN				GPIO_Pin_10
-#define macESP8266_USART_RX_PORT			GPIOB
-#define macESP8266_USART_RX_PIN				GPIO_Pin_11
+#define ESP8266_USART_GPIO_APBxClkCmd	RCC_APB2PeriphClockCmd
+#define ESP8266_USART_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define ESP8266_USART_TX_PORT			GPIOB
+#define ESP8266_USART_TX_PIN			GPIO_Pin_10
+#define ESP8266_USART_RX_PORT			GPIOB
+#define ESP8266_USART_RX_PIN			GPIO_Pin_11
 
-#define macESP8266_USART_APBxClock_FUN		RCC_APB1PeriphClockCmd
-#define macESP8266_USART_CLK				RCC_APB1Periph_USART3
-#define macESP8266_USARTx					USART3
-#define macESP8266_USART_BAUD_RATE			115200
-#define macESP8266_USART_IRQ				USART3_IRQn
-#define macESP8266_USART_INT_FUN			USART3_IRQHandler
+#define ESP8266_USART_APBxClkCmd		RCC_APB1PeriphClockCmd
+#define ESP8266_USART_CLK				RCC_APB1Periph_USART3
+#define ESP8266_USARTx					USART3
+#define ESP8266_USART_BAUD_RATE			115200
+#define ESP8266_USART_IRQ				USART3_IRQn
+#define ESP8266_USART_INT_FUN			USART3_IRQHandler
 
-#define macESP8266_CH_ENABLE()		GPIO_SetBits(macESP8266_CH_PD_PORT, macESP8266_CH_PD_PIN)
-#define macESP8266_CH_DISABLE()		GPIO_ResetBits(macESP8266_CH_PD_PORT, macESP8266_CH_PD_PIN)
-#define macESP8266_RST_HIGH_LEVEL()	GPIO_SetBits(macESP8266_RST_PORT, macESP8266_RST_PIN)
-#define macESP8266_RST_LOW_LEVEL()	GPIO_ResetBits(macESP8266_RST_PORT, macESP8266_RST_PIN)
+#define ESP8266_CH_ENABLE()			GPIO_SetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
+#define ESP8266_CH_DISABLE()		GPIO_ResetBits(ESP8266_CH_PD_PORT, ESP8266_CH_PD_PIN)
+#define ESP8266_RST_HIGH_LEVEL()	GPIO_SetBits(ESP8266_RST_PORT, ESP8266_RST_PIN)
+#define ESP8266_RST_LOW_LEVEL()		GPIO_ResetBits(ESP8266_RST_PORT, ESP8266_RST_PIN)
 
 void	ESP8266_Init				(void);
 bool	ESP8266_Cmd					(char* cmd, char* reply1, char* reply2, uint32_t waittime);
@@ -108,16 +108,16 @@ void ESP8266_GPIO_Config ( void )
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	// 配置 CH_PD 引脚
-	macESP8266_CH_PD_APBxClock_FUN(macESP8266_CH_PD_CLK, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = macESP8266_CH_PD_PIN;
+	ESP8266_CH_PD_APBxClkCmd(ESP8266_CH_PD_CLK, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = ESP8266_CH_PD_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(macESP8266_CH_PD_PORT, &GPIO_InitStructure);
+	GPIO_Init(ESP8266_CH_PD_PORT, &GPIO_InitStructure);
 
 	// 配置 RST 引脚
-	macESP8266_RST_APBxClock_FUN(macESP8266_RST_CLK, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = macESP8266_RST_PIN;
-	GPIO_Init(macESP8266_RST_PORT, &GPIO_InitStructure);
+	ESP8266_RST_APBxClkCmd(ESP8266_RST_CLK, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = ESP8266_RST_PIN;
+	GPIO_Init(ESP8266_RST_PORT, &GPIO_InitStructure);
 }
 
 // 初始化ESP8266用到的 USART
@@ -127,53 +127,53 @@ void ESP8266_USART_Config ( void )
 	USART_InitTypeDef USART_InitStructure;
 	
 	/* config USART clock */
-	macESP8266_USART_APBxClock_FUN(macESP8266_USART_CLK, ENABLE);
-	macESP8266_USART_GPIO_APBxClock_FUN(macESP8266_USART_GPIO_CLK, ENABLE);
+	ESP8266_USART_APBxClkCmd(ESP8266_USART_CLK, ENABLE);
+	ESP8266_USART_GPIO_APBxClkCmd(ESP8266_USART_GPIO_CLK, ENABLE);
 	
 	/* USART GPIO config */
 	/* Configure USART Tx as alternate function push-pull */
-	GPIO_InitStructure.GPIO_Pin = macESP8266_USART_TX_PIN;
+	GPIO_InitStructure.GPIO_Pin = ESP8266_USART_TX_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(macESP8266_USART_TX_PORT, &GPIO_InitStructure);
+	GPIO_Init(ESP8266_USART_TX_PORT, &GPIO_InitStructure);
   
 	/* Configure USART Rx as input floating */
-	GPIO_InitStructure.GPIO_Pin = macESP8266_USART_RX_PIN;
+	GPIO_InitStructure.GPIO_Pin = ESP8266_USART_RX_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(macESP8266_USART_RX_PORT, &GPIO_InitStructure);
+	GPIO_Init(ESP8266_USART_RX_PORT, &GPIO_InitStructure);
 	
 	/* USART1 mode config */
-	USART_InitStructure.USART_BaudRate = macESP8266_USART_BAUD_RATE;
+	USART_InitStructure.USART_BaudRate = ESP8266_USART_BAUD_RATE;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No ;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_Init(macESP8266_USARTx, &USART_InitStructure);
+	USART_Init(ESP8266_USARTx, &USART_InitStructure);
 	
 	/* 中断配置 */
-	USART_ITConfig (macESP8266_USARTx, USART_IT_RXNE, ENABLE); // 使能串口接收中断
-	USART_ITConfig (macESP8266_USARTx, USART_IT_IDLE, ENABLE); // 使能串口总线空闲中断
+	USART_ITConfig (ESP8266_USARTx, USART_IT_RXNE, ENABLE); // 使能串口接收中断
+	USART_ITConfig (ESP8266_USARTx, USART_IT_IDLE, ENABLE); // 使能串口总线空闲中断
 
-	NVIC_CONFIG(macESP8266_USART_IRQ, 0, 1);
+	NVIC_CONFIG(ESP8266_USART_IRQ, 0, 1);
 	
-	USART_Cmd(macESP8266_USARTx, ENABLE);
+	USART_Cmd(ESP8266_USARTx, ENABLE);
 }
 
 // 串口接收中断处理函数，将 ESP8266 发送来的数据保存到 Data_RX_BUF 中
 void macESP8266_USART_INT_FUN(void)
 {	
 	uint8_t c;
-	if (USART_GetITStatus(macESP8266_USARTx, USART_IT_RXNE) == SET)	// 接收中断
+	if (USART_GetITStatus(ESP8266_USARTx, USART_IT_RXNE) == SET)	// 接收中断
 	{
-		c = USART_ReceiveData(macESP8266_USARTx);
+		c = USART_ReceiveData(ESP8266_USARTx);
 		if (strEsp8266_Frame_Record.InfoBit.FrameLength < (RX_BUF_MAX_LEN - 1))	// 预留1个字节写结束符
 			strEsp8266_Frame_Record.Data_RX_BUF[strEsp8266_Frame_Record.InfoBit.FrameLength++] = c;
 	}
-	if (USART_GetITStatus(macESP8266_USARTx, USART_IT_IDLE) == SET)	// 数据帧接收完毕
+	if (USART_GetITStatus(ESP8266_USARTx, USART_IT_IDLE) == SET)	// 数据帧接收完毕
 	{
 		strEsp8266_Frame_Record.InfoBit.FrameFinishFlag = 1;
-		c = USART_ReceiveData(macESP8266_USARTx);	// 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
+		c = USART_ReceiveData(ESP8266_USARTx);	// 由软件序列清除中断标志位(先读USART_SR，然后读USART_DR)
 	}
 }
 
@@ -182,8 +182,8 @@ void ESP8266_SendStr(char* str)
 {
 	for(uint32_t i = 0; str[i]; ++i)
 	{			
-		USART_SendData(macESP8266_USARTx, str[i]);
-		while(USART_GetFlagStatus(macESP8266_USARTx, USART_FLAG_TXE) == RESET);
+		USART_SendData(ESP8266_USARTx, str[i]);
+		while(USART_GetFlagStatus(ESP8266_USARTx, USART_FLAG_TXE) == RESET);
 	}
 }
 
@@ -481,11 +481,11 @@ void ESP8266_EXAMPLE(void)
 	uint8_t count;
 	ESP8266_GPIO_Config(); 
 	ESP8266_USART_Config();
-	macESP8266_RST_HIGH_LEVEL();
-	macESP8266_CH_DISABLE();
+	ESP8266_RST_HIGH_LEVEL();
+	ESP8266_CH_DISABLE();
 
 	printf("configuring...\r\n");
-	macESP8266_CH_ENABLE();
+	ESP8266_CH_ENABLE();
 	
 	// 对WF-ESP8266模块进行AT测试启动
 	delay_ms(1000);

@@ -4,12 +4,14 @@
 
 // 接收 NEC 红外遥控使用的GPIO及时钟
 #define IR_GPIO_PORT		GPIOE
+#define IR_GPIO_APBxClkCmd	RCC_APB2PeriphClockCmd
 #define IR_GPIO_CLK			RCC_APB2Periph_GPIOE
 #define IR_GPIO_PIN			GPIO_Pin_5
+
+// 中断相关
 #define IR_GPIO_PORT_SOURCE	GPIO_PortSourceGPIOE
 #define IR_GPIO_PIN_SOURCE	GPIO_PinSource5
 
-// 中断相关
 #define IR_EXTI_LINE		EXTI_Line5
 // EXTI0_IRQn, EXTI1_IRQn, EXTI2_IRQn, EXTI3_IRQn, EXTI4_IRQn, EXTI9_5_IRQn, EXTI15_10_IRQn
 #define IR_EXTI_IRQN		EXTI9_5_IRQn
@@ -29,7 +31,7 @@ void IR_Init(void)
 	EXTI_InitTypeDef EXTI_InitStructure;
 
 	/* config the extiline clock and AFIO clock */
-	RCC_APB2PeriphClockCmd(IR_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
+	IR_GPIO_APBxClkCmd(IR_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
 	/* config the NVIC */
 	NVIC_CONFIG(IR_EXTI_IRQN, 1, 6);
