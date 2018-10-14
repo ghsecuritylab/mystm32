@@ -134,6 +134,7 @@ uint8_t SPI_NRF24L01_SendByte(uint8_t c)
 #define RX_PW_P4        0x15  // 'RX payload width, pipe4' register address 
 #define RX_PW_P5        0x16  // 'RX payload width, pipe5' register address 
 #define FIFO_STATUS     0x17  // 'FIFO Status Register' register address 
+
 // 寄存器操作命令
 #define READ_CONFREG    0x00  // 读配置寄存器，低5位为寄存器地址
 #define WRITE_CONFREG   0x20  // 写配置寄存器，低5位为寄存器地址
@@ -143,10 +144,12 @@ uint8_t SPI_NRF24L01_SendByte(uint8_t c)
 #define FLUSH_RX        0xE2  // 清除RX FIFO寄存器。接收模式下用
 #define REUSE_TX_PL     0xE3  // 重新使用上一包数据，CE为高，数据包被不断发送
 #define NOP             0xFF  // 空操作，可以用来读状态寄存器
+
 // 状态信息
 #define MAX_TX          0x10  // 达到最大发送次数中断
 #define TX_OK           0x20  // TX发送完成中断
 #define RX_OK           0x40  // 接收到数据中断
+
 // 发送接收数据宽度定义
 #define TX_ADR_WIDTH    5     // 5字节的地址宽度
 #define RX_ADR_WIDTH    5     // 5字节的地址宽度
@@ -228,6 +231,8 @@ void TX_Mode(void)
     NRF24L01_CE_HIGH(); 
 }
 
+
+// 发送数据包，发送过程阻塞
 uint8_t TxPacket(uint8_t *txbuf)
 {
     uint8_t state;
@@ -239,19 +244,19 @@ uint8_t TxPacket(uint8_t *txbuf)
     while (GPIO_ReadInputDataBit(NRF24L01_IRQ_PORT, NRF24L01_IRQ_PIN) != 0)
     {}	// 等待发送完成
  
-    state = SPI_NRF24L01_SendByte(READ_CONFREG+STATUS);	// 读取状态寄存器的值
-    SPI_RW_Reg(WRITE_CONFREG+STATUS, state);	// 清除TX_DS或MAX_RT中断标志
+    state = SPI_NRF24L01_SendByte(READ_CONFREG + STATUS);	// 读取状态寄存器的值
+    SPI_RW_Reg(WRITE_CONFREG + STATUS, state);	// 清除TX_DS或MAX_RT中断标志
  
-    if(state & MAX_TX)//达到最大重发次数
+    if(state & MAX_TX)	// 达到最大重发次数
     {
-        SPI_RW_Reg(FLUSH_TX, 0xff);	//清除TX FIFO寄存器 
-        return MAX_TX; 
+        SPI_RW_Reg(FLUSH_TX, 0xff);	// 清除TX FIFO寄存器 
+        return MAX_TX;
     }
-    if(state & TX_OK)	//发送完成
+    if(state & TX_OK)	// 发送完成
     {
         return TX_OK;
     }
-    return 0xff;	//其他原因发送失败
+    return 0xff;	// 其他原因发送失败
 }
 
 void RX_Mode(void)
@@ -279,8 +284,8 @@ uint8_t RxPacket(uint8_t *rxbuf)
 {
     uint8_t state;
  
-    state = SPI_NRF24L01_SendByte(READ_CONFREG+STATUS);	// 读取状态寄存器的值         
-    SPI_RW_Reg(WRITE_CONFREG+STATUS, state);	// 清除TX_DS或MAX_RT中断标志
+    state = SPI_NRF24L01_SendByte(READ_CONFREG + STATUS);	// 读取状态寄存器的值         
+    SPI_RW_Reg(WRITE_CONFREG + STATUS, state);	// 清除TX_DS或MAX_RT中断标志
 
     if(state & RX_OK)	// 接收到数据
     {

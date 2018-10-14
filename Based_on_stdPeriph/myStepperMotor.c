@@ -1,7 +1,7 @@
 #include "mylib.h"
 
-#define STEPPER_MOTOR_CLK			RCC_APB2Periph_GPIOB
 #define STEPPER_MOTOR_APBxClkCmd	RCC_APB2PeriphClockCmd
+#define STEPPER_MOTOR_CLK			RCC_APB2Periph_GPIOB
 
 #define STEPPER_MOTOR_PORT		GPIOB
 #define STEPPER_MOTOR_PHASE_A	GPIO_Pin_5
@@ -18,6 +18,8 @@
 
 void rotateClockWise(uint8_t speed, uint8_t times)
 {
+	if (speed > 20) speed=20;
+	speed = 20 - speed;
 	for (uint8_t i=0; i<times; ++i)
 	{
 		// 4 phase 8 steps -> D > DC > C > CB > B > BA > A > AD
@@ -58,6 +60,8 @@ void rotateClockWise(uint8_t speed, uint8_t times)
 
 void rotateAntiClockWise(uint8_t speed, uint8_t times)
 {
+	if (speed > 20) speed=20;
+	speed = 20 - speed;
 	for (uint8_t i=0; i<times; ++i)
 	{
 		// 4 phase 8 steps -> A > AB > B > BC > C > CD > D > DA
@@ -115,22 +119,20 @@ void STEPPER_MOTOR_EXAMPLE(void)
 	delay_ms(50);	// wait for system to be steady
 	while(1)
 	{
-		rotateClockWise(25, 10);	// rotate clockwise 10 times
-		rotateClockWise(23, 10);
-		rotateClockWise(20, 10);
-		rotateClockWise(16, 10);
+		rotateClockWise(15, 10);	// rotate clockwise 10 times
+		rotateClockWise(13, 10);	// speed gradually decline
 		rotateClockWise(10, 10);
-		rotateClockWise(4, 10);
+		rotateClockWise(6, 10);
+		rotateClockWise(1, 10);
 		rotateStop();
-		delay_ms(900);
+		delay_ms(500);
 		
-		rotateAntiClockWise(25, 10);	// rotate anticlockwise 10 times
-		rotateAntiClockWise(23, 10);
-		rotateAntiClockWise(20, 10);
-		rotateAntiClockWise(16, 10);
+		rotateAntiClockWise(15, 10);	// rotate anticlockwise 10 times
+		rotateAntiClockWise(13, 10);
 		rotateAntiClockWise(10, 10);
-		rotateAntiClockWise(4, 10);
+		rotateAntiClockWise(6, 10);
+		rotateAntiClockWise(1, 10);
 		rotateStop();
-		delay_ms(900);
+		delay_ms(500);
 	}
 }
