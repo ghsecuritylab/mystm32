@@ -1,0 +1,11 @@
+/Objects
+/Listings
+/RTE
+/DebugConfig
+*.uvguix.*
+*.scvd
+*.lst
+*.inp
+*.Bak
+*.map
+res.c
