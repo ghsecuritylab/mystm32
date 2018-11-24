@@ -581,7 +581,7 @@ static HAL_StatusTypeDef I2Cx_WriteBuffer(uint16_t Addr, uint8_t Reg, uint16_t R
   {
     /* Re-Initiaize the BUS */
     I2Cx_Error();
-  }        
+  }
   return status;
 }
 
@@ -633,12 +633,12 @@ static HAL_StatusTypeDef I2Cx_ReadBuffer(uint16_t Addr, uint8_t Reg, uint16_t Re
 }
 
 /**
-* @brief  Checks if target device is ready for communication. 
-* @note   This function is used with Memory devices
-* @param  DevAddress: Target device address
-* @param  Trials: Number of trials
-* @retval HAL status
-*/
+  * @brief  Checks if target device is ready for communication. 
+  * @note   This function is used with Memory devices
+  * @param  DevAddress: Target device address
+  * @param  Trials: Number of trials
+  * @retval HAL status
+  */
 static HAL_StatusTypeDef I2Cx_IsDeviceReady(uint16_t DevAddress, uint32_t Trials)
 { 
   return (HAL_I2C_IsDeviceReady(&heval_I2c, DevAddress, Trials, I2cxTimeout));

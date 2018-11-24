@@ -11,37 +11,37 @@
 #include <string.h>
 
 #include "w5500_conf.h"
-#include "bsp_i2c_ee.h"
+//#include "bsp_i2c_ee.h"
 #include "utility.h"
 #include "w5500.h"
 #include "dhcp.h"
-#include "bsp_TiMbase.h"
+//#include "bsp_TiMbase.h"
 
-CONFIG_MSG  ConfigMsg;																	/*配置结构体*/
-EEPROM_MSG_STR EEPROM_MSG;															/*EEPROM存储信息结构体*/
+CONFIG_MSG  ConfigMsg;	/*配置结构体*/
+EEPROM_MSG_STR EEPROM_MSG;	/*EEPROM存储信息结构体*/
 
 /*定义MAC地址,如果多块W5500网络适配板在同一现场工作，请使用不同的MAC地址*/
 uint8 mac[6]={0x00,0x08,0xdc,0x11,0x11,0x11};
 
 /*定义默认IP信息*/
-uint8 local_ip[4]  ={192,168,1,88};											/*定义W5500默认IP地址*/
-uint8 subnet[4]    ={255,255,255,0};										/*定义W5500默认子网掩码*/
-uint8 gateway[4]   ={192,168,1,1};											/*定义W5500默认网关*/
-uint8 dns_server[4]={114,114,114,114};									/*定义W5500默认DNS*/
+uint8 local_ip[4]  ={192,168,1,88};	/*定义W5500默认IP地址*/
+uint8 subnet[4]    ={255,255,255,0};	/*定义W5500默认子网掩码*/
+uint8 gateway[4]   ={192,168,1,1};	/*定义W5500默认网关*/
+uint8 dns_server[4]={114,114,114,114};	/*定义W5500默认DNS*/
 
-uint16 local_port=5000;	                       					/*定义本地端口*/
+uint16 local_port=5000;	/*定义本地端口*/
 
 /*定义远端IP信息*/
-uint8  remote_ip[4]={192,168,1,99};											/*远端IP地址*/
-uint16 remote_port=5000;																/*远端端口号*/
+uint8  remote_ip[4]={192,168,1,99};	/*远端IP地址*/
+uint16 remote_port=5000;	/*远端端口号*/
 
 /*IP配置方法选择，请自行选择*/
-uint8	ip_from=IP_FROM_DEFINE;				
+uint8	ip_from=IP_FROM_DEFINE;
 
-uint8   dhcp_ok   = 0;													   			/*dhcp成功获取IP*/
-uint32	ms        = 0;															  	/*毫秒计数*/
-uint32	dhcp_time = 0;															  	/*DHCP运行计数*/
-vu8	    ntptimer  = 0;															  	/*NPT秒计数*/
+uint8   dhcp_ok   = 0;	/*dhcp成功获取IP*/
+uint32	ms        = 0;	/*毫秒计数*/
+uint32	dhcp_time = 0;	/*DHCP运行计数*/
+vu8	    ntptimer  = 0;	/*NPT秒计数*/
 
 /**
 *@brief		配置W5500的IP地址
@@ -387,8 +387,8 @@ void read_config_from_eeprom(void)
 */
 void timer2_init(void)
 {
-	TIM2_Configuration();																		/* TIM2 定时配置 */
-	TIM2_NVIC_Configuration();															/* 定时器的中断优先级 */
+	TIM2_Configuration();	/* TIM2 定时配置 */
+	TIM2_NVIC_Configuration();	/* 定时器的中断优先级 */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);		/* TIM2 重新开时钟，开始计时 */
 }
 
@@ -423,9 +423,9 @@ void timer2_isr(void)
   if(ms>=1000)
   {  
     ms=0;
-    dhcp_time++;																					/*DHCP定时加1S*/
+    dhcp_time++;	/*DHCP定时加1S*/
 	  #ifndef	__NTP_H__
-	  ntptimer++;																						/*NTP重试时间加1S*/
+	  ntptimer++;	/*NTP重试时间加1S*/
 	  #endif
   }
 
