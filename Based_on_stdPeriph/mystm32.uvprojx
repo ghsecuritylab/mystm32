@@ -501,11 +501,6 @@
               <FilePath>Resource\res.c</FilePath>
             </File>
             <File>
-              <FileName>myESP8266.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\myESP8266.c</FilePath>
-            </File>
-            <File>
               <FileName>myEXTI_IR.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\myEXTI_IR.c</FilePath>
@@ -519,6 +514,21 @@
               <FileName>myStepperMotor.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\myStepperMotor.c</FilePath>
+            </File>
+            <File>
+              <FileName>myESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myESP8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>myBluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myBluetooth.c</FilePath>
+            </File>
+            <File>
+              <FileName>myATGM336H.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\myATGM336H.c</FilePath>
             </File>
           </Files>
         </Group>

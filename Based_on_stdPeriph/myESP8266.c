@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#ifdef 0
+
 #if defined (__CC_ARM)
 #pragma anon_unions
 #endif
@@ -161,7 +163,7 @@ void ESP8266_USART_Config ( void )
 }
 
 // 串口接收中断处理函数，将 ESP8266 发送来的数据保存到 Data_RX_BUF 中
-void macESP8266_USART_INT_FUN(void)
+void ESP8266_USART_INT_FUN(void)
 {	
 	uint8_t c;
 	if (USART_GetITStatus(ESP8266_USARTx, USART_IT_RXNE) == SET)	// 接收中断
@@ -546,3 +548,4 @@ void ESP8266_EXAMPLE(void)
 		while (!ESP8266_UnvarnishSend(ENABLE));
 	}
 }
+#endif
