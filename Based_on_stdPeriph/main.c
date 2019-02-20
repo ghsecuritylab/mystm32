@@ -10,14 +10,14 @@ uint8_t translate[] =
 	'.',	0,		'=',	'B'
 };
 void NRF24L01_EXAMPLE(void);
-
 int main()
 {
-	//USART_CONFIG();
+	// USART1 config 115200 8-N-1
+	USART_CONFIG();
 	while(1)
 	{
 		NRF24L01_EXAMPLE();
-		//printf("OVER!!\r\n");
+		printf("OVER!!\r\n");
 		while(1){}
 	}
 	return 0;

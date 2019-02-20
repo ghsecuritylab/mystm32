@@ -252,8 +252,8 @@ struct STRUCT_USARTx_Frame strGNSS_Frame_Record = { 0 };
 
 #define GNSS_USART_GPIO_APBxClkCmd	RCC_APB2PeriphClockCmd
 #define GNSS_USART_GPIO_CLK			RCC_APB2Periph_GPIOB
-#define GNSS_USART_TX_PORT			GPIOB
-#define GNSS_USART_TX_PIN			GPIO_Pin_10
+//#define GNSS_USART_TX_PORT			GPIOB
+//#define GNSS_USART_TX_PIN			GPIO_Pin_10
 #define GNSS_USART_RX_PORT			GPIOB
 #define GNSS_USART_RX_PIN			GPIO_Pin_11
 
@@ -279,10 +279,10 @@ void GNSS_USART_Config ( void )
 	
 	/* USART GPIO config */
 	/* Configure USART Tx as alternate function push-pull */
-	GPIO_InitStructure.GPIO_Pin = GNSS_USART_TX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GNSS_USART_TX_PORT, &GPIO_InitStructure);
+//	GPIO_InitStructure.GPIO_Pin = GNSS_USART_TX_PIN;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIO_Init(GNSS_USART_TX_PORT, &GPIO_InitStructure);
   
 	/* Configure USART Rx as input floating */
 	GPIO_InitStructure.GPIO_Pin = GNSS_USART_RX_PIN;
