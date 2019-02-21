@@ -574,38 +574,38 @@ static void SystemClockConfig_STOP(void)
   * @param  GPIO_Pin
   * @retval None
   */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if (GPIO_Pin == KEY_BUTTON_PIN)
-  {
-    if ((((USBD_HandleTypeDef *) hpcd.pData)->dev_remote_wakeup == 1) &&
-        (((USBD_HandleTypeDef *) hpcd.pData)->dev_state ==
-         USBD_STATE_SUSPENDED))
-    {
-      if ((&hpcd)->Init.low_power_enable)
-      {
-        /* Reset SLEEPDEEP bit of Cortex System Control Register */
-        SCB->SCR &=
-          (uint32_t) ~
-          ((uint32_t) (SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//  if (GPIO_Pin == KEY_BUTTON_PIN)
+//  {
+//    if ((((USBD_HandleTypeDef *) hpcd.pData)->dev_remote_wakeup == 1) &&
+//        (((USBD_HandleTypeDef *) hpcd.pData)->dev_state ==
+//         USBD_STATE_SUSPENDED))
+//    {
+//      if ((&hpcd)->Init.low_power_enable)
+//      {
+//        /* Reset SLEEPDEEP bit of Cortex System Control Register */
+//        SCB->SCR &=
+//          (uint32_t) ~
+//          ((uint32_t) (SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
 
-        SystemClockConfig_STOP();
-      }
+//        SystemClockConfig_STOP();
+//      }
 
-      /* Activate Remote wakeup */
-      HAL_PCD_ActivateRemoteWakeup((&hpcd));
+//      /* Activate Remote wakeup */
+//      HAL_PCD_ActivateRemoteWakeup((&hpcd));
 
-      /* remote wakeup delay */
-      HAL_Delay(10);
+//      /* remote wakeup delay */
+//      HAL_Delay(10);
 
-      /* Disable Remote wakeup */
-      HAL_PCD_DeActivateRemoteWakeup((&hpcd));
+//      /* Disable Remote wakeup */
+//      HAL_PCD_DeActivateRemoteWakeup((&hpcd));
 
-      /* change remote_wakeup feature to 0 */
-      ((USBD_HandleTypeDef *) hpcd.pData)->dev_remote_wakeup = 0;
-      remotewakeupon = 1;
-    }
-  }
-}
+//      /* change remote_wakeup feature to 0 */
+//      ((USBD_HandleTypeDef *) hpcd.pData)->dev_remote_wakeup = 0;
+//      remotewakeupon = 1;
+//    }
+//  }
+//}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

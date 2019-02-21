@@ -228,18 +228,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>3</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Src\flash.c</PathWithFileName>
-      <FilenameWithoutPath>flash.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
   </Group>
 
   <Group>
@@ -250,13 +238,25 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
+      <FileNumber>3</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\BSP\f103_spi.c</PathWithFileName>
+      <FilenameWithoutPath>f103_spi.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
       <FileNumber>4</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\BSP\stm3210e_eval.c</PathWithFileName>
-      <FilenameWithoutPath>stm3210e_eval.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\BSP\f103_usart.c</PathWithFileName>
+      <FilenameWithoutPath>f103_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -267,8 +267,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\BSP\stm3210e_eval_serialflash.c</PathWithFileName>
-      <FilenameWithoutPath>stm3210e_eval_serialflash.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\BSP\f103_flash.c</PathWithFileName>
+      <FilenameWithoutPath>f103_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

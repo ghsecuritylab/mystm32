@@ -102,24 +102,24 @@ void init_ip_arp_udp_tcp(unsigned char *mymac,unsigned char *myip,unsigned char 
 	}
 }
 /*----------------------------------------------------------------------------------
-µ±ÊÕµ½Ä¿µÄIPÎª±¾»úIPµÄARP°üÊ±£¬·µ»ØÖµÎª1£¬·ñÔò·µ»Ø0
+å½“æ”¶åˆ°ç›®çš„IPä¸ºæœ¬æœºIPçš„ARPåŒ…æ—¶ï¼Œè¿”å›å€¼ä¸º1ï¼Œå¦åˆ™è¿”å›0
 -----------------------------------------------------------------------------------*/
 unsigned char eth_type_is_arp_and_my_ip(unsigned char *buf,unsigned  int len)
 {
 	unsigned char i=0;
-    //°ü³¤¶È²»¹»£¬Ö±½Ó·µ»Ø
+    //åŒ…é•¿åº¦ä¸å¤Ÿï¼Œç›´æ¥è¿”å›
 	if (len<41)
 	{
 	    return(0);
 	}
 
-    //Èç¹ûÀàĞÍ²»ÊÇARP°ü£¬Ö±½Ó·µ»Ø
+    //å¦‚æœç±»å‹ä¸æ˜¯ARPåŒ…ï¼Œç›´æ¥è¿”å›
 	if(buf[ETH_TYPE_H_P] != ETHTYPE_ARP_H_V || buf[ETH_TYPE_L_P] != ETHTYPE_ARP_L_V)
 	{
 	    return(0);
 	}
 
-    //Èç¹ûARP°üµÄIPµØÖ·Óë±¾»úIP²»Ò»ÖÂ£¬Ö±½Ó·µ»Ø
+    //å¦‚æœARPåŒ…çš„IPåœ°å€ä¸æœ¬æœºIPä¸ä¸€è‡´ï¼Œç›´æ¥è¿”å›
 	while(i<4)
 	{
 	    if(buf[ETH_ARP_DST_IP_P+i] != ipaddr[i])
@@ -128,7 +128,7 @@ unsigned char eth_type_is_arp_and_my_ip(unsigned char *buf,unsigned  int len)
 	    }
 	    i++;
 	}
-    printf("\n\rÊÕµ½Ö÷»ú[%d.%d.%d.%d]·¢ËÍµÄARP°ü",buf[ETH_ARP_SRC_IP_P],buf[ETH_ARP_SRC_IP_P+1],buf[ETH_ARP_SRC_IP_P+2],buf[ETH_ARP_SRC_IP_P+3]);
+    printf("\n\ræ”¶åˆ°ä¸»æœº[%d.%d.%d.%d]å‘é€çš„ARPåŒ…",buf[ETH_ARP_SRC_IP_P],buf[ETH_ARP_SRC_IP_P+1],buf[ETH_ARP_SRC_IP_P+2],buf[ETH_ARP_SRC_IP_P+3]);
     
 	return(1);
 }
@@ -136,26 +136,26 @@ unsigned char eth_type_is_arp_and_my_ip(unsigned char *buf,unsigned  int len)
 unsigned char eth_type_is_ip_and_my_ip(unsigned char *buf,unsigned  int len)
 {
 	unsigned char i=0;
-    //°ü³¤¶È²»¹»£¬Ö±½Ó·µ»Ø
+    //åŒ…é•¿åº¦ä¸å¤Ÿï¼Œç›´æ¥è¿”å›
 	if (len<42)
 	{
 	    return(0);
 	}
     
-    //Èç¹û°üÀàĞÍ²»ÊÇIP°ü£¬Ö±½Ó·µ»Ø
+    //å¦‚æœåŒ…ç±»å‹ä¸æ˜¯IPåŒ…ï¼Œç›´æ¥è¿”å›
 	if(buf[ETH_TYPE_H_P]!=ETHTYPE_IP_H_V || buf[ETH_TYPE_L_P]!=ETHTYPE_IP_L_V)
 	{
 
         return(0);
 	}
-    //Èç¹û³¤¶È²ÎÊı²»ÕıÈ·£¬Ö±½Ó·µ»Ø
+    //å¦‚æœé•¿åº¦å‚æ•°ä¸æ­£ç¡®ï¼Œç›´æ¥è¿”å›
 	if (buf[IP_HEADER_LEN_VER_P]!=0x45)
 	{
 	    // must be IP V4 and 20 byte header
 	    return(0);
 	}
     
-    //Èç¹ûIP°üµÄIPµØÖ·Óë±¾»úIP²»Ò»ÖÂ£¬Ö±½Ó·µ»Ø    
+    //å¦‚æœIPåŒ…çš„IPåœ°å€ä¸æœ¬æœºIPä¸ä¸€è‡´ï¼Œç›´æ¥è¿”å›    
 	while(i<4)
 	{
 	    if(buf[IP_DST_P+i]!=ipaddr[i])
@@ -172,7 +172,7 @@ void make_eth(unsigned char *buf)
 {
 	unsigned char i=0;
 
-	//ÌîĞ´°üµÄÄ¿µÄMACµØÖ·£¬ÒÔ¼°Ô´MACµØÖ·
+	//å¡«å†™åŒ…çš„ç›®çš„MACåœ°å€ï¼Œä»¥åŠæºMACåœ°å€
 	while(i<6)
 	{
         buf[ETH_DST_MAC +i]=buf[ETH_SRC_MAC +i];
@@ -292,14 +292,14 @@ void make_arp_answer_from_request(unsigned char *buf)
 {
 	unsigned char i=0;
     
-	//ÌîĞ´°üµÄÄ¿µÄMACµØÖ·ÒÔ¼°Ô´MACµØÖ·	
+	//å¡«å†™åŒ…çš„ç›®çš„MACåœ°å€ä»¥åŠæºMACåœ°å€	
 	make_eth(buf); 
     
-    //ÌîĞ´ARPÏìÓ¦°üµÄÀàĞÍ
-	buf[ETH_ARP_OPCODE_H_P]=ETH_ARP_OPCODE_REPLY_H_V;   //arp ÏìÓ¦
+    //å¡«å†™ARPå“åº”åŒ…çš„ç±»å‹
+	buf[ETH_ARP_OPCODE_H_P]=ETH_ARP_OPCODE_REPLY_H_V;   //arp å“åº”
 	buf[ETH_ARP_OPCODE_L_P]=ETH_ARP_OPCODE_REPLY_L_V;
 
-    //ÌîĞ´ARP°üµÄÄ¿µÄMACµØÖ·ÒÔ¼°Ô´MACµØÖ·
+    //å¡«å†™ARPåŒ…çš„ç›®çš„MACåœ°å€ä»¥åŠæºMACåœ°å€
 	while(i<6)
 	{
         buf[ETH_ARP_DST_MAC_P+i]=buf[ETH_ARP_SRC_MAC_P+i];
@@ -307,7 +307,7 @@ void make_arp_answer_from_request(unsigned char *buf)
         i++;
 	}
 
-    //ÌîĞ´ARP°üµÄÄ¿µÄIPµØÖ·ÒÔ¼°Ô´IPµØÖ·    
+    //å¡«å†™ARPåŒ…çš„ç›®çš„IPåœ°å€ä»¥åŠæºIPåœ°å€    
 	i=0;
 	while(i<4)
 	{
@@ -316,21 +316,21 @@ void make_arp_answer_from_request(unsigned char *buf)
         i++;
 	}
 
-    printf("\n\rÉñÖÛIIIºÅ[%d.%d.%d.%d]·¢ËÍARPÏàÓ¦",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
+    printf("\n\rç¥èˆŸIIIå·[%d.%d.%d.%d]å‘é€ARPç›¸åº”",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
 
-    //·¢ËÍARPÏàÓ¦°ü
+    //å‘é€ARPç›¸åº”åŒ…
 	enc28j60PacketSend(42,buf); 
 }
 
 void make_echo_reply_from_request(unsigned char *buf,unsigned  int len)
 {
-	//ÌîĞ´°üµÄÄ¿µÄMACµØÖ·ÒÔ¼°Ô´MACµØÖ·	
+	//å¡«å†™åŒ…çš„ç›®çš„MACåœ°å€ä»¥åŠæºMACåœ°å€	
 	make_eth(buf);
-	//ÌîĞ´°üµÄÄ¿µÄIPµØÖ·ÒÔ¼°Ô´IPµØÖ·	
+	//å¡«å†™åŒ…çš„ç›®çš„IPåœ°å€ä»¥åŠæºIPåœ°å€	
 	make_ip(buf);
 
-    //ÌîĞ´ICMPÏàÓ¦°üÀàĞÍ
-	buf[ICMP_TYPE_P]=ICMP_TYPE_ECHOREPLY_V;	  //////»ØËÍÓ¦´ğ////////////////////////////////////////////////////////////////////////////
+    //å¡«å†™ICMPç›¸åº”åŒ…ç±»å‹
+	buf[ICMP_TYPE_P]=ICMP_TYPE_ECHOREPLY_V;	  //////å›é€åº”ç­”////////////////////////////////////////////////////////////////////////////
 
     // we changed only the icmp.type field from request(=8) to reply(=0).
 	// we can therefore easily correct the checksum:
@@ -340,9 +340,9 @@ void make_echo_reply_from_request(unsigned char *buf,unsigned  int len)
 	}
 	buf[ICMP_CHECKSUM_P]+=0x08;
 
-    printf("\n\rÉñÖÛIIIºÅ[%d.%d.%d.%d]·¢ËÍICMP°üÏìÓ¦",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
+    printf("\n\rç¥èˆŸIIIå·[%d.%d.%d.%d]å‘é€ICMPåŒ…å“åº”",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
 
-    //·¢ËÍICMPÏìÓ¦°ü
+    //å‘é€ICMPå“åº”åŒ…
 	enc28j60PacketSend(len,buf);
 }
 
@@ -384,13 +384,13 @@ void make_tcp_synack_from_syn(unsigned char *buf)
 {
 	unsigned  int ck;
     
-	//ÌîĞ´°üµÄÄ¿µÄMACµØÖ·ÒÔ¼°Ô´MACµØÖ·	
+	//å¡«å†™åŒ…çš„ç›®çš„MACåœ°å€ä»¥åŠæºMACåœ°å€	
 	make_eth(buf);
-	//¼ÆËã°üµÄ³¤¶È
+	//è®¡ç®—åŒ…çš„é•¿åº¦
 	// total length field in the IP header must be set: 20 bytes IP + 24 bytes (20tcp+4tcp options)
 	buf[IP_TOTLEN_H_P]=0;
 	buf[IP_TOTLEN_L_P]=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4;
-	//ÌîĞ´°üµÄÄ¿µÄIPµØÖ·ÒÔ¼°Ô´IPµØÖ·	
+	//å¡«å†™åŒ…çš„ç›®çš„IPåœ°å€ä»¥åŠæºIPåœ°å€	
 	make_ip(buf);
 	buf[TCP_FLAGS_P]=TCP_FLAGS_SYNACK_V;
 	make_tcphead(buf,1,1,0);
@@ -399,7 +399,7 @@ void make_tcp_synack_from_syn(unsigned char *buf)
 	buf[TCP_CHECKSUM_H_P]=ck>>8;
 	buf[TCP_CHECKSUM_L_P]=ck& 0xff;
 	// add 4 for option mss:
-    printf("\n\rÉñÖÛIIIºÅ[%d.%d.%d.%d]·¢ËÍSYN°üÏìÓ¦",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
+    printf("\n\rç¥èˆŸIIIå·[%d.%d.%d.%d]å‘é€SYNåŒ…å“åº”",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
 	
 	enc28j60PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4+ETH_HEADER_LEN,buf);
 }
@@ -494,7 +494,7 @@ void make_tcp_ack_from_any(unsigned char *buf)
 	buf[TCP_CHECKSUM_H_P]=j>>8;
 	buf[TCP_CHECKSUM_L_P]=j& 0xff;
 
-    printf("\n\rÉñÖÛIIIºÅ[%d.%d.%d.%d]·¢ËÍACK°üÏìÓ¦",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
+    printf("\n\rç¥èˆŸIIIå·[%d.%d.%d.%d]å‘é€ACKåŒ…å“åº”",ipaddr[0],ipaddr[1],ipaddr[2],ipaddr[3]);
     
 	enc28j60PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+ETH_HEADER_LEN,buf);
 }

@@ -308,8 +308,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\BSP\stm3210e_eval.c</PathWithFileName>
-      <FilenameWithoutPath>stm3210e_eval.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\BSP\f103_usart.c</PathWithFileName>
+      <FilenameWithoutPath>f103_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

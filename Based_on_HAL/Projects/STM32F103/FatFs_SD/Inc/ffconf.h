@@ -9,9 +9,9 @@
 /-----------------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #ifdef SD_MODE_SPI
-#include "stm3210e_eval_sd_spi.h"
+#include "f103_sd_spi.h"
 #else
-#include "stm3210e_eval_sd_sdio.h"
+#include "f103_sd_sdio.h"
 #endif
 /*---------------------------------------------------------------------------/
 / Function Configurations

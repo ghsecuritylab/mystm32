@@ -50,8 +50,8 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include "stm3210e_eval.h"
+#include "f103_usart.h"
+#include "f103_spi.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

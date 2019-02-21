@@ -426,19 +426,24 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>stm3210e_eval.c</FileName>
+              <FileName>f103_sd_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_sd_spi.c</FilePath>
             </File>
             <File>
-              <FileName>stm3210e_eval_sd_spi.c</FileName>
+              <FileName>f103_sd_sdio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval_sd_spi.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_sd_sdio.c</FilePath>
             </File>
             <File>
-              <FileName>stm3210e_eval_sd_sdio.c</FileName>
+              <FileName>f103_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval_sd_sdio.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>f103_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\BSP\f103_usart.c</FilePath>
             </File>
           </Files>
         </Group>

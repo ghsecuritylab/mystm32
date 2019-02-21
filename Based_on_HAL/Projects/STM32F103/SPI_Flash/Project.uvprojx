@@ -336,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE,FLASH_SPI_W25Qxx</Define>
               <Undefine></Undefine>
-              <IncludePath>./Inc;../../../CMSIS/STM32F1xx/Include;../../../STM32F1xx_HAL_Driver/Inc;../../../BSP/</IncludePath>
+              <IncludePath>./Inc;../../../CMSIS/STM32F1xx/Include;../../../STM32F1xx_HAL_Driver/Inc;..\..\..\BSP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -390,25 +390,25 @@
               <FileType>1</FileType>
               <FilePath>./Src/main.c</FilePath>
             </File>
-            <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Src\flash.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>stm3210e_eval.c</FileName>
+              <FileName>f103_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_spi.c</FilePath>
             </File>
             <File>
-              <FileName>stm3210e_eval_serialflash.c</FileName>
+              <FileName>f103_usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval_serialflash.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>f103_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\BSP\f103_flash.c</FilePath>
             </File>
           </Files>
         </Group>

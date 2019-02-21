@@ -61,23 +61,11 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 
-/* UART handler declaration */
-UART_HandleTypeDef UartHandle;
-
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
 static void Error_Handler(uint8_t id);
 
 /* Private functions --------------------------------------------------------- */
-#ifdef __GNUC__
-  /* With GCC, small printf (option LD Linker->Libraries->Small printf
-     set to 'Yes') calls __io_putchar() */
-  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
-#else
-  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
-#endif /* __GNUC__ */
 
 /**
   * @brief  Main program.
@@ -93,21 +81,7 @@ int main(void)
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
 
-  /*##-1- Configure the UART peripheral ######################################*/
-  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-  /* UART configured as follows:
-      - Word Length = 8 Bits (7 data bit + 1 parity bit) : BE CAREFUL : Program 7 data bits + 1 parity bit in PC HyperTerminal
-      - Stop Bit    = One Stop bit
-      - Parity      = no parity
-      - BaudRate    = 115200 baud
-      - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Init.BaudRate   = 115200;
-  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits   = UART_STOPBITS_1;
-  UartHandle.Init.Parity     = UART_PARITY_NONE;
-  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  UartHandle.Init.Mode       = UART_MODE_TX_RX;
-  BSP_COM_Init(COM1, &UartHandle);
+  USART_CONFIG();
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
@@ -116,35 +90,6 @@ int main(void)
   while (1)
   {
   }
-}
-
-/**
-  * @brief  Retargets the C library printf function to the USART.
-  * @param  None
-  * @retval None
-  */
-PUTCHAR_PROTOTYPE
-{
-  /* Place your implementation of fputc here */
-  /* e.g. write a character to the USART1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
-
-  return ch;
-}
-
-/**
-  * @brief  Retargets the C library scanf function to the USART.
-  * @param  None
-  * @retval None
-  */
-GETCHAR_PROTOTYPE
-{
-  /* Place your implementation of fgetc here */
-  /* e.g. read a character to the USART1 and Loop until the end of transmission */
-  uint8_t ch;
-  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-
-  return ch;
 }
 
 /**
@@ -317,14 +262,14 @@ int main(void)
 static void BSP_Config(void)
 {
   /* Initialize STM3210C_EVAL's LEDs */
-  BSP_LED_Init(LED1);
-  BSP_LED_Init(LED2);
+//  BSP_LED_Init(LED1);
+//  BSP_LED_Init(LED2);
 
   /* Set Systick Interrupt to the highest priority */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0x0, 0x0);
 
   /* Configure Key Button */
-  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
+  //BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
 
   /* Init IO Expander */
   BSP_IO_Init();
@@ -332,19 +277,6 @@ static void BSP_Config(void)
   /* Enable IO Expander interrupt for ETH MII pin */
   BSP_IO_ConfigPin(MII_INT_PIN, IO_MODE_IT_FALLING_EDGE);
 
-#ifdef USE_LCD
-  /* Initialize the STM3210C_EVAL's LCD */
-  BSP_LCD_Init();
-
-  /* Initialize LCD Log module */
-  LCD_LOG_Init();  
-
-  /* Show Header and Footer texts */
-  LCD_LOG_SetHeader((uint8_t *)"TCP Echo Client Application");
-  LCD_LOG_SetFooter((uint8_t *)"STM3210C-EVAL board");
-  
-  LCD_UsrLog("  State: Ethernet Initialization ...\n");
-#endif
 }
 
 /**
@@ -390,20 +322,20 @@ static void Netif_Config(void)
   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == GPIO_PIN_14)
-  {
-    /* Get the IT status register value */
-    if(BSP_IO_ITGetStatus(MII_INT_PIN))
-    {
-      ethernetif_set_link(&gnetif);
-    }
-    BSP_IO_ITClear(MII_INT_PIN);
-  }
-  else if (GPIO_Pin == GPIO_PIN_9)
-  {
-     /*connect to tcp server */ 
-     tcp_echoclient_connect();
-  }
+//  if (GPIO_Pin == GPIO_PIN_14)
+//  {
+//    /* Get the IT status register value */
+//    if(BSP_IO_ITGetStatus(MII_INT_PIN))
+//    {
+//      ethernetif_set_link(&gnetif);
+//    }
+//    BSP_IO_ITClear(MII_INT_PIN);
+//  }
+//  else if (GPIO_Pin == GPIO_PIN_9)
+//  {
+//     /*connect to tcp server */ 
+//     tcp_echoclient_connect();
+//  }
 }
 
 /**

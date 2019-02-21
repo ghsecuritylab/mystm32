@@ -161,9 +161,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-extern TM_USB_HIDDEVICE_Mouse_t mouse;
   HAL_IncTick();
-  //USB_HIDDEVICE_MouseSend(&mouse);
 }
 
 /******************************************************************************/
@@ -200,7 +198,7 @@ void USBWakeUp_IRQHandler(void)
   */
 void EXTI9_5_IRQHandler(void)
 {
-  HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
+//  HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 }
 
 /**

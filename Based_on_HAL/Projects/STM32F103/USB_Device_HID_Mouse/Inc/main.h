@@ -50,8 +50,7 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include "stm3210e_eval.h"
+#include "f103_usart.h"
 #include "usbd_core.h"
 #include "stm32f1xx_hal_pcd.h"
 #include "usbd_desc.h"

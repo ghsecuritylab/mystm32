@@ -426,9 +426,14 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>stm3210e_eval.c</FileName>
+              <FileName>f103_usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\BSP\stm3210e_eval.c</FilePath>
+              <FilePath>..\..\..\BSP\f103_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>f103_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\BSP\f103_spi.c</FilePath>
             </File>
           </Files>
         </Group>

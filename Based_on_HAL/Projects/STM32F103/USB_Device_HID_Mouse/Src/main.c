@@ -61,8 +61,6 @@
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 USBD_HandleTypeDef USBD_Device;
-/* UART handler declaration */
-UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes ----------------------------------------------- */
 void SystemClock_Config(void);
@@ -71,15 +69,6 @@ uint8_t USB_HID_Ready(void);
 unsigned char KEY_PAGE_ASCII(char c);
 
 /* Private functions --------------------------------------------------------- */
-#ifdef __GNUC__
-  /* With GCC, small printf (option LD Linker->Libraries->Small printf
-     set to 'Yes') calls __io_putchar() */
-  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-  #define GETCHAR_PROTOTYPE int __io_getchar(int ch)
-#else
-  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-  #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
-#endif /* __GNUC__ */
 
 /**
   * @brief  Main program.
@@ -95,22 +84,8 @@ int main(void)
   /* Configure the system clock to 72 MHz */
   SystemClock_Config();
 
-  /*##-1- Configure the UART peripheral ######################################*/
-  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-  /* UART configured as follows:
-      - Word Length = 8 Bits (7 data bit + 1 parity bit) : BE CAREFUL : Program 7 data bits + 1 parity bit in PC HyperTerminal
-      - Stop Bit    = One Stop bit
-      - Parity      = no parity
-      - BaudRate    = 115200 baud
-      - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Init.BaudRate   = 115200;
-  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits   = UART_STOPBITS_1;
-  UartHandle.Init.Parity     = UART_PARITY_NONE;
-  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  UartHandle.Init.Mode       = UART_MODE_TX_RX;
-  BSP_COM_Init(COM1, &UartHandle);
-
+  USART_CONFIG();
+	
   printf("please insert the device into your PC\n");
 
 /* Configure Key push-button for remote wakeup */
@@ -131,16 +106,30 @@ int main(void)
   }
   printf("demo started!\n");
   
+#if 1
+	  
+	TM_USB_HIDDEVICE_Mouse_t mouse = {
+	  TM_USB_HIDDEVICE_Button_Released,
+	  TM_USB_HIDDEVICE_Button_Released,
+	  TM_USB_HIDDEVICE_Button_Released,
+	  0,0,0
+	};
+	while(1) {
+	  HAL_Delay(1000);
+	  USB_HIDDEVICE_MouseSend(&mouse);
+	}
+
+#else
   TM_USB_HIDDEVICE_Keyboard_t keyboard = {
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  0,0,0,0,0,0
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	TM_USB_HIDDEVICE_Button_Released,
+	0,0,0,0,0,0
   };
   /* Win+R */
   keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
@@ -191,6 +180,7 @@ int main(void)
     USB_HIDDEVICE_KeyboardSend(&keyboard);
     HAL_Delay(200);
   }
+#endif
   
   /* Infinite loop */
   while (1)
@@ -262,12 +252,6 @@ void USB_HIDDEVICE_KeyboardSend(TM_USB_HIDDEVICE_Keyboard_t* keyboard)
     USBD_HID_SendReport(&USBD_Device, HID_Buffer+1, sizeof HID_Buffer-1);
 }
 
-TM_USB_HIDDEVICE_Mouse_t mouse = {
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  TM_USB_HIDDEVICE_Button_Released,
-  0,0,0
-};
 void USB_HIDDEVICE_MouseSend(TM_USB_HIDDEVICE_Mouse_t* mouse)
 {
 #define CURSOR_STEP     4
@@ -362,36 +346,6 @@ void USB_HIDDEVICE_GamepadSend(TM_USB_HIDDEVICE_Gamepad_t* gamepad)
 	
 	/* Send to USB gamepad data */
     USBD_HID_SendReport(&USBD_Device, HID_Buffer, sizeof HID_Buffer);
-}
-
-
-/**
-  * @brief  Retargets the C library printf function to the USART.
-  * @param  None
-  * @retval None
-  */
-PUTCHAR_PROTOTYPE
-{
-  /* Place your implementation of fputc here */
-  /* e.g. write a character to the USART1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
-
-  return ch;
-}
-
-/**
-  * @brief  Retargets the C library scanf function to the USART.
-  * @param  None
-  * @retval None
-  */
-GETCHAR_PROTOTYPE
-{
-  /* Place your implementation of fgetc here */
-  /* e.g. read a character to the USART1 and Loop until the end of transmission */
-  uint8_t ch;
-  HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-
-  return ch;
 }
 
 /**

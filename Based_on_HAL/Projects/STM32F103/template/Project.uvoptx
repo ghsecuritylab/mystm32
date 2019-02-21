@@ -200,7 +200,7 @@
       <GroupNumber>1</GroupNumber>
       <FileNumber>2</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>./Src/main.c</PathWithFileName>
@@ -223,8 +223,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\BSP\stm3210e_eval.c</PathWithFileName>
-      <FilenameWithoutPath>stm3210e_eval.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\BSP\f103_usart.c</PathWithFileName>
+      <FilenameWithoutPath>f103_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -252,7 +252,7 @@
 
   <Group>
     <GroupName>STM32F1xx_HAL_Driver</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
