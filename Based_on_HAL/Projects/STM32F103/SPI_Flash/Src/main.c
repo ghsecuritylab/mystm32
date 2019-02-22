@@ -84,7 +84,7 @@ void FLASH_demo(void)
 	BSP_SERIAL_FLASH_Init();
 	
 	#define BufferSize		(sizeof(Tx_Buffer) - 1)
-	uint8_t Tx_Buffer[] = "STM32F10x SPI Firmware Library Example: communication with an W25Qxx SPI FLASH";
+	uint8_t Tx_Buffer[] = "STM32F10x SPI Firmware Library Example: communication with a W25Qxx SPI FLASH";
 	uint8_t Rx_Buffer[BufferSize+1] = {0};
 	
 	// Flash Device ID
@@ -103,13 +103,13 @@ void FLASH_demo(void)
 		
 		if(TransferStatus2 == PASSED)
 		{
-		  printf("FLASH WRITE : OK.");
-		  printf("FLASH READ  : OK.");
+		  printf("FLASH WRITE : OK.\n");
+		  printf("FLASH READ  : OK.\n");
 		}
 		else
 		{
-		  printf("FLASH WRITE : FAILED.");
-		  printf("FLASH READ  : FAILED.");
+		  printf("FLASH WRITE : FAILED.\n");
+		  printf("FLASH READ  : FAILED.\n");
 		}
 	}
 	else

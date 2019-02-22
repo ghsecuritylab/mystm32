@@ -10,16 +10,16 @@ void               SPIx_MspInit(SPI_HandleTypeDef *hspi);
 #define EVAL_SPIx                               SPI3
 #define EVAL_SPIx_CLK_ENABLE()                  __HAL_RCC_SPI3_CLK_ENABLE()
 
-#define EVAL_SPIx_SCK_GPIO_PORT                 GPIOC             /* PC.10*/
-#define EVAL_SPIx_SCK_PIN                       GPIO_PIN_10
-#define EVAL_SPIx_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOC_CLK_ENABLE()
-#define EVAL_SPIx_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOC_CLK_DISABLE()
+#define EVAL_SPIx_SCK_GPIO_PORT                 GPIOB             /* PB.3*/
+#define EVAL_SPIx_SCK_PIN                       GPIO_PIN_3
+#define EVAL_SPIx_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define EVAL_SPIx_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define EVAL_SPIx_MISO_MOSI_GPIO_PORT           GPIOC
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOC_CLK_ENABLE()
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOC_CLK_DISABLE()
-#define EVAL_SPIx_MISO_PIN                      GPIO_PIN_11       /* PC.11*/
-#define EVAL_SPIx_MOSI_PIN                      GPIO_PIN_12       /* PC.12*/
+#define EVAL_SPIx_MISO_MOSI_GPIO_PORT           GPIOB
+#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOB_CLK_ENABLE()
+#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOB_CLK_DISABLE()
+#define EVAL_SPIx_MISO_PIN                      GPIO_PIN_4        /* PB.4*/
+#define EVAL_SPIx_MOSI_PIN                      GPIO_PIN_5        /* PB.5*/
 
 /* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain

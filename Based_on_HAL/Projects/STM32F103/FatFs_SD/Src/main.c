@@ -150,7 +150,7 @@ DWORD get_fattime(void) {
   */
 int main(void)
 {
-  /* STM32F107xC HAL library initialization:
+  /* HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
          can eventually implement his proper time base source (a general purpose 
@@ -171,8 +171,7 @@ int main(void)
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
   /* Infinite loop */
-  //getchar();
-
+  getchar();
 
   FRESULT res;                                          /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */

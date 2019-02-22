@@ -6,15 +6,16 @@ void duty_cycle(uint16_t pulse)
 }
 void PWM_BREATH_EXAMPLE(void)
 {
+	PWM_CONFIG();
 	while (1)
 	{
 		for(int32_t i = 0; i < PERIOD_VALUE; i++) {
 			duty_cycle(i);
-			HAL_Delay(100);
+			HAL_Delay(20);
 		}
 		for(int32_t i = PERIOD_VALUE-1; i >= 0; i--) {
 			duty_cycle(i);
-			HAL_Delay(100);
+			HAL_Delay(20);
 		}
 	}
 }
@@ -37,6 +38,7 @@ void notone(void)
 }
 void PWM_MELODY_EXAMPLE(void)
 {
+	PWM_CONFIG();
 	while (1)
 	{
 		for(int8_t i = 0; i < sizeof(notes_c6)/sizeof(uint16_t); i++) {
@@ -59,7 +61,7 @@ TIM_OC_InitTypeDef sConfig;
 uint32_t uhPrescalerValue = 0;
 
 void Error_Handler(uint8_t id);
-void PWM_EXAMPLE(void)
+void PWM_CONFIG(void)
 {
 
   /* Compute the prescaler value to have TIM2 counter clock equal to 2000000 Hz */

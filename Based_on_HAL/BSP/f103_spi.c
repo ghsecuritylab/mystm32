@@ -33,6 +33,10 @@ void SPIx_MspInit(SPI_HandleTypeDef *hspi)
   /*** Configure the SPI peripheral ***/ 
   /* Enable SPI clock */
   EVAL_SPIx_CLK_ENABLE();
+  
+  // FOR USING SPI3 WE MUST DISABLE JTAG
+  __HAL_RCC_AFIO_CLK_ENABLE();
+  __HAL_AFIO_REMAP_SWJ_NOJTAG();
 }
 
 /**

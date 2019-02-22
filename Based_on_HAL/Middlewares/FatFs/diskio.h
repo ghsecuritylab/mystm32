@@ -9,7 +9,6 @@
 extern "C" {
 #endif
 
-#include "integer.h"
 #define _USE_IOCTL 1
 #define _USE_WRITE 1
 

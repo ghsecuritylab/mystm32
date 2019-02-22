@@ -85,8 +85,8 @@ int main(void)
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
-  //PWM_BREATH_EXAMPLE();
-  PWM_MELODY_EXAMPLE();
+  PWM_BREATH_EXAMPLE();
+  //PWM_MELODY_EXAMPLE();
   
   /* Infinite loop */
   while (1)

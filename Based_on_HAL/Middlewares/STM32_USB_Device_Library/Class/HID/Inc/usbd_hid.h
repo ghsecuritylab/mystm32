@@ -54,7 +54,15 @@
 
 #define USB_HID_CONFIG_DESC_SIZ       34
 #define USB_HID_DESC_SIZ              9
-#define HID_MOUSE_REPORT_DESC_SIZE    45/*197*//*74*/
+#ifdef HID_KEYBOARD
+#define HID_MOUSE_REPORT_DESC_SIZE    45
+#elif defined(HID_MOUSE)
+#define HID_MOUSE_REPORT_DESC_SIZE    54
+#elif defined(HID_GAMEPAD1)
+#define HID_MOUSE_REPORT_DESC_SIZE    48
+#elif defined(HID_GAMEPAD2)
+#define HID_MOUSE_REPORT_DESC_SIZE    48
+#endif
 
 #define HID_DESCRIPTOR_TYPE           0x21
 #define HID_REPORT_DESC               0x22

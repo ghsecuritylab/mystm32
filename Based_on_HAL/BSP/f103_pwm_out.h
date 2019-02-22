@@ -34,6 +34,7 @@
 #define PULSE_CHANNEL3		CCR3
 #define PULSE_CHANNEL4		CCR4
 
+void PWM_CONFIG(void);
 void duty_cycle(uint16_t pulse);
 void PWM_BREATH_EXAMPLE(void);
 void tone(uint16_t Hz);

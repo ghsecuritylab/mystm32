@@ -127,16 +127,14 @@ typedef struct
 // -------------------------------
 // ?? SD Detect ??
 // -------------------------------
-#if 0
-/**
-  * @brief  SD Detect Interface pins
-  */
-#define SD_DETECT_PIN                           GPIO_PIN_0
-#define SD_DETECT_GPIO_PORT                     GPIOE
-#define SD_DETECT_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOE_CLK_ENABLE()
-#define SD_DETECT_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOE_CLK_DISABLE()
-#define SD_DETECT_EXTI_IRQn                     EXTI0_IRQn
-#endif
+///**
+//  * @brief  SD Detect Interface pins
+//  */
+//#define SD_DETECT_PIN                           GPIO_PIN_0
+//#define SD_DETECT_GPIO_PORT                     GPIOE
+//#define SD_DETECT_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOE_CLK_ENABLE()
+//#define SD_DETECT_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOE_CLK_DISABLE()
+//#define SD_DETECT_EXTI_IRQn                     EXTI0_IRQn
 
 /**
   * @brief  SD detection on its memory slot

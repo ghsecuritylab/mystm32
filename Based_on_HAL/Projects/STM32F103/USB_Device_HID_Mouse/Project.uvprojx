@@ -334,7 +334,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F103xE</Define>
+              <Define>USE_HAL_DRIVER,STM32F103xE,HID_MOUSE</Define>
               <Undefine></Undefine>
               <IncludePath>./Inc;../../../CMSIS/STM32F1xx/Include;../../../STM32F1xx_HAL_Driver/Inc;../../../BSP/;../../../Middlewares/STM32_USB_Device_Library/Core/Inc;../../../Middlewares/STM32_USB_Device_Library/Class/HID/Inc</IncludePath>
             </VariousControls>

@@ -1,33 +1,33 @@
 #include "mylib.h"
 // CS(NSS)引脚 片选选普通GPIO即可
 #define FLASH_SPI_CS_APBxClkCmd		RCC_APB2PeriphClockCmd
-#define FLASH_SPI_CS_CLK			RCC_APB2Periph_GPIOC
-#define	FLASH_SPI_CS_PORT			GPIOC
+#define FLASH_SPI_CS_CLK			RCC_APB2Periph_GPIOB
+#define	FLASH_SPI_CS_PORT			GPIOB
 #define FLASH_SPI_CS_PIN			GPIO_Pin_0
 // SCK引脚
 #define FLASH_SPI_SCK_APBxClkCmd	RCC_APB2PeriphClockCmd
-#define FLASH_SPI_SCK_CLK			RCC_APB2Periph_GPIOA
-#define FLASH_SPI_SCK_PORT			GPIOA
-#define FLASH_SPI_SCK_PIN			GPIO_Pin_5
+#define FLASH_SPI_SCK_CLK			RCC_APB2Periph_GPIOC
+#define FLASH_SPI_SCK_PORT			GPIOB
+#define FLASH_SPI_SCK_PIN			GPIO_Pin_3
 // MISO引脚
 #define FLASH_SPI_MISO_APBxClkCmd	RCC_APB2PeriphClockCmd
-#define FLASH_SPI_MISO_CLK			RCC_APB2Periph_GPIOA
-#define	FLASH_SPI_MISO_PORT			GPIOA
-#define FLASH_SPI_MISO_PIN			GPIO_Pin_6
+#define FLASH_SPI_MISO_CLK			RCC_APB2Periph_GPIOB
+#define	FLASH_SPI_MISO_PORT			GPIOB
+#define FLASH_SPI_MISO_PIN			GPIO_Pin_4
 // MOSI引脚
 #define FLASH_SPI_MOSI_APBxClkCmd	RCC_APB2PeriphClockCmd
-#define FLASH_SPI_MOSI_CLK			RCC_APB2Periph_GPIOA
-#define	FLASH_SPI_MOSI_PORT			GPIOA
-#define FLASH_SPI_MOSI_PIN			GPIO_Pin_7
+#define FLASH_SPI_MOSI_CLK			RCC_APB2Periph_GPIOB
+#define	FLASH_SPI_MOSI_PORT			GPIOB
+#define FLASH_SPI_MOSI_PIN			GPIO_Pin_5
 // SPI
-#define FLASH_SPIx					SPI1
-#define FLASH_SPI_APBxClkCmd		RCC_APB2PeriphClockCmd
-#define FLASH_SPI_CLK				RCC_APB2Periph_SPI1
+#define FLASH_SPIx					SPI3
+#define FLASH_SPI_APBxClkCmd		RCC_APB1PeriphClockCmd
+#define FLASH_SPI_CLK				RCC_APB1Periph_SPI3
 
 //#define FLASH_ID				0xEF3015	/*W25X16*/
 //#define FLASH_ID				0xEF4015	/*W25Q16*/
-//#define FLASH_ID				0XEF4017	/*W25Q64*/
-#define FLASH_ID				0XEF4018	/*W25Q128*/
+#define FLASH_ID				0XEF4017	/*W25Q64*/
+//#define FLASH_ID				0XEF4018	/*W25Q128*/
 #define FLASH_PageSize			256
 #define FLASH_SectorSize		4096
 
@@ -62,6 +62,10 @@ void SPI_FLASH_Init(void)
 	
 	// 使能SPI时钟 
 	FLASH_SPI_APBxClkCmd(FLASH_SPI_CLK, ENABLE);
+	
+	// 如果使用 SPI3 则需要禁用 JTAG
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 	
 	// 使能SPI引脚相关的时钟 
 	FLASH_SPI_CS_APBxClkCmd(FLASH_SPI_CS_CLK, ENABLE);
@@ -425,6 +429,7 @@ void SPI_FLASH_EXAMPLE(void)
 	
 	// 获取 Flash Device ID
 	printf("DeviceID=%x\n", SPI_FLASH_ReadDeviceID());
+	printf("ID=%x\n", SPI_FLASH_ReadID());
 
 	// 检验 SPI Flash ID
 	if (FLASH_ID == SPI_FLASH_ReadID())

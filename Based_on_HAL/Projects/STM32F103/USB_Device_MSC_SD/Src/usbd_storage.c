@@ -47,7 +47,12 @@
 
 /* Includes ------------------------------------------------------------------ */
 #include "usbd_storage.h"
-#include "f103_sd_spi.h"
+
+#ifdef SD_MODE_SPI
+	#include "f103_sd_spi.h"
+#else
+	#include "f103_sd_sdio.h"
+#endif
 
 /* Private typedef ----------------------------------------------------------- */
 /* Private define ------------------------------------------------------------ */
