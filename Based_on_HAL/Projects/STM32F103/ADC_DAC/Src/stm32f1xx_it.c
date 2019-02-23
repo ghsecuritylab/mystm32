@@ -172,6 +172,27 @@ void SysTick_Handler(void)
 /* file (startup_stm32f1xx.s).  */
 /******************************************************************************/
 
+extern ADC_HandleTypeDef    AdcHandle;
+/**
+  * @brief  This function handles ADC interrupt request.
+  * @param  None
+  * @retval None
+  */
+void ADCx_IRQHandler(void)
+{
+  HAL_ADC_IRQHandler(&AdcHandle);
+}
+
+/**
+* @brief  This function handles DMA interrupt request.
+* @param  None
+* @retval None
+*/
+void ADCx_DMA_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(AdcHandle.DMA_Handle);
+}
+
 /**
   * @}
   */

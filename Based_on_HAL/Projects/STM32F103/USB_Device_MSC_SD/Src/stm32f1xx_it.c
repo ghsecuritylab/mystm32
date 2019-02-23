@@ -184,7 +184,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   HAL_PCD_IRQHandler(&hpcd);
 }
 
-#if defined(SD_MODE_SPI)
+#ifdef SD_MODE_SPI
 	;
 #else
 extern SD_HandleTypeDef uSdHandle;

@@ -90,9 +90,6 @@ int main(void)
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
 
-  /* Infinite loop */
-  //getchar();
-
   /* Init MSC Application */
   USBD_Init(&USBD_Device, &MSC_Desc, 0);
 

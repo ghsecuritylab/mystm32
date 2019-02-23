@@ -1,8 +1,9 @@
 # Applications
 
-## DAC
+## ADC_DAC (not implemented)
 
-- 数模转换
+- 读取模拟量，转换为数字量，再将数字量输出为模拟量
+- 移植自 f103 的 Examples\ 的 DAC 和 ADC 工程
 
 ## ETH_ENC28J60 (not implemented)
 
@@ -26,7 +27,7 @@
 
 - 给 PC 模拟一个鼠标，使用 rand() 函数控制，因此鼠标是随机移动的
 - 给 PC 模拟一个键盘，插入计算机后会弹出记事本并输入内容
-- 移植自官方例程。修改了 usbd_hid.c 文件的 USBD_HID_CfgDesc 部分，根据项目需要设置 `nInterfaceProtocol` 值和 `HID_MOUSE_ReportDesc` 部分。
+- 移植自官方例程。修改了 usbd_hid.c 文件的 USBD_HID_CfgDesc 部分和 `HID_MOUSE_ReportDesc` 部分。
 
 ## USB Device MSC SD
 

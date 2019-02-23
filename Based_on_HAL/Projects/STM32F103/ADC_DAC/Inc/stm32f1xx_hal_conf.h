@@ -53,7 +53,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED
-/* #define HAL_ADC_MODULE_ENABLED */
+#define HAL_ADC_MODULE_ENABLED
 /* #define HAL_CAN_MODULE_ENABLED */
 #define HAL_CORTEX_MODULE_ENABLED
 /* #define HAL_CRC_MODULE_ENABLED */
@@ -138,7 +138,8 @@
   * @brief This is the HAL system configuration section
   */     
 #define  VDD_VALUE                    3300U /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            0x00U /*!< tick interrupt priority */
+//#define  TICK_INT_PRIORITY            0x00U /*!< tick interrupt priority */
+#define  TICK_INT_PRIORITY            0x0FU /*!< tick interrupt priority */
 #define  USE_RTOS                     0U
 #define  PREFETCH_ENABLE              1U
 

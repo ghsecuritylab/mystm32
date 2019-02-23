@@ -172,7 +172,7 @@ void SysTick_Handler(void)
 /* available peripheral interrupt handler's name please refer to the startup */
 /* file (startup_stm32f1xx.s).  */
 /******************************************************************************/
-#if defined(SD_MODE_SPI)
+#ifdef SD_MODE_SPI
 	;
 #else
 extern SD_HandleTypeDef uSdHandle;

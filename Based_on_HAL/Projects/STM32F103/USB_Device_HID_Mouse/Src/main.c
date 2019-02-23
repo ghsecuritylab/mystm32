@@ -130,43 +130,43 @@ int main(void)
 	TM_USB_HIDDEVICE_Button_Released,
 	0,0,0,0,0,0
   };
-//  /* Win+R */
-//  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
-//  keyboard.Key1 = KEY_PAGE_R;
-//  USB_HIDDEVICE_KeyboardSend(&keyboard);
-//  HAL_Delay(60);
-//  /* Key Release */
-//  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Released;
-//  keyboard.Key1 = KEY_PAGE_NONE;
-//  USB_HIDDEVICE_KeyboardSend(&keyboard);
-//  HAL_Delay(200);
+  /* Win+R */
+  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Pressed;
+  keyboard.Key1 = KEY_PAGE_R;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(60);
+  /* Key Release */
+  keyboard.L_GUI = TM_USB_HIDDEVICE_Button_Released;
+  keyboard.Key1 = KEY_PAGE_NONE;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(200);
 
-//  /* notepad */
-//  char buff1[] = "notepad";
-//  for (uint8_t i=0; i < sizeof(buff1)-1; ++i)
-//  {
-//    /* key pressed */
-//    keyboard.Key1 = KEY_PAGE_ASCII(buff1[i]);
-//    USB_HIDDEVICE_KeyboardSend(&keyboard);
-//    HAL_Delay(50);
+  /* notepad */
+  char buff1[] = "notepad";
+  for (uint8_t i=0; i < sizeof(buff1)-1; ++i)
+  {
+    /* key pressed */
+    keyboard.Key1 = KEY_PAGE_ASCII(buff1[i]);
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(50);
 
-//    /* Key Release */
-//    keyboard.Key1 = KEY_PAGE_NONE;
-//    USB_HIDDEVICE_KeyboardSend(&keyboard);
-//    HAL_Delay(200);
-//  }
+    /* Key Release */
+    keyboard.Key1 = KEY_PAGE_NONE;
+    USB_HIDDEVICE_KeyboardSend(&keyboard);
+    HAL_Delay(200);
+  }
 
-//  /* Enter */
-//  keyboard.Key1 = KEY_PAGE_ENTER;
-//  USB_HIDDEVICE_KeyboardSend(&keyboard);
-//  HAL_Delay(50);
-//  /* Key Release */
-//  keyboard.Key1 = KEY_PAGE_NONE;
-//  USB_HIDDEVICE_KeyboardSend(&keyboard);
-//  HAL_Delay(200);
+  /* Enter */
+  keyboard.Key1 = KEY_PAGE_ENTER;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(50);
+  /* Key Release */
+  keyboard.Key1 = KEY_PAGE_NONE;
+  USB_HIDDEVICE_KeyboardSend(&keyboard);
+  HAL_Delay(200);
   
   /* notepad */
-  char buff2[] = "hello,world!";
+  char buff2[] = "helloworld";//only A-Za-z0-9
   for (uint8_t i=0; i < sizeof(buff2)-1; ++i)
   {
     /* key pressed */
