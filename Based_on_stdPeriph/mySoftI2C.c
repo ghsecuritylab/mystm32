@@ -1,27 +1,31 @@
 #include "mylib.h"
 
-#define EEPROM_I2C_WR	0	/* 写控制bit */
-#define EEPROM_I2C_RD	1	/* 读控制bit */
-
 // 定义I2C总线连接的GPIO端口, 用户只需要修改下面4行代码即可任意改变SCL和SDA的引脚
-
-#define I2C_G_ClockCmd	RCC_APB2PeriphClockCmd	/* GPIO端口时钟 */
-#define I2C_G	 		RCC_APB2Periph_GPIOB	/* GPIO端口时钟 */
-#define I2C_GPIO		GPIOB					/* GPIO端口 */
-#define I2C_SCL			GPIO_Pin_6				/* 连接到SCL时钟线的GPIO */
-#define I2C_SDA			GPIO_Pin_7				/* 连接到SDA数据线的GPIO */
+// SCL
+#define I2C_SCL_APBxClkCmd	RCC_APB2PeriphClockCmd	/* GPIO端口时钟 */
+#define I2C_SCL_CLK	 		RCC_APB2Periph_GPIOB	/* GPIO端口时钟 */
+#define I2C_SCL_PORT		GPIOB					/* GPIO端口 */
+#define I2C_SCL_PIN			GPIO_Pin_6				/* 连接到SCL时钟线的GPIO */
+// SDA
+#define I2C_SDA_APBxClkCmd	RCC_APB2PeriphClockCmd	/* GPIO端口时钟 */
+#define I2C_SDA_CLK	 		RCC_APB2Periph_GPIOB	/* GPIO端口时钟 */
+#define I2C_SDA_PORT		GPIOB					/* GPIO端口 */
+#define I2C_SDA_PIN			GPIO_Pin_7				/* 连接到SDA数据线的GPIO */
 
 #define	fastSet(p,i)	{p->BSRR=i;}
 #define fastReset(p,i)	{p->BRR=i;}
 #define fastToggle(p,i)	{p->ODR^=i;}
 
-#define I2C_SDA_1()		fastSet(I2C_GPIO,I2C_SDA)
-#define I2C_SDA_0()		fastReset(I2C_GPIO,I2C_SDA)
-#define I2C_SCL_1()		fastSet(I2C_GPIO,I2C_SCL)
-#define I2C_SCL_0()		fastReset(I2C_GPIO,I2C_SCL)
+#define I2C_SCL_1()		fastSet(I2C_SCL_PORT, I2C_SCL_PIN)
+#define I2C_SCL_0()		fastReset(I2C_SCL_PORT, I2C_SCL_PIN)
+#define I2C_SDA_1()		fastSet(I2C_SDA_PORT, I2C_SDA_PIN)
+#define I2C_SDA_0()		fastReset(I2C_SDA_PORT, I2C_SDA_PIN)
 
 // 读SDA状态
-#define I2C_SDA_READ()  ((I2C_GPIO->IDR & I2C_SDA) != 0)
+#define I2C_SDA_READ()  ((I2C_SDA_PORT->IDR & I2C_SDA_PIN) != 0)
+
+#define I2C_WR	0	/* 写控制bit */
+#define I2C_RD	1	/* 读控制bit */
 
 #define EEPROM_WORD_ADDRESS
 
@@ -87,18 +91,20 @@ void i2c_Start(void)
 void i2c_Config(void)
 {
 	GPIO_InitTypeDef gpio_init_t;
-
-	I2C_G_ClockCmd(I2C_G, ENABLE);	// 打开GPIO时钟
-
-	gpio_init_t.GPIO_Pin = I2C_SCL | I2C_SDA;
 	gpio_init_t.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_OD;	// 开漏输出
-	GPIO_Init(I2C_GPIO, &gpio_init_t);
+
+	I2C_SCL_APBxClkCmd(I2C_SCL_CLK, ENABLE);	// 打开GPIO时钟
+	gpio_init_t.GPIO_Pin = I2C_SCL_PIN;
+	GPIO_Init(I2C_SCL_PORT, &gpio_init_t);
+	
+	I2C_SDA_APBxClkCmd(I2C_SDA_CLK, ENABLE);	// 打开GPIO时钟
+	gpio_init_t.GPIO_Pin = I2C_SDA_PIN;
+	GPIO_Init(I2C_SDA_PORT, &gpio_init_t);
 
 	// 给一个停止信号，复位I2C总线上的所有设备到待机模式
 	i2c_Stop();
 }
-
 
 // CPU向I2C总线设备发送8bit数据
 void i2c_SendByte(uint8_t c)
@@ -210,7 +216,7 @@ uint8_t i2c_ee_CheckDevice()
 	i2c_Start();	// 发送启动信号 
 
 	// 发送设备地址+读写控制bit（0 = w，1 = r) bit7 先传
-	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_WR);
+	i2c_SendByte(EEPROM_ADDRESS | I2C_WR);
 	
 	success = !i2c_WaitAck();	// 检测设备的ACK应答
 
@@ -228,7 +234,7 @@ uint8_t i2c_ee_ByteWrite(uint8_t c, uint8_t addr)
 	i2c_Start();
 	
 	// 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
-	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_WR);	// 此处是写指令
+	i2c_SendByte(EEPROM_ADDRESS | I2C_WR);	// 此处是写指令
 	
 	// 第3步：发送一个时钟，判断器件是否正确应答
 	if (i2c_WaitAck() == 1)
@@ -275,7 +281,7 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 	i2c_Start();
 	
 	// 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
-	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_WR);	// 此处是写指令
+	i2c_SendByte(EEPROM_ADDRESS | I2C_WR);	// 此处是写指令
 	 
 	// 第3步：等待ACK
 	if (i2c_WaitAck() == 1)
@@ -300,7 +306,7 @@ uint8_t i2c_ee_ReadBytes(uint8_t *pBuffer, uint8_t ReadAddr, uint16_t NumByteToR
 	i2c_Start();
 	
 	// 第7步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
-	i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_RD);	// 此处是读指令
+	i2c_SendByte(EEPROM_ADDRESS | I2C_RD);	// 此处是读指令
 	
 	// 第8步：发送ACK
 	if (i2c_WaitAck() == 1)
@@ -364,7 +370,7 @@ uint8_t i2c_ee_WriteBytes(uint8_t *pBuffer, uint8_t WriteAddr, uint16_t NumByteT
 			i2c_Start();
 			
 			// 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读
-			i2c_SendByte(EEPROM_ADDRESS | EEPROM_I2C_WR);	// 此处是写指令
+			i2c_SendByte(EEPROM_ADDRESS | I2C_WR);	// 此处是写指令
 			
 			// 第3步：发送一个时钟，判断器件是否正确应答
 			if (i2c_WaitAck() == 1)
