@@ -1,9 +1,9 @@
 #include "mylib.h"
 
 #define LED1_GPIO_ClkCmd 	RCC_APB2PeriphClockCmd
-#define LED1_GPIO_CLK 		RCC_APB2Periph_GPIOC
-#define LED1_GPIO			GPIOC
-#define LED1_GPIO_PIN		GPIO_Pin_0
+#define LED1_GPIO_CLK 		RCC_APB2Periph_GPIOB
+#define LED1_GPIO			GPIOB
+#define LED1_GPIO_PIN		GPIO_Pin_12
 
 #define LED2_GPIO_ClkCmd 	RCC_APB2PeriphClockCmd
 #define LED2_GPIO_CLK 		RCC_APB2Periph_GPIOB
@@ -12,11 +12,11 @@
 
 void LED_Init(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	LED1_GPIO_ClkCmd(LED1_GPIO_CLK, ENABLE);
 //	LED2_GPIO_ClkCmd(LED2_GPIO_CLK, ENABLE);
 	
-	GPIO_InitTypeDef gpio_init_t;	
+	GPIO_InitTypeDef gpio_init_t;
 	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_PP;
 	gpio_init_t.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_t.GPIO_Pin = LED1_GPIO_PIN;

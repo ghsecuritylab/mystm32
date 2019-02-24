@@ -111,7 +111,6 @@ void SPI_FLASH_Init(void)
 	SPI_Cmd(FLASH_SPIx , ENABLE);
 }
 
-
 // 使用SPI发送一个字节数据，返回接收到的数据
 uint8_t SPI_FLASH_SendByte(uint8_t c)
 {
@@ -139,7 +138,6 @@ uint8_t SPI_FLASH_SendByte(uint8_t c)
 	// 读取数据寄存器，获取接收缓冲区数据
 	return SPI_I2S_ReceiveData(FLASH_SPIx);
 }
-
 
 // 等待WIP(BUSY)标志被置0，即等待到FLASH内部数据写入完毕
 void SPI_FLASH_WaitForWriteEnd(void)
@@ -249,7 +247,6 @@ void SPI_FLASH_PageWrite(uint8_t* pBuffer, uint32_t WriteAddr, uint16_t NumByteT
 	//等待写入完毕
 	SPI_FLASH_WaitForWriteEnd();
 }
-
 
 // 对FLASH写入数据，需要先擦除扇区并选中
 void SPI_FLASH_BufferWrite(uint8_t* pBuffer, uint32_t WriteAddr, uint16_t NumByteToWrite)
@@ -450,4 +447,3 @@ void SPI_FLASH_EXAMPLE(void)
 	else
 		printf("Cannot find specified Flash!\n");
 }
-

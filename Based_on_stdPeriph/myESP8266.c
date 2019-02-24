@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#ifdef 0
+#if 0
 
 #if defined (__CC_ARM)
 #pragma anon_unions
