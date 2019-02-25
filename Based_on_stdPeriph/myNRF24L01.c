@@ -434,6 +434,13 @@ void NRF24L01_CAR_RX_EXAMPLE(void)
 	}
 }
 
+uint8_t translate[] = 
+{
+	' ',	'F',	' ',	' ',
+	'L',	'S',	'R',	' ',
+	' ',	'B',	' ',	' ',
+	' ',	' ',	' ',	' ',
+};
 uint8_t carForwards[TX_PLOAD_WIDTH] = "F";
 uint8_t carBackwards[TX_PLOAD_WIDTH] = "B";
 uint8_t carLeftwards[TX_PLOAD_WIDTH] = "L";
@@ -447,13 +454,23 @@ void NRF24L01_CAR_TX_EXAMPLE(void)
 		return;
 	}
 	TX_Mode();
+	KEYBOARD_CONFIG();
 
-	printf("Send %s\n", carForwards);
-	switch (TxPacket(carForwards))
+	while(1)
 	{
-		case TX_OK: printf("Transmit ok\n");break;
-		case MAX_TX: printf("Failed: reached max retrans times\n");break;
-		default: printf("Unknown error\n");
+		uint8_t key = getKey();
+		if (key != 0xFF) {
+			switch (translate[key]) {
+				case 'F':TxPacket(carForwards);break;
+				case 'B':TxPacket(carBackwards);break;
+				case 'L':TxPacket(carLeftwards);break;
+				case 'R':TxPacket(carRightwards);break;
+				case 'S':TxPacket(carStop);break;
+				default:break;
+			}
+			waitKeyUp(key);
+			TxPacket(carStop);
+		}
+		delay_ms(5);
 	}
-	
 }
