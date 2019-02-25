@@ -394,27 +394,27 @@ void NRF24L01_CAR_RX_EXAMPLE(void)
 		GPIO_ResetBits(GPIOB, GPIO_Pin_12);	// 常亮：收到了信号
 		switch (RxBuffer[0]) {
 		case 'F':		// Forward
-			CH1_DutyCycle(9);
+			CH1_DutyCycle(6);
 			CH2_DutyCycle(0);
-			CH3_DutyCycle(9);
+			CH3_DutyCycle(6);
 			CH4_DutyCycle(0);
 			break;
 		case 'B':		// Backwards
 			CH1_DutyCycle(0);
-			CH2_DutyCycle(9);
+			CH2_DutyCycle(6);
 			CH3_DutyCycle(0);
-			CH4_DutyCycle(9);
+			CH4_DutyCycle(6);
 			break;
 		case 'L':		// Leftwards
-			CH1_DutyCycle(10);
+			CH1_DutyCycle(6);
 			CH2_DutyCycle(0);
 			CH3_DutyCycle(0);
-			CH4_DutyCycle(10);
+			CH4_DutyCycle(6);
 			break;
 		case 'R':		// Rightwards
 			CH1_DutyCycle(0);
-			CH2_DutyCycle(10);
-			CH3_DutyCycle(10);
+			CH2_DutyCycle(6);
+			CH3_DutyCycle(6);
 			CH4_DutyCycle(0);
 			break;
 		case 'S':		// Stop

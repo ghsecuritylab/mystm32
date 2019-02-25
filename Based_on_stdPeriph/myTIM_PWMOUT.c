@@ -56,9 +56,9 @@
 
 // ==================其他=======================
 // ARR
-#define TIMx_PERIOD					12
+#define TIMx_PERIOD					7
 // PWM 信号的频率 F=TIM_CLK/{(ARR+1)*(PSC+1)}
-#define TIMx_PRESCALER				2000
+#define TIMx_PRESCALER				1000
 
 // By default, set all to be high/low
 //#define TIMx_PULSE					TIMx_PERIOD
