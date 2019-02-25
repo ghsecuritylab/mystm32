@@ -449,10 +449,7 @@ uint8_t carStop[TX_PLOAD_WIDTH] = "S";
 void NRF24L01_CAR_TX_EXAMPLE(void)
 {
 	if (!NRF24L01_Detect())
-	{
-		printf("Unable to find NRF24L01\n");
 		return;
-	}
 	TX_Mode();
 	KEYBOARD_CONFIG();
 
