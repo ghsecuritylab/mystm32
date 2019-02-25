@@ -10,7 +10,7 @@ void display_real(double real);
 void DISPLAY_CONFIG(void);
 void KEYBOARD_CONFIG(void);
 uint8_t getKey(void);
-uint8_t getKey_nonBlock(void);
+void waitKeyUp(uint8_t keyId);
 void NVIC_CONFIG(uint8_t IRQChannel, uint8_t PreemptionPriority, uint8_t SubPriority);
 void USART_INT_CONFIG(void);
 void USART_CONFIG(void);

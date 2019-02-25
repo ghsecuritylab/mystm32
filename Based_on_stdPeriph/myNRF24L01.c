@@ -382,38 +382,39 @@ void NRF24L01_CAR_RX_EXAMPLE(void)
 			delay_ms(500);
 		}	// 闪烁：未找到 NRF24L01
 	
+	GPIO_SetBits(GPIOB, GPIO_Pin_12);	// 不亮：正在接收
 	TIM_PWMOUT_CONFIG();
 	RX_Mode();
 	while(1)
 	{
 		//while (NRF24L01_IRQ_READ() != 0) {}
 		while (RxPacket(RxBuffer) != 0)
-			delay_ms(50);
+			delay_ms(40);
 
 		GPIO_ResetBits(GPIOB, GPIO_Pin_12);	// 常亮：收到了信号
 		switch (RxBuffer[0]) {
 		case 'F':		// Forward
-			CH1_DutyCycle(4);
+			CH1_DutyCycle(9);
 			CH2_DutyCycle(0);
-			CH3_DutyCycle(4);
+			CH3_DutyCycle(9);
 			CH4_DutyCycle(0);
 			break;
 		case 'B':		// Backwards
 			CH1_DutyCycle(0);
-			CH2_DutyCycle(3);
+			CH2_DutyCycle(9);
 			CH3_DutyCycle(0);
-			CH4_DutyCycle(3);
+			CH4_DutyCycle(9);
 			break;
 		case 'L':		// Leftwards
-			CH1_DutyCycle(1);
+			CH1_DutyCycle(10);
 			CH2_DutyCycle(0);
-			CH3_DutyCycle(3);
-			CH4_DutyCycle(0);
+			CH3_DutyCycle(0);
+			CH4_DutyCycle(10);
 			break;
 		case 'R':		// Rightwards
-			CH1_DutyCycle(3);
-			CH2_DutyCycle(0);
-			CH3_DutyCycle(1);
+			CH1_DutyCycle(0);
+			CH2_DutyCycle(10);
+			CH3_DutyCycle(10);
 			CH4_DutyCycle(0);
 			break;
 		case 'S':		// Stop
@@ -433,16 +434,10 @@ void NRF24L01_CAR_RX_EXAMPLE(void)
 	}
 }
 
-uint8_t carCommands[][TX_PLOAD_WIDTH] = {
-	"F",
-	"B",
-	"F",
-	"B",
-	"L",
-	"B",
-	"L",
-	"B"
-};
+uint8_t carForwards[TX_PLOAD_WIDTH] = "F";
+uint8_t carBackwards[TX_PLOAD_WIDTH] = "B";
+uint8_t carLeftwards[TX_PLOAD_WIDTH] = "L";
+uint8_t carRightwards[TX_PLOAD_WIDTH] = "R";
 uint8_t carStop[TX_PLOAD_WIDTH] = "S";
 void NRF24L01_CAR_TX_EXAMPLE(void)
 {
@@ -452,24 +447,13 @@ void NRF24L01_CAR_TX_EXAMPLE(void)
 		return;
 	}
 	TX_Mode();
-	for (uint8_t i=0; i < 8; ) {
-		printf("Send %s\n", carCommands[i]);
-		switch (TxPacket(carCommands[i]))
-		{
-			case TX_OK: printf("Transmit ok\n");break;
-			case MAX_TX: printf("Failed: reached max retrans times\n");delay_ms(100);continue;
-			default: printf("Unknown error\n");delay_ms(100);continue;
-		}
-		delay_ms(3000);
-stop:
-		printf("Send %s\n", carStop);
-		switch (TxPacket(carStop))
-		{
-			case TX_OK: printf("Transmit ok\n");break;
-			case MAX_TX: printf("Failed: reached max retrans times\n");delay_ms(100);goto stop;
-			default: printf("Unknown error\n");delay_ms(100);goto stop;
-		}
-		delay_ms(2000);
-		++i;
+
+	printf("Send %s\n", carForwards);
+	switch (TxPacket(carForwards))
+	{
+		case TX_OK: printf("Transmit ok\n");break;
+		case MAX_TX: printf("Failed: reached max retrans times\n");break;
+		default: printf("Unknown error\n");
 	}
+	
 }

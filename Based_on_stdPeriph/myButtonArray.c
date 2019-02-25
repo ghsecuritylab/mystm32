@@ -1,102 +1,111 @@
 #include "mylib.h"
 
-#define KEYBOARD_WClockCmd 	RCC_APB2PeriphClockCmd
-#define KEYBOARD_W 			RCC_APB2Periph_GPIOB
-#define KEYBOARD_DClockCmd 	RCC_APB2PeriphClockCmd
-#define KEYBOARD_D 			RCC_APB2Periph_GPIOB
-#define GPIO_D		GPIOB
-#define GPIO_D_Pin0	GPIO_Pin_6
-#define GPIO_D_Pin1	GPIO_Pin_7
-#define GPIO_D_Pin2	GPIO_Pin_8
-#define GPIO_D_Pin3	GPIO_Pin_9
-#define GPIO_W		GPIOB
-#define GPIO_W_Pin0	GPIO_Pin_12
-#define GPIO_W_Pin1	GPIO_Pin_13
-#define GPIO_W_Pin2	GPIO_Pin_14
-#define GPIO_W_Pin3	GPIO_Pin_15
+// 位选
+#define KEYBOARD_W_APBxClkCmd 	RCC_APB2PeriphClockCmd
+#define KEYBOARD_W_CLK			RCC_APB2Periph_GPIOB
+#define KEYBOARD_W_PORT			GPIOB
+#define KEYBOARD_W_PIN0			GPIO_Pin_12
+#define KEYBOARD_W_PIN1			GPIO_Pin_13
+#define KEYBOARD_W_PIN2			GPIO_Pin_14
+#define KEYBOARD_W_PIN3			GPIO_Pin_15
+
+// 段选
+#define KEYBOARD_D_APBxClkCmd 	RCC_APB2PeriphClockCmd
+#define KEYBOARD_D_CLK			RCC_APB2Periph_GPIOB
+#define KEYBOARD_D_PORT			GPIOB
+#define KEYBOARD_D_PIN0			GPIO_Pin_6
+#define KEYBOARD_D_PIN1			GPIO_Pin_7
+#define KEYBOARD_D_PIN2			GPIO_Pin_8
+#define KEYBOARD_D_PIN3			GPIO_Pin_9
 
 void KEYBOARD_CONFIG()
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	KEYBOARD_WClockCmd(KEYBOARD_W, ENABLE);
-	KEYBOARD_DClockCmd(KEYBOARD_D, ENABLE);
+	KEYBOARD_W_APBxClkCmd(KEYBOARD_W_CLK, ENABLE);
+	KEYBOARD_D_APBxClkCmd(KEYBOARD_D_CLK, ENABLE);
 	
 	GPIO_InitTypeDef gpio_init_t;	
-	gpio_init_t.GPIO_Mode = GPIO_Mode_IPD;
+	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_OD;	// 段选：开漏输出
 	gpio_init_t.GPIO_Speed = GPIO_Speed_50MHz;
-	gpio_init_t.GPIO_Pin = GPIO_D_Pin0|GPIO_D_Pin1|GPIO_D_Pin2|GPIO_D_Pin3;
-	GPIO_Init(GPIO_D, &gpio_init_t);
-	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_PP;
-	gpio_init_t.GPIO_Pin = GPIO_W_Pin0|GPIO_W_Pin1|GPIO_W_Pin2|GPIO_W_Pin3;
-	GPIO_Init(GPIO_W, &gpio_init_t);
+	gpio_init_t.GPIO_Pin = KEYBOARD_D_PIN0|KEYBOARD_D_PIN1|KEYBOARD_D_PIN2|KEYBOARD_D_PIN3;
+	GPIO_Init(KEYBOARD_D_PORT, &gpio_init_t);
+	
+	gpio_init_t.GPIO_Mode = GPIO_Mode_Out_PP;	// 位选：推挽输出
+	gpio_init_t.GPIO_Pin = KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3;
+	GPIO_Init(KEYBOARD_W_PORT, &gpio_init_t);
+	
+	// 段选全部置低
+	GPIO_ResetBits(KEYBOARD_D_PORT, KEYBOARD_D_PIN0|KEYBOARD_D_PIN1|KEYBOARD_D_PIN2|KEYBOARD_D_PIN3);
 }
 
-uint16_t key_table[] = {GPIO_W_Pin0,GPIO_W_Pin1,GPIO_W_Pin2,GPIO_W_Pin3};
-#define N (sizeof(key_table)/sizeof(uint16_t))
-uint8_t _getKey(uint8_t block)
+uint16_t w_table[] = {KEYBOARD_W_PIN0, KEYBOARD_W_PIN1, KEYBOARD_W_PIN2, KEYBOARD_W_PIN3};
+#define N (sizeof(w_table)/sizeof(uint16_t))
+uint8_t getKey()
 {
-	GPIO_SetBits(GPIO_W, GPIO_W_Pin0|GPIO_W_Pin1|GPIO_W_Pin2|GPIO_W_Pin3);
-	switch (GPIO_ReadInputData(GPIO_D)&(GPIO_D_Pin0|GPIO_D_Pin1|GPIO_D_Pin2|GPIO_D_Pin3))
+	// 位选全部置高
+	GPIO_SetBits(KEYBOARD_W_PORT, KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3);
+	uint16_t r = GPIO_ReadInputData(KEYBOARD_D_PORT) & (KEYBOARD_D_PIN0|KEYBOARD_D_PIN1|KEYBOARD_D_PIN2|KEYBOARD_D_PIN3);
+	// 读段选，被按下的为高电平
+	switch (r)
 	{
-		case GPIO_D_Pin0:
+		case KEYBOARD_D_PIN0:
 			delay_ms(10);
-			if (GPIO_D->IDR & GPIO_D_Pin0)
+			// 抖动检测
+			if (KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN0)
 			{
-				for (uint8_t i=0; i < N; i++)	// the top-left key's id is zero
+				// 位选逐个置低
+				for (uint8_t i=0; i < N; i++)
 				{
-					GPIO_ResetBits(GPIO_W, key_table[i]);
-					if (!(GPIO_D->IDR & GPIO_D_Pin0))
+					GPIO_ResetBits(KEYBOARD_W_PORT, w_table[i]);
+					// 段选上的高电平检测不到了
+					if (!(KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN0))
 					{
-						GPIO_SetBits(GPIO_W, key_table[i]);
-						if (block) while (GPIO_D->IDR & GPIO_D_Pin0);	// wait for user release the key
+						// 恢复位选
+						GPIO_SetBits(KEYBOARD_W_PORT, KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3);
 						return i;
 					}
 				}
 			}
 			return 0xFF;	// joggling
-		case GPIO_D_Pin1:
+		case KEYBOARD_D_PIN1:
 			delay_ms(10);
-			if (GPIO_D->IDR & GPIO_D_Pin1)
+			if (KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN1)
 			{
 				for (uint8_t i=0; i < N; i++)
 				{
-					GPIO_ResetBits(GPIO_W, key_table[i]);
-					if (!(GPIO_D->IDR & GPIO_D_Pin1))
+					GPIO_ResetBits(KEYBOARD_W_PORT, w_table[i]);
+					if (!(KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN1))
 					{
-						GPIO_SetBits(GPIO_W, key_table[i]);
-						if (block) while (GPIO_D->IDR & GPIO_D_Pin1);
+						GPIO_SetBits(KEYBOARD_W_PORT, KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3);
 						return i+N;
 					}
 				}
 			}
 			return 0xFF;
-		case GPIO_D_Pin2:
+		case KEYBOARD_D_PIN2:
 			delay_ms(10);
-			if (GPIO_D->IDR & GPIO_D_Pin2)
+			if (KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN2)
 			{
 				for (uint8_t i=0; i < N; i++)
 				{
-					GPIO_ResetBits(GPIO_W, key_table[i]);
-					if (!(GPIO_D->IDR & GPIO_D_Pin2))
+					GPIO_ResetBits(KEYBOARD_W_PORT, w_table[i]);
+					if (!(KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN2))
 					{
-						GPIO_SetBits(GPIO_W, key_table[i]);
-						if (block) while (GPIO_D->IDR & GPIO_D_Pin2);
+						GPIO_SetBits(KEYBOARD_W_PORT, KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3);
 						return i+2*N;
 					}
 				}
 			}
 			return 0xFF;
-		case GPIO_D_Pin3:
+		case KEYBOARD_D_PIN3:
 			delay_ms(10);
-			if (GPIO_D->IDR & GPIO_D_Pin3)
+			if (KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN3)
 			{
 				for (uint8_t i=0; i < N; i++)
 				{
-					GPIO_ResetBits(GPIO_W, key_table[i]);
-					if (!(GPIO_D->IDR & GPIO_D_Pin3))
+					GPIO_ResetBits(KEYBOARD_W_PORT, w_table[i]);
+					if (!(KEYBOARD_D_PORT->IDR & KEYBOARD_D_PIN3))
 					{
-						GPIO_SetBits(GPIO_W, key_table[i]);
-						if (block) while (GPIO_D->IDR & GPIO_D_Pin3);
+						GPIO_SetBits(KEYBOARD_W_PORT, KEYBOARD_W_PIN0|KEYBOARD_W_PIN1|KEYBOARD_W_PIN2|KEYBOARD_W_PIN3);
 						return i+3*N;
 					}
 				}
@@ -106,12 +115,9 @@ uint8_t _getKey(uint8_t block)
 	return 0xFF;	// no key pressed
 }
 
-uint8_t getKey()
-{
-	return _getKey(1);
-}
-
-uint8_t getKey_nonBlock()
-{
-	return _getKey(0);
+uint16_t d_table[] = {KEYBOARD_D_PIN0, KEYBOARD_D_PIN1, KEYBOARD_D_PIN2, KEYBOARD_D_PIN3};
+void waitKeyUp(uint8_t keyId)
+{	
+	// wait for user release the key
+	while (KEYBOARD_D_PORT->IDR & d_table[keyId/N]) {}
 }

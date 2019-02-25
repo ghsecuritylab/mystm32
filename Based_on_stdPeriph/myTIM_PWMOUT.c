@@ -55,10 +55,10 @@
 #define TIM_OC_CH4_PreloadConfig	TIM_OC4PreloadConfig
 
 // ==================其他=======================
-
-#define TIMx_PERIOD					6
+// ARR
+#define TIMx_PERIOD					12
 // PWM 信号的频率 F=TIM_CLK/{(ARR+1)*(PSC+1)}
-#define TIMx_PRESCALER				12000000
+#define TIMx_PRESCALER				2000
 
 // By default, set all to be high/low
 //#define TIMx_PULSE					TIMx_PERIOD

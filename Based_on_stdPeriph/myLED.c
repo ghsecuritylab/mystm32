@@ -12,7 +12,6 @@
 
 void LED_Init(void)
 {
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	LED1_GPIO_ClkCmd(LED1_GPIO_CLK, ENABLE);
 //	LED2_GPIO_ClkCmd(LED2_GPIO_CLK, ENABLE);
 	
