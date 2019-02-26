@@ -84,8 +84,9 @@ int main(void)
 
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r UART Printf Example: retarget the C library printf function to the UART\n\r");
-
-  DAC_CONFIG();
+  //DAC_CONFIG();
+  ADC_EXAMPLE();
+	
   /* Infinite loop */
   while (1)
   {

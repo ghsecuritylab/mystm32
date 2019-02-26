@@ -2,7 +2,6 @@
 
 #define VDD_APPLI                      ((uint32_t) 3300)   /* Value of analog voltage supply Vdda (unit: mV) */
 #define RANGE_12BITS                   ((uint32_t) 4095)   /* Max value with a full range of 12 bits */
-#define USERBUTTON_CLICK_COUNT_MAX     ((uint32_t)    4)   /* Maximum value of variable "UserButtonClickCount" */
 
 #define ADCCONVERTEDVALUES_BUFFER_SIZE ((uint32_t)    3)   /* Size of array containing ADC converted values: set to ADC sequencer number of ranks converted, to have a rank in each address */
 
@@ -52,41 +51,28 @@
   * @retval None
   */
 #define COMPUTATION_DIGITAL_12BITS_TO_VOLTAGE(ADC_DATA)                        \
-  ( (ADC_DATA) * VDD_APPLI / RANGE_12BITS)
-  
+  ( (ADC_DATA) * VDD_APPLI / RANGE_12BITS )
+
 /* Private variables ---------------------------------------------------------*/
 /* ADC handler declaration */
 ADC_HandleTypeDef    AdcHandle;
 
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-/* DAC handler declaration */
-DAC_HandleTypeDef    DacHandle;
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
-
 /* Variable containing ADC conversions results */
 __IO uint16_t   aADCxConvertedValues[ADCCONVERTEDVALUES_BUFFER_SIZE];
 
-/* Variables for ADC conversions results computation to physical values */
-uint16_t   uhADCChannelToDAC_mVolt = 0;
-uint16_t   uhVrefInt_mVolt = 0;
- int32_t   wTemperature_DegreeCelsius = 0;
-          
-/* Variables to manage push button on board: interface between ExtLine interruption and main program */
-uint8_t         ubUserButtonClickCount = 0;      /* Count number of clicks: Incremented after User Button interrupt */
-__IO uint8_t    ubUserButtonClickEvent = RESET;  /* Event detection: Set after User Button interrupt */
-
 /* Variable to report ADC sequencer status */
-uint8_t         ubSequenceCompleted = RESET;     /* Set when all ranks of the sequence have been converted */
+uint8_t    ubSequenceCompleted = RESET;     /* Set when all ranks of the sequence have been converted */
 
 static void ADC_Config(void);
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-static void DAC_Config(void);
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
-
 void Error_Handler(uint8_t id);
 
-void ADC_CONFIG(void) 
+void ADC_EXAMPLE(void)
 {
+  /* Variables for ADC conversions results computation to physical values */
+  uint16_t   uhADCChannelToDAC_mVolt = 0;
+  uint16_t   uhVrefInt_mVolt = 0;
+   int32_t   wTemperature_DegreeCelsius = 0;
+	
   /* Configure the ADC peripheral */
   ADC_Config();
   
@@ -97,31 +83,7 @@ void ADC_CONFIG(void)
     Error_Handler(0);
   }
 
-
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-  /* Configure the DAC peripheral */
-  DAC_Config();
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
-  
-
   /*## Enable peripherals ####################################################*/
-  
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-  /* Set DAC Channel data register: channel corresponding to ADC channel CHANNELa */
-  /* Set DAC output to 1/2 of full range (4095 <=> Vdda=3.3V): 2048 <=> 1.65V              */
-  if (HAL_DAC_SetValue(&DacHandle, DACx_CHANNEL_TO_ADCx_CHANNELa, DAC_ALIGN_12B_R, RANGE_12BITS/2) != HAL_OK)
-  {
-    /* Setting value Error */
-    Error_Handler(1);
-  }
-  
-  /* Enable DAC Channel: channel corresponding to ADC channel CHANNELa */
-  if (HAL_DAC_Start(&DacHandle, DACx_CHANNEL_TO_ADCx_CHANNELa) != HAL_OK)
-  {
-    /* Start Error */
-    Error_Handler(2);
-  }
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
 
   /*## Start ADC conversions #################################################*/
   
@@ -135,41 +97,9 @@ void ADC_CONFIG(void)
     Error_Handler(3);
   }
   
-  
   /* Infinite loop */
   while (1)
   {
-
-    /* Wait for event on push button to perform following actions */
-    while ((ubUserButtonClickEvent) == RESET)
-    {
-    }
-    /* Reset variable for next loop iteration */
-    ubUserButtonClickEvent = RESET;
-
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-    /* Set DAC voltage on channel corresponding to ADCx_CHANNELa              */
-    /* in function of user button clicks count.                               */
-    /* Set DAC output successively to:                                        */
-    /*  - minimum of full range (0 <=> ground 0V)                             */
-    /*  - 1/4 of full range (4095 <=> Vdda=3.3V): 1023 <=> 0.825V             */
-    /*  - 1/2 of full range (4095 <=> Vdda=3.3V): 2048 <=> 1.65V              */
-    /*  - 3/4 of full range (4095 <=> Vdda=3.3V): 3071 <=> 2.475V             */
-    /*  - maximum of full range (4095 <=> Vdda=3.3V)                          */
-    if (HAL_DAC_SetValue(&DacHandle,
-                         DACx_CHANNEL_TO_ADCx_CHANNELa,
-                         DAC_ALIGN_12B_R,
-                         (RANGE_12BITS * ubUserButtonClickCount / USERBUTTON_CLICK_COUNT_MAX)
-                        ) != HAL_OK)
-    {
-      /* Start Error */
-      Error_Handler(4);
-    }
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
-
-    /* Wait for DAC settling time */
-    HAL_Delay(1);
-    
     /* Start ADC conversion */
     /* Since sequencer is enabled in discontinuous mode, this will perform    */
     /* the conversion of the next rank in sequencer.                          */
@@ -179,20 +109,17 @@ void ADC_CONFIG(void)
     /*       "HAL_ADC_Start_DMA()", this function will keep DMA transfer      */
     /*       active.                                                          */
     HAL_ADC_Start(&AdcHandle);
-      
+
     /* Wait for conversion completion before conditional check hereafter */
     HAL_ADC_PollForConversion(&AdcHandle, 1);
-    
-    /* Turn-on/off LED1 in function of ADC sequencer status */
-    /* - Turn-off if sequencer has not yet converted all ranks */    
-    /* - Turn-on if sequencer has converted all ranks */
+
     if (ubSequenceCompleted == RESET)
     {
-		printf("BSP_LED_Off");
+		// has not yet converted all ranks
     }
     else
     {
-		printf("BSP_LED_On");
+		// sequencer has converted all ranks
       
       /* Computation of ADC conversions raw data to physical values */
       /* Note: ADC results are transferred into array "aADCxConvertedValues"  */
@@ -201,6 +128,20 @@ void ADC_CONFIG(void)
       uhVrefInt_mVolt            = COMPUTATION_DIGITAL_12BITS_TO_VOLTAGE(aADCxConvertedValues[2]);
       wTemperature_DegreeCelsius = COMPUTATION_TEMPERATURE_STD_PARAMS(aADCxConvertedValues[1]);
 
+		printf("uhADCChannelToDAC_mVolt: %hu\n", uhADCChannelToDAC_mVolt);
+		printf("uhVrefInt_mVolt: %hu\n", uhVrefInt_mVolt);
+		printf("wTemperature_DegreeCelsius: %d\n", wTemperature_DegreeCelsius);
+		
+//		  extern DAC_HandleTypeDef    DacHandle;
+//		  /*##-3- Set DAC Channel1 DHR register ######################################*/
+//		  if (HAL_DAC_SetValue(&DacHandle, DAC_CHANNEL_1, DAC_ALIGN_8B_R, aADCxConvertedValues[0]*0xFFF0U/RANGE_12BITS) != HAL_OK)
+//		  {
+//			/* Setting value Error */
+//			Error_Handler(2);
+//		  }
+		
+		HAL_Delay(800);
+		
       /* Reset variable for next loop iteration */
       ubSequenceCompleted = RESET;
     }
@@ -255,7 +196,6 @@ static void ADC_Config(void)
   sConfig.Channel      = ADC_CHANNEL_TEMPSENSOR;
   sConfig.Rank         = ADC_REGULAR_RANK_2;
 
-  
   if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig) != HAL_OK)
   {
     /* Channel Configuration Error */
@@ -267,45 +207,12 @@ static void ADC_Config(void)
   sConfig.Channel      = ADC_CHANNEL_VREFINT;
   sConfig.Rank         = ADC_REGULAR_RANK_3;
 
-  
   if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig) != HAL_OK)
   {
     /* Channel Configuration Error */
     Error_Handler(23);
   }
-  
 }
-
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-/**
-  * @brief  DAC configuration
-  * @param  None
-  * @retval None
-  */
-static void DAC_Config(void)
-{
-  static DAC_ChannelConfTypeDef sConfig;
-
-  /* Configuration of DACx peripheral */
-  DacHandle.Instance = DACx;
-
-  if (HAL_DAC_Init(&DacHandle) != HAL_OK)
-  {
-    /* DAC initialization error */
-    Error_Handler(30);
-  }
-
-  /* Configuration of DAC channel */
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-
-  if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DACx_CHANNEL_TO_ADCx_CHANNELa) != HAL_OK)
-  {
-    /* Channel configuration error */
-    Error_Handler(31);
-  }
-}
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
 
 /**
   * @brief  Conversion complete callback in non blocking mode
@@ -412,7 +319,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
   HAL_NVIC_SetPriority(ADCx_DMA_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(ADCx_DMA_IRQn);
   
-
   /* NVIC configuration for ADC interrupt */
   /* Priority: high-priority */
   HAL_NVIC_SetPriority(ADCx_IRQn, 0, 0);
@@ -453,58 +359,3 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
   /* Disable the NVIC configuration for ADC interrupt */
   HAL_NVIC_DisableIRQ(ADCx_IRQn);
 }
-
-#if defined(WAVEFORM_VOLTAGE_GENERATION_FOR_TEST)
-/**
-  * @brief DAC MSP initialization
-  *        This function configures the hardware resources used in this example:
-  *          - Enable clock of peripheral
-  *          - Configure the GPIO associated to the peripheral channels
-  *          - Configure the NVIC associated to the peripheral interruptions
-  * @param hdac: DAC handle pointer
-  * @retval None
-  */
-void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
-{
-  GPIO_InitTypeDef          GPIO_InitStruct;
-  
-  /*##-1- Enable peripherals and GPIO Clocks #################################*/
-  /* Enable GPIO clock */
-  DACx_CHANNEL_GPIO_CLK_ENABLE();
-  /* DAC peripheral clock enable */
-  DACx_CLK_ENABLE();
-  
-  /*##-2- Configure peripheral GPIO ##########################################*/
-  /* Configure GPIO pin of the selected DAC channel */
-  GPIO_InitStruct.Pin = DACx_CHANNEL_TO_ADCx_CHANNELa_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(DACx_CHANNEL_TO_ADCx_CHANNELa_GPIO_PORT, &GPIO_InitStruct);
-  
-  /*##-3- Configure the NVIC #################################################*/
-  /* Note: On this device, DAC has no interruption (no underrun IT) */
-}
-
-/**
-  * @brief DAC MSP de-initialization
-  *        This function frees the hardware resources used in this example:
-  *          - Disable clock of peripheral
-  *          - Revert GPIO associated to the peripheral channels to their default state
-  *          - Revert NVIC associated to the peripheral interruptions to its default state
-  * @param hadc: DAC handle pointer
-  * @retval None
-  */
-void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac)
-{
-  /*##-1- Reset peripherals ##################################################*/
-  DACx_FORCE_RESET();
-  DACx_RELEASE_RESET();
-
-  /*##-2- Disable peripherals and GPIO Clocks ################################*/
-  /* De-initialize GPIO pin of the selected DAC channel */
-  HAL_GPIO_DeInit(DACx_CHANNEL_TO_ADCx_CHANNELa_GPIO_PORT, DACx_CHANNEL_TO_ADCx_CHANNELa_PIN);
-
-  /*##-3- Disable the NVIC for DAC ###########################################*/
-  /* Note: On this device, DAC has no interruption (no underrun IT) */
-}
-#endif /* WAVEFORM_VOLTAGE_GENERATION_FOR_TEST */
