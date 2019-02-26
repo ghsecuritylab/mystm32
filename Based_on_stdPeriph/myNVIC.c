@@ -16,3 +16,8 @@ void NVIC_CONFIG(uint8_t IRQChannel, uint8_t PreemptionPriority, uint8_t SubPrio
 	nvic_init_t.NVIC_IRQChannelSubPriority = SubPriority;
 	NVIC_Init(&nvic_init_t);
 }
+
+void NVIC_Systick(void)
+{
+	NVIC_SetPriority(SysTick_IRQn, 0x00);
+}

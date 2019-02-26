@@ -1,19 +1,19 @@
 #include "mylib.h"
 // DMA1 有7个通道，DMA2 有5个通道；DMA1 优先级高于 DMA2
 
-void DMA_ADC_Config(ADC_TypeDef *ADCX, uint32_t DMA_, DMA_Channel_TypeDef *DMAX_ChannelX, uint16_t dest[], uint32_t ArrayLength)
+void DMA_ADC_Config(ADC_TypeDef *ADCx, uint32_t DMA_CLK, DMA_Channel_TypeDef *DMAx_Channelx, uint16_t dest[], uint32_t ArrayLength)
 {
 	DMA_InitTypeDef dma_init_t;
 	
 	// 开启DMA时钟
-	RCC_AHBPeriphClockCmd(DMA_, ENABLE);
+	RCC_AHBPeriphClockCmd(DMA_CLK, ENABLE);
 	
 	// 复位DMA
-	DMA_DeInit(DMAX_ChannelX);
+	DMA_DeInit(DMAx_Channelx);
 
 	// 设置DMA源地址：串口数据寄存器地址
-	// ADC1 转换结果保存在DR寄存器，串口为(USARTX_BASE+0x04)
-	dma_init_t.DMA_PeripheralBaseAddr = (uint32_t)&(ADCX->DR);
+	// ADCx 转换结果保存在DR寄存器，串口为(USARTX_BASE+0x04)
+	dma_init_t.DMA_PeripheralBaseAddr = (uint32_t)&(ADCx->DR);
 	// 存储器地址
 	dma_init_t.DMA_MemoryBaseAddr = (uint32_t)dest;
 	// 外设地址不增
@@ -36,7 +36,7 @@ void DMA_ADC_Config(ADC_TypeDef *ADCX, uint32_t DMA_, DMA_Channel_TypeDef *DMAX_
 	// 设置的优先级相同时，通道编号越低优先级越高
 	dma_init_t.DMA_Priority = DMA_Priority_High;
 	// 配置DMA通道
-	DMA_Init(DMAX_ChannelX, &dma_init_t);
-	// 使能DMA
-	DMA_Cmd(DMAX_ChannelX, ENABLE);
+	DMA_Init(DMAx_Channelx, &dma_init_t);
+	// 使能DMA通道
+	DMA_Cmd(DMAx_Channelx, ENABLE);
 }

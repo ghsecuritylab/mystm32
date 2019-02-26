@@ -68,9 +68,9 @@ void TIM_PWMOUT_CONFIG()
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	TIM_CH1_APBxClkCmd(TIM_CH1_CLK, ENABLE);
-	TIM_CH2_APBxClkCmd(TIM_CH2_CLK, ENABLE);
-	TIM_CH3_APBxClkCmd(TIM_CH3_CLK, ENABLE);
-	TIM_CH4_APBxClkCmd(TIM_CH4_CLK, ENABLE);
+//	TIM_CH2_APBxClkCmd(TIM_CH2_CLK, ENABLE);
+//	TIM_CH3_APBxClkCmd(TIM_CH3_CLK, ENABLE);
+//	TIM_CH4_APBxClkCmd(TIM_CH4_CLK, ENABLE);
 	
 //	TIM_CHNClockCmd(TIM_CHN, ENABLE);
 //	TIM_BKINClockCmd(TIM_BKIN, ENABLE);
@@ -87,14 +87,14 @@ void TIM_PWMOUT_CONFIG()
 //	GPIO_Init(GPIO_BKIN, &gpio_init_t);
 //	GPIO_ResetBits(GPIO_BKIN, GPIO_BKIN_Pin);
 	
-	gpio_init_t.GPIO_Pin = TIM_CH2_PIN;
-	GPIO_Init(TIM_CH2_PORT, &gpio_init_t);
-	
-	gpio_init_t.GPIO_Pin = TIM_CH3_PIN;
-	GPIO_Init(TIM_CH3_PORT, &gpio_init_t);
-	
-	gpio_init_t.GPIO_Pin = TIM_CH4_PIN;
-	GPIO_Init(TIM_CH4_PORT, &gpio_init_t);
+//	gpio_init_t.GPIO_Pin = TIM_CH2_PIN;
+//	GPIO_Init(TIM_CH2_PORT, &gpio_init_t);
+//	
+//	gpio_init_t.GPIO_Pin = TIM_CH3_PIN;
+//	GPIO_Init(TIM_CH3_PORT, &gpio_init_t);
+//	
+//	gpio_init_t.GPIO_Pin = TIM_CH4_PIN;
+//	GPIO_Init(TIM_CH4_PORT, &gpio_init_t);
 	
 	TIM_APBxClkCmd(TIM_CLK, ENABLE);
 	
@@ -119,12 +119,12 @@ void TIM_PWMOUT_CONFIG()
 	
 	TIM_OC_CH1_Init(TIMx, &oc_init_t);	// 配置通道1
 	TIM_OC_CH1_PreloadConfig(TIMx, TIM_OCPreload_Enable);
-	TIM_OC_CH2_Init(TIMx, &oc_init_t);	// 配置通道2
-	TIM_OC_CH2_PreloadConfig(TIMx, TIM_OCPreload_Enable);
-	TIM_OC_CH3_Init(TIMx, &oc_init_t);	// 配置通道3
-	TIM_OC_CH3_PreloadConfig(TIMx, TIM_OCPreload_Enable);
-	TIM_OC_CH4_Init(TIMx, &oc_init_t);	// 配置通道4
-	TIM_OC_CH4_PreloadConfig(TIMx, TIM_OCPreload_Enable);
+//	TIM_OC_CH2_Init(TIMx, &oc_init_t);	// 配置通道2
+//	TIM_OC_CH2_PreloadConfig(TIMx, TIM_OCPreload_Enable);
+//	TIM_OC_CH3_Init(TIMx, &oc_init_t);	// 配置通道3
+//	TIM_OC_CH3_PreloadConfig(TIMx, TIM_OCPreload_Enable);
+//	TIM_OC_CH4_Init(TIMx, &oc_init_t);	// 配置通道4
+//	TIM_OC_CH4_PreloadConfig(TIMx, TIM_OCPreload_Enable);
 	
 //	// 初始化刹车
 //	TIM_BDTRInitTypeDef bdtr_init_t;
