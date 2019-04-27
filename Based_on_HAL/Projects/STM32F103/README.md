@@ -1,6 +1,6 @@
 # Applications
 
-## ADC_DAC (not implemented)
+## ADC_DAC
 
 - 读取模拟量，转换为数字量，再将数字量输出为模拟量
 - 移植自 f103 的 Examples\ 的 DAC 和 ADC 工程
@@ -35,3 +35,8 @@
 - 定义全局宏 SD_MODE_SPI 使用 SPI 方式，否则使用 SDIO 方式
 - USB 接线方式：DM/DP = PA11/PA12，DP 需要接 >1K 电阻上拉
 - 先运行程序，再将 USB 插入
+
+## 其它说明
+
+- 所谓 OTG 就是说产品既可以作为设备端又可以作为主机端
+- 只有 STM32F107 等支持 OTG 功能的 MCU 才可以用作 USB Host，STM32F103 只能用作 Device
